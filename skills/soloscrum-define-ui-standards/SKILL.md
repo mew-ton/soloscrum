@@ -6,68 +6,67 @@ user-invocable: false
 
 # soloscrum-define-ui-standards
 
-デザイントークン・パターンの規約。
+Design token and UI pattern conventions.
 
-## デザイントークン
+## Design Tokens
 
-プロジェクトのデザイントークンは Figma の Variables または Tokens Studio で管理する。
+Manage project design tokens in Figma Variables or Tokens Studio.
 
-### トークンカテゴリ
+### Token Categories
 
-| カテゴリ | 用途 |
+| Category | Purpose |
 |---|---|
-| `color` | ブランドカラー・セマンティックカラー |
-| `typography` | フォントファミリー・サイズ・ウェイト・行間 |
-| `spacing` | マージン・パディング・ギャップ |
-| `radius` | ボーダーラジウス |
-| `shadow` | ボックスシャドウ |
-| `motion` | トランジション時間・イージング |
+| `color` | Brand colors and semantic colors |
+| `typography` | Font family, size, weight, line height |
+| `spacing` | Margin, padding, gap |
+| `radius` | Border radius |
+| `shadow` | Box shadow |
+| `motion` | Transition duration and easing |
 
-### 命名規約
+### Naming Convention
 
 ```
 {category}/{semantic}/{variant}
 
-例:
+Examples:
 color/brand/primary
 color/status/error
 typography/body/md
 spacing/component/md
 ```
 
-## コンポーネント規約
+## Component Conventions
 
-### 必須 State
+### Required States
 
-全てのインタラクティブコンポーネントに以下を定義する:
+Define the following for all interactive components:
 
-| State | 必須 |
+| State | Required |
 |---|---|
-| Default | ✅ 必須 |
-| Hover | ✅ 必須（デスクトップ） |
-| Focus | ✅ 必須（アクセシビリティ） |
-| Active / Pressed | 任意 |
-| Disabled | ✅ 必須（disabled 状態がある場合） |
-| Loading | ✅ 必須（非同期処理がある場合） |
-| Error | ✅ 必須（入力バリデーションがある場合） |
+| Default | ✅ Required |
+| Hover | ✅ Required (desktop) |
+| Focus | ✅ Required (accessibility) |
+| Active / Pressed | Optional |
+| Disabled | ✅ Required (when disabled state exists) |
+| Loading | ✅ Required (when async operations exist) |
+| Error | ✅ Required (when input validation exists) |
 
-### アクセシビリティ
+### Accessibility
 
-| 基準 | 値 |
+| Standard | Value |
 |---|---|
-| テキストコントラスト比 | WCAG AA: 4.5:1 以上（通常テキスト） |
-| 大きいテキストコントラスト比 | WCAG AA: 3:1 以上（18px 以上） |
-| タッチターゲットサイズ | 44px × 44px 以上 |
-| フォーカスインジケーター | 視認できる強調表示 |
+| Text contrast ratio | WCAG AA: 4.5:1 or above (normal text) |
+| Large text contrast ratio | WCAG AA: 3:1 or above (18px or larger) |
+| Touch target size | 44px × 44px or larger |
+| Focus indicator | Visibly highlighted |
 
-## 新規パターン追加
+## Adding New Patterns
 
-既存パターンで対応できない場合:
-1. ユーザーに確認してから制作する
-2. Figma のコンポーネントライブラリに追加する
-3. 命名・使用基準を Figma のコンポーネント説明に記載する
+When existing patterns cannot cover a use case:
+1. Confirm with user before creating
+2. Add to Figma component library
+3. Document naming and usage criteria in the Figma component description
 
-## 注意
+## Notes
 
-このファイルは汎用の初期値である。プロジェクト固有のデザイントークン・パターンは  
-Figma ファイルまたは `.claude/rules/` で上書き定義する。
+This file contains generic initial values. Project-specific design tokens and patterns should override these in the Figma file or in `.claude/rules/`.

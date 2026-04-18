@@ -6,36 +6,36 @@ user-invocable: false
 
 # soloscrum-define-dod
 
-Definition of Done（汎用）。
+Definition of Done (generic).
 
-## DoD チェックリスト
+## DoD Checklist
 
-- [ ] ACが全て満たされている
-- [ ] テストが存在する（対象がある場合）
-- [ ] PR本文にIssue番号が含まれる（`Closes #N` または `Fixes #N` 形式）
-- [ ] Lintエラーゼロ
-- [ ] レビューがpassしている
+- [ ] All AC are satisfied
+- [ ] Tests exist (when applicable)
+- [ ] PR body contains Issue number (`Closes #N` or `Fixes #N` format)
+- [ ] Zero lint errors
+- [ ] Review has passed
 
-## 各項目の判断基準
+## Criteria for Each Item
 
-### AC が全て満たされている
-- Issue に記載された全ての AC チェックボックスが満たされている
-- 動作確認済みで証跡がある（スクリーンショット・テスト結果等）
+### All AC are satisfied
+- All AC checkboxes in the Issue are met
+- Behavior has been verified with evidence (screenshots, test results, etc.)
 
-### テストが存在する（対象がある場合）
-- 対象がない場合: ロジックを持たない設定変更・ドキュメント修正等
-- 対象がある場合: ビジネスロジック・API エンドポイント・ユーティリティ関数等
+### Tests exist (when applicable)
+- Not applicable: configuration changes with no logic, documentation updates, etc.
+- Applicable: business logic, API endpoints, utility functions, etc.
 
-### PR 本文に Issue 番号が含まれる
-- `Closes #123` / `Fixes #123` / `Resolves #123` のいずれかが本文に存在する
+### PR body contains Issue number
+- One of `Closes #123` / `Fixes #123` / `Resolves #123` must appear in the PR body
 
-### Lint エラーゼロ
-- プロジェクトの Lint 設定（ESLint・Prettier・Rubocop等）でエラーが出ない
-- Warning は許容するが、エラーは不可
+### Zero lint errors
+- No errors from the project's lint configuration (ESLint, Prettier, Rubocop, etc.)
+- Warnings are acceptable; errors are not
 
-### レビューがpassしている
-- `review-agent` による自動レビューで Pass 判定を得ている
+### Review has passed
+- Pass verdict obtained from `review-agent` automated review
 
-## リポジトリ固有の追加 DoD
+## Repository-Specific Additional DoD
 
-`.claude/rules/dod-extra.md` で定義する（soloscrum 本体には含めない）。
+Define in `.claude/rules/dod-extra.md` (not included in the soloscrum core).

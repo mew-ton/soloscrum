@@ -7,37 +7,37 @@ disable-model-invocation: true
 
 # /status
 
-現在の作業状況を確認する。
+Show current work status.
 
-## 動作
+## Behavior
 
-1. Linear MCP で現在の状況を取得
-   - In Progress の subtask 一覧
-   - In Review の subtask 一覧
-   - 直近で完了した subtask
-2. GitHub で対応する PR の状況を確認
-3. 状況サマリーを提示
+1. Fetch current state from Linear MCP:
+   - In Progress subtasks
+   - In Review subtasks
+   - Recently completed subtasks
+2. Check corresponding PR status on GitHub
+3. Present status summary
 
-## 入力
+## Input
 
-なし（オプションで Issue 番号を指定して絞り込み可: `$ARGUMENTS`）
+None (optionally specify issue number to filter: `$ARGUMENTS`)
 
-## 出力
+## Output
 
 ```
-## 作業状況
+## Work Status
 
 ### In Progress
-- [subtask] タイトル (SP: X) — type: develop/design-ui
+- [subtask] Title (SP: X) — type: develop/design-ui
 
 ### In Review
-- [subtask] タイトル — PR #N / Figma URL
+- [subtask] Title — PR #N / Figma URL
 
-### 直近完了
-- [subtask] タイトル — Done
+### Recently Completed
+- [subtask] Title — Done
 ```
 
-## 使用リソース
+## Resources
 
-- Linear MCP（直接）
-- GitHub MCP（PR 状況確認）
+- Linear MCP (direct)
+- GitHub MCP (PR status check)

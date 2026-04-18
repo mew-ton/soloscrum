@@ -7,35 +7,35 @@ disable-model-invocation: true
 
 # /design-ui
 
-design-ui subtaskをFigmaで制作する。
+Design a design-ui subtask in Figma.
 
-## 動作
+## Behavior
 
-1. 対象 Linear subtask（type: design-ui）を受け取る（`$ARGUMENTS`）
-2. `ui-agent` を起動し以下を実行させる
-   - `soloscrum-define-ui-standards` を参照してデザイントークン・パターン確認
-   - Figma MCP でデザイン制作
-     - コンポーネント制作
-     - デザイントークン適用
-     - UIパターン整合性確認
-   - State 遷移図の作成（該当する場合）
-   - `soloscrum-define-dod` で DoD 確認
-3. Linear subtask を In Review にステート遷移
-4. ユーザーに Figma URL を提示
+1. Receive target Linear subtask (type: design-ui) (`$ARGUMENTS`)
+2. Launch `ui-agent` to:
+   - Check design tokens and pattern conventions via `soloscrum-define-ui-standards`
+   - Produce design in Figma MCP:
+     - Component creation
+     - Design token application
+     - UI pattern consistency check
+   - Create state transition diagram (if applicable)
+   - Verify DoD with `soloscrum-define-dod`
+3. Transition Linear subtask to In Review
+4. Present Figma URL to user
 
-## 入力
+## Input
 
-- Linear subtask URL または ID
-- （省略時）Linear の In Progress 状態の subtask を自動選択
+- Linear subtask URL or ID
+- (If omitted) auto-select the subtask in Linear In Progress state
 
-## 出力
+## Output
 
-- 制作された Figma ファイル URL
-- デザインサマリー
-- DoD チェックリスト結果
+- Created Figma file URL
+- Design summary
+- DoD checklist result
 
-## 使用リソース
+## Resources
 
 - Subagent: `ui-agent`
 - Skills: `soloscrum-design-ui-task`, `soloscrum-define-ui-standards`, `soloscrum-define-dod`
-- MCP: Figma MCP（`mcp.figma.com/mcp`）
+- MCP: Figma MCP (`mcp.figma.com/mcp`)

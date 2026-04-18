@@ -6,9 +6,9 @@ user-invocable: false
 
 # soloscrum-define-branch-commit
 
-ブランチ命名・コミット規約。
+Branch naming and commit conventions.
 
-## ブランチ命名
+## Branch Naming
 
 ```
 {type}/{issue-id}-{slug}
@@ -16,36 +16,36 @@ user-invocable: false
 
 ### type
 
-| type | 用途 |
+| type | Purpose |
 |---|---|
-| `feat` | 新機能 |
-| `fix` | バグ修正 |
-| `refactor` | リファクタリング |
-| `docs` | ドキュメント |
-| `chore` | ビルド・ツール・依存関係 |
-| `test` | テスト追加・修正 |
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Refactoring |
+| `docs` | Documentation |
+| `chore` | Build, tooling, dependencies |
+| `test` | Test additions and fixes |
 
 ### issue-id
 
-- GitHub Issue 番号（例: `123`）
-- Linear subtask ID（例: `PRJ-42`）
+- GitHub Issue number (e.g. `123`)
+- Linear subtask ID (e.g. `PRJ-42`)
 
 ### slug
 
-- Issue タイトルをケバブケースに変換
-- 最大 30 文字
-- 英小文字・数字・ハイフンのみ
+- Issue title converted to kebab-case
+- 30 characters maximum
+- Lowercase letters, numbers, and hyphens only
 
-### 例
+### Examples
 
 ```
 feat/123-user-password-reset
 fix/PRJ-42-auth-token-expiry
 ```
 
-## コミット規約
+## Commit Conventions
 
-[Conventional Commits](https://www.conventionalcommits.org/) を使用する。
+Use [Conventional Commits](https://www.conventionalcommits.org/).
 
 ```
 {type}({scope}): {description}
@@ -59,7 +59,7 @@ fix/PRJ-42-auth-token-expiry
 
 `feat` / `fix` / `refactor` / `docs` / `chore` / `test` / `style` / `perf`
 
-### 例
+### Example
 
 ```
 feat(auth): add password reset endpoint
@@ -70,7 +70,7 @@ verification flow.
 Closes #123
 ```
 
-## 注意
+## Notes
 
-- リポジトリ固有のブランチ戦略は `.claude/rules/branch.md` を優先する
-- main / master への直接コミットは行わない
+- Repository-specific branch strategy in `.claude/rules/branch.md` takes precedence
+- Never commit directly to main / master

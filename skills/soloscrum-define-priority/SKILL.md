@@ -6,34 +6,34 @@ user-invocable: false
 
 # soloscrum-define-priority
 
-優先度の定義と判断基準。
+Priority level definitions and decision criteria.
 
-## 優先度テーブル
+## Priority Table
 
-| 優先度 | 判断基準 | 対応目安 |
+| Priority | Decision criteria | Response target |
 |---|---|---|
-| **Urgent** | ブロッカー・本番障害・セキュリティ脆弱性 | 即時対応 |
-| **High** | ユーザー影響が大きい・他 Issue が依存している | 次のサイクルで対応 |
-| **Medium** | 通常の機能開発・改善 | バックログ順に対応 |
-| **Low** | 技術的負債・リファクタリング・Nice to Have | 余裕があれば対応 |
+| **Urgent** | Blocker, production outage, security vulnerability | Immediate |
+| **High** | High user impact, other Issues depend on this | Next cycle |
+| **Medium** | Normal feature development and improvements | Process in backlog order |
+| **Low** | Tech debt, refactoring, nice-to-have | When capacity allows |
 
-## 判定フロー
+## Decision Flow
 
 ```
-本番で動かない or データが失われる可能性がある？
+Production down or risk of data loss?
   → YES: Urgent
 
-他のタスクがこれを待っている or ユーザーへの影響が大きい？
+Other tasks are waiting on this, or high user impact?
   → YES: High
 
-通常の機能開発・改善か？
+Normal feature development or improvement?
   → YES: Medium
 
-それ以外（技術的負債・将来のための改善）？
+Other (tech debt, future improvements)?
   → Low
 ```
 
-## 注意
+## Notes
 
-- 個人開発では Urgent / High が重なることが多い。Urgent は真に緊急なものだけに絞る
-- Medium が積み上がりすぎたら Low に降格して棚上げを検討する
+- In solo development, Urgent and High often overlap. Reserve Urgent for genuinely time-critical situations only.
+- If Medium items accumulate too much, consider downgrading to Low and deferring them.

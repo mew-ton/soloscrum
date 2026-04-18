@@ -6,68 +6,66 @@ user-invocable: false
 
 # soloscrum-define-story-points
 
-SPの定義と算出基準。
+SP definition and estimation criteria.
 
-## SP の二段階構造
+## Two-Level SP Structure
 
-soloscrum では SP の見積もりを **Issue レベル（PO レイヤー）** と **subtask レベル（Dev レイヤー）** の二段階で行う。
+soloscrum uses SP estimation at two levels: **Issue level (PO layer)** and **subtask level (Dev layer)**.
 
-### なぜ二段階なのか
+### Why Two Levels?
 
-タスクは原則として無限に細分化できる。「アプリを実装する」「認証機能を作る」「ログイン画面を作る」のように、ルートに置くタスクのスコープは自由に設定できる。
+Tasks can be decomposed infinitely. The scope of a root task is entirely flexible — "implement the app", "build the auth feature", "build the login screen" are all valid roots. Because of this, a layer is needed before breakdown to ask: "is this Issue actually a manageable size?" Entering breakdown with an oversized Issue causes subtask explosion and makes tracking unmanageable.
 
-このため、breakdown（subtask分解）の前に「このIssueはそもそも管理可能な粒度か」を判断するレイヤーが必要になる。粒度が大きすぎるまま breakdown に進むと、subtask が膨大になり管理が破綻する。
+The lightweight estimate in the PO layer serves as this **entry gate**.
 
-PO レイヤーでの軽量見積もりは、この **入口ゲート** として機能する。
+### Issue SP (PO Layer)
 
-### Issue SP（PO レイヤー）
+- **Purpose**: Determine whether the Issue is a manageable size
+- **Owner**: `po-agent` (during `/refine`)
+- **Precision**: Rough is fine. Estimate from intuition without detailing every aspect
+- **Threshold**: Trigger `suggest_split` when SP > 5 or estimated days > 2
+- **Registered in Linear**: No — this is a size-check value only
 
-- **目的**: Issue が管理可能な粒度かどうかを判定する
-- **実施者**: `po-agent`（`/refine` 時）
-- **精度**: 大まかで構わない。細部まで詰めずに概算する
-- **閾値**: SP 5 超、または推定2日超で `suggest_split` を実行する
-- **Linear への登録**: しない（あくまで粒度チェック用）
+When Issue SP exceeds the threshold, split the Issue per `soloscrum-define-issue-size` and re-estimate.
 
-Issue SP が閾値を超えた場合は、`soloscrum-define-issue-size` の基準に従ってIssueを分割し、再見積もりする。
+### Subtask SP (Dev Layer)
 
-### subtask SP（Dev レイヤー）
-
-- **目的**: Linear に登録する実値。実装の計画・進捗管理に使う
-- **実施者**: `dev-agent`（`/breakdown` 時）
-- **精度**: AC・影響ファイル数・新規性を精査した上で算出する
-- **Linear への登録**: する（subtask の estimate フィールドにセット）
+- **Purpose**: The actual value registered in Linear, used for planning and progress tracking
+- **Owner**: `dev-agent` (during `/breakdown`)
+- **Precision**: Calculate after carefully reviewing AC, affected files, and novelty
+- **Registered in Linear**: Yes — set on the subtask's estimate field
 
 ---
 
-## SP テーブル
+## SP Table
 
-| SP | 目安工数 | 複雑度の目安 |
+| SP | Estimated effort | Complexity guide |
 |---|---|---|
-| 1 | 2時間以内 | 明確な変更、1〜2ファイル、テスト容易 |
-| 2 | 半日（〜4時間） | 小規模な機能追加、3〜5ファイル |
-| 3 | 1日（〜8時間） | 中規模な機能追加、複数コンポーネント連携 |
-| 5 | 2日（〜16時間） | 大規模な機能追加、新しいパターン導入 |
-| 5超 | 出さない | → Issue を分割して再見積もりする |
+| 1 | Up to 2 hours | Clear change, 1-2 files, easy to test |
+| 2 | Half day (~4 hours) | Small feature addition, 3-5 files |
+| 3 | 1 day (~8 hours) | Medium feature addition, multiple components |
+| 5 | 2 days (~16 hours) | Large feature addition, new patterns introduced |
+| >5 | Do not use | → Split the Issue and re-estimate |
 
-SP テーブルは Issue SP・subtask SP 共通で使用する。
+The SP table is shared by both Issue SP and subtask SP.
 
-## 算出手順
+## Estimation Procedure
 
-### Issue SP（PO レイヤー）
+### Issue SP (PO Layer)
 
-1. Issue の Goal と AC の量・複雑さを概観する
-2. 「この Issue を一人で実装するとしたら何日かかるか」を直感で見積もる
-3. SP テーブルに当てはめる
-4. SP 5 超または推定2日超の場合は Issue を分割する
+1. Survey the volume and complexity of the Issue's Goal and AC
+2. Estimate intuitively: "How many days would it take one person to implement this?"
+3. Map to the SP table
+4. If SP > 5 or estimated days > 2, split the Issue
 
-### subtask SP（Dev レイヤー）
+### Subtask SP (Dev Layer)
 
-1. subtask の AC 数・影響ファイル数・新規性を評価する
-2. 不確実性が高い場合は 1 段階上げる
-3. SP 5 を超える見積もりになる場合は Issue 分割が漏れている可能性があるためユーザーに確認する
+1. Evaluate AC count, affected file count, and novelty of the subtask
+2. Increase by one step if uncertainty is high
+3. If estimate exceeds SP 5, a missed Issue split is likely — confirm with user
 
-## 注意
+## Notes
 
-- SP はコード行数ではなく**複雑度と不確実性**で決める
-- 個人開発なのでチームの平均速度は考慮しない
-- 過去の実績と照らして過小・過大評価を避ける
+- SP measures **complexity and uncertainty**, not lines of code
+- Solo development — do not factor in team velocity
+- Avoid under- or over-estimation by comparing against past experience

@@ -7,33 +7,33 @@ disable-model-invocation: true
 
 # /validate
 
-機能設計の妥当性を検証する。
+Validate feature design for feasibility.
 
-## 動作
+## Behavior
 
-1. 対象 Issue（またはアイデア）を受け取る（`$ARGUMENTS`）
-2. `design-agent` を起動し以下を実行させる
-   - 機能設計の妥当性評価（`soloscrum-define-design-criteria` 基準）
-   - スコープの明確性チェック
-   - 依存関係の洗い出し
-   - 技術的実現可能性の評価
-3. 検証結果をユーザーに提示
-4. 問題があれば修正案を提案
+1. Receive target Issue or idea (`$ARGUMENTS`)
+2. Launch `design-agent` to:
+   - Evaluate feature design validity (`soloscrum-define-design-criteria` criteria)
+   - Check scope clarity
+   - Identify dependencies
+   - Assess technical feasibility
+3. Present validation results to user
+4. Propose fixes if issues are found
 
-## 入力
+## Input
 
-- GitHub Issue URL または Issue 番号
-- Issue 本文（直接テキストでも可）
+- GitHub Issue URL or issue number
+- Issue body (direct text also accepted)
 
-## 出力
+## Output
 
-- 妥当性評価レポート
-  - スコープ明確性: OK / 要修正
-  - 依存関係リスト
-  - 技術的懸念点（あれば）
-  - 推奨アクション
+- Validation report
+  - Scope clarity: OK / Needs revision
+  - Dependency list
+  - Technical concerns (if any)
+  - Recommended action
 
-## 使用リソース
+## Resources
 
 - Subagent: `design-agent`
 - Skills: `soloscrum-validate-feature`, `soloscrum-define-design-criteria`

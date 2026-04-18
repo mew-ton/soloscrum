@@ -8,52 +8,52 @@ allowed-tools: Read Glob Grep
 
 # soloscrum-review-implementation
 
-DoD照合・コード品質・クローズ判断を行う。
+Verify DoD, code quality, and make close decision.
 
-## 概要
+## Overview
 
-PR または Figma ファイルを受け取り、DoD・AC・コード品質を評価する。Pass / Fail を判定し、Pass の場合はクローズ手続きを実行する。
+Receives a PR or Figma file, evaluates DoD, AC, and code quality. Makes Pass / Fail verdict and executes close procedure on Pass.
 
-## 手順
+## Steps
 
-1. 対象の PR または Figma ファイルと対応 Issue を読み込む: $ARGUMENTS
-2. `soloscrum-define-dod` の全項目を確認する
-   - AC が全て満たされているか
-   - テストが存在するか（対象がある場合）
-   - PR 本文に Issue 番号が含まれるか
-   - Lint エラーゼロか
-3. コードレビュー（PR の場合）
-   - ロジックの正確性
-   - セキュリティ: OWASP Top 10 観点
-   - パフォーマンス: 明らかなボトルネックがないか
-   - 可読性・保守性
-4. 全評価結果をまとめてレポートを作成する
-5. **Pass 判定の場合**
-   - PR にレビュー Approve
-   - Linear subtask を Done に遷移
-   - 全 subtask 完了確認
-   - 全完了であれば GitHub Issue をクローズ
-6. **Fail 判定の場合**
-   - 具体的な指摘と改善案を PR にコメント
-   - Linear subtask を In Progress に差し戻し
+1. Read target PR or Figma file and corresponding Issue: $ARGUMENTS
+2. Verify all items in `soloscrum-define-dod`:
+   - Are all AC satisfied?
+   - Do tests exist (when applicable)?
+   - Does PR body contain Issue number?
+   - Zero lint errors?
+3. Code review (for PRs):
+   - Logic correctness
+   - Security: OWASP Top 10 perspective
+   - Performance: no obvious bottlenecks
+   - Readability and maintainability
+4. Compile all evaluation results into a report
+5. **On Pass:**
+   - Approve PR review
+   - Transition Linear subtask to Done
+   - Confirm all subtasks complete
+   - Close GitHub Issue if all complete
+6. **On Fail:**
+   - Comment specific issues and improvement suggestions on PR
+   - Revert Linear subtask to In Progress
 
-## 出力形式
+## Output Format
 
 ```
-## レビュー結果
+## Review Result
 
-### DoD チェック
-- [x] AC が全て満たされている
-- [x] テストが存在する
-- [x] PR 本文に Issue 番号が含まれる
-- [x] Lint エラーゼロ
+### DoD Check
+- [x] All AC satisfied
+- [x] Tests exist
+- [x] PR body contains Issue number
+- [x] Zero lint errors
 
-### 指摘事項
-- [あれば具体的に]
+### Issues
+- [specific details if any]
 
-### 判定: Pass / Fail
+### Verdict: Pass / Fail
 ```
 
-## 依存スキル
+## Depends On
 
 - `soloscrum-define-dod`

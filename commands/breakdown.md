@@ -7,33 +7,33 @@ disable-model-invocation: true
 
 # /breakdown
 
-IssueをLinear subtaskに分解しタイプを付与する。
+Break an Issue into Linear subtasks with type and story points.
 
-## 動作
+## Behavior
 
-1. 対象 Issue を受け取る（`$ARGUMENTS`）
-2. `design-agent` が粒度・タイプ設計を実行
-   - subtask への分解方針を策定
-   - 各 subtask にタイプ付与（`soloscrum-define-task-type` 基準）
-   - `soloscrum-validate-feature` で分解の妥当性を確認
-3. ユーザーに分解案を提示・確認
-4. 承認後、`dev-agent` が Linear MCP で subtask を登録
-   - SP 算出（`soloscrum-define-story-points` 基準）
-   - タスクタイプをラベルとして付与
+1. Receive target Issue (`$ARGUMENTS`)
+2. `design-agent` performs size and type design:
+   - Plan subtask decomposition strategy
+   - Assign type to each subtask (`soloscrum-define-task-type` criteria)
+   - Verify decomposition validity with `soloscrum-validate-feature`
+3. Present breakdown proposal to user for confirmation
+4. Upon approval, `dev-agent` registers subtasks in Linear via MCP:
+   - Calculate SP (`soloscrum-define-story-points` criteria)
+   - Assign task type as label
 
-## 入力
+## Input
 
-- GitHub Issue URL または Issue 番号
+- GitHub Issue URL or issue number
 
-## 出力
+## Output
 
-- 作成された Linear subtask リスト
-  - タイトル
-  - タイプ（develop / design-ui）
+- Created Linear subtask list
+  - Title
+  - Type (develop / design-ui)
   - SP
-  - 説明
+  - Description
 
-## 使用リソース
+## Resources
 
-- Subagents: `design-agent`（粒度・タイプ設計）, `dev-agent`（subtask 登録）
+- Subagents: `design-agent` (size and type design), `dev-agent` (subtask registration)
 - Skills: `soloscrum-validate-feature`, `soloscrum-define-task-type`, `soloscrum-split-into-tasks`, `soloscrum-define-story-points`

@@ -6,39 +6,39 @@ user-invocable: false
 
 # soloscrum-define-task-type
 
-subtaskタイプ（develop / design-ui）と付与基準。
+Subtask type definitions (develop / design-ui) and assignment criteria.
 
-## タイプ定義
+## Type Definitions
 
-| タイプ | 定義 | 担当 subagent |
+| Type | Definition | Assigned agent |
 |---|---|---|
-| `develop` | コード変更を伴う全ての作業 | `dev-agent` |
-| `design-ui` | Figma・デザイントークン・UIパターンの作業 | `ui-agent` |
+| `develop` | Any work involving code changes | `dev-agent` |
+| `design-ui` | Figma, design tokens, and UI pattern work | `ui-agent` |
 
-## 付与基準
+## Assignment Criteria
 
-### `develop` を付与する場合
+### Assign `develop` when:
 
-- バックエンド実装（API、DB、バッチ等）
-- フロントエンド実装（ロジック、状態管理、APIコール等）
-- コンポーネントの動作実装（デザインが確定した後の実装）
-- テスト実装
-- インフラ設定
+- Backend implementation (API, DB, batch, etc.)
+- Frontend implementation (logic, state management, API calls, etc.)
+- Component behavior implementation (after design is finalized)
+- Test implementation
+- Infrastructure configuration
 
-### `design-ui` を付与する場合
+### Assign `design-ui` when:
 
-- 新規 UI コンポーネントの Figma 制作
-- デザイントークンの定義・更新
-- UIパターンの策定
-- 画面遷移・State フローのデザイン定義
+- Figma production of new UI components
+- Design token definition and updates
+- UI pattern definition
+- Screen transition and state flow design
 
-## 同一 subtask に両タイプは付与しない
+## Never assign both types to a single subtask
 
-- UI を伴う機能は `design-ui` → `develop` の順で別 subtask に分ける
-- `design-ui` subtask の完了後に `develop` subtask を着手する
+- Features with UI must be split into separate subtasks: `design-ui` first, then `develop`
+- The `develop` subtask should not start until the `design-ui` subtask is complete
 
-## ラベル
+## Labels
 
-Linear では以下のラベルを使用する:
+Use the following labels in Linear:
 - `type:develop`
 - `type:design-ui`

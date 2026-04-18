@@ -8,38 +8,38 @@ effort: high
 
 # /review
 
-実装・デザインをレビューしIssueをクローズする。
+Review implementation or design and close the Issue.
 
-## 動作
+## Behavior
 
-1. 対象 PR または Figma ファイルを受け取る（`$ARGUMENTS`）
-2. `review-agent` を起動し以下を実行させる
-   - `soloscrum-define-dod` と `.claude/rules/dod-extra.md` で DoD 照合
-   - コード品質チェック（PR の場合）
-   - Issueの AC（Acceptance Criteria）全件確認
-   - 問題点の指摘とレビューコメント
-3. オプション: `design-agent` で機能スコープ逸脱チェック
-4. オプション: `ui-agent` でデザイン再現性チェック
-5. Pass 判定の場合:
-   - PR マージ承認
-   - Linear subtask を Done にステート遷移
-   - 全 subtask 完了時、GitHub Issue をクローズ
+1. Receive target PR or Figma file (`$ARGUMENTS`)
+2. Launch `review-agent` to:
+   - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
+   - Check code quality (for PRs)
+   - Verify all Issue AC (Acceptance Criteria)
+   - Flag issues and post review comments
+3. Optional: `design-agent` checks for feature scope deviation
+4. Optional: `ui-agent` checks design fidelity
+5. On Pass:
+   - Approve and merge PR
+   - Transition Linear subtask to Done
+   - Close GitHub Issue when all subtasks are complete
 
-## 入力
+## Input
 
-- PR URL / 番号 または Figma ファイル URL
-- 対応する GitHub Issue 番号（省略時は PR の本文から抽出）
+- PR URL / number or Figma file URL
+- Corresponding GitHub Issue number (extracted from PR body if omitted)
 
-## 出力
+## Output
 
-- レビュー結果レポート
-  - DoD チェックリスト
-  - 指摘事項リスト（あれば）
-  - Pass / Fail 判定
-- Pass 時: Issue クローズ確認
+- Review report
+  - DoD checklist
+  - Issues list (if any)
+  - Pass / Fail verdict
+- On Pass: Issue close confirmation
 
-## 使用リソース
+## Resources
 
-- Subagents: `review-agent`（必須）, `design-agent`（オプション）, `ui-agent`（オプション）
+- Subagents: `review-agent` (required), `design-agent` (optional), `ui-agent` (optional)
 - Skills: `soloscrum-review-implementation`, `soloscrum-define-dod`
 - Rules: `.claude/rules/dod-extra.md`

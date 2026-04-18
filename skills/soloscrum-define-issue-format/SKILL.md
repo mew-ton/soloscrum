@@ -6,42 +6,42 @@ user-invocable: false
 
 # soloscrum-define-issue-format
 
-Issue title/body のフォーマット定義。
+Issue title and body format definition.
 
-## タイトル規約
+## Title Conventions
 
-- 動詞から始める（「追加する」「修正する」「対応する」「削除する」等）
-- 50文字以内
-- 技術的な詳細は含めない（Whatを書く）
+- Start with a verb (e.g. "Add", "Fix", "Support", "Remove")
+- 50 characters or fewer
+- No technical details (write the What, not the How)
 
-良い例: `ユーザーがパスワードをリセットできるようにする`  
-悪い例: `Auth0でpassword_resetエンドポイントを実装してJWTを返す`
+Good: `Allow users to reset their password`
+Bad: `Implement password_reset endpoint with Auth0 and return JWT`
 
-## ボディ構造
+## Body Structure
 
 ```markdown
 ## Background
-[なぜこの機能が必要か。現状の課題や背景を記述する]
+[Why this feature is needed. Describe the current problem or context.]
 
 ## Goal
-[この Issue で達成する目標を1〜2文で記述する]
+[State the objective of this Issue in 1-2 sentences.]
 
 ## Acceptance Criteria
-- [ ] [検証可能な条件。"〜できる" / "〜が表示される" 形式]
-- [ ] [ユーザー視点で記述する]
-- [ ] [技術詳細ではなく振る舞いで記述する]
+- [ ] [Verifiable condition. Use "user can ..." / "... is displayed" format]
+- [ ] [Write from the user's perspective]
+- [ ] [Describe behavior, not technical implementation]
 
 ## Out of Scope
-- [今回の対象外を明示する。空の場合でも「なし」と書く]
+- [Explicitly state what is excluded. Write "None" if nothing is excluded.]
 
 ## Notes
-[補足事項・参考リンク・デザインモックへのリンク等（任意）]
+[Supplementary info, reference links, design mock links, etc. (optional)]
 ```
 
-## AC の書き方ガイド
+## AC Writing Guide
 
-| 良い例 | 悪い例 |
+| Good | Bad |
 |---|---|
-| ユーザーはメールアドレスでログインできる | JWTトークンを発行する |
-| 入力エラー時にエラーメッセージが表示される | バリデーションを実装する |
-| ログアウト後はダッシュボードにアクセスできない | セッションを削除する |
+| User can log in with email address | Issue JWT token |
+| Error message is shown on invalid input | Implement validation |
+| Dashboard is inaccessible after logout | Delete session |

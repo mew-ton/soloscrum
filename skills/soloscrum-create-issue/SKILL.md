@@ -7,49 +7,49 @@ disable-model-invocation: true
 
 # soloscrum-create-issue
 
-アイデアをIssueに構造化・粒度判定・分割提案する。
+Structure an idea into an Issue with size check and split proposal.
 
-## 概要
+## Overview
 
-自由形式のアイデアや要望を受け取り、`soloscrum-define-issue-format` に従った GitHub Issue 形式に変換する。粒度が基準を超える場合は分割を提案する。
+Receives a free-form idea or request and converts it into GitHub Issue format following `soloscrum-define-issue-format`. Proposes splitting when size exceeds threshold.
 
-## 手順
+## Steps
 
-1. 以下のアイデアや要望のテキストを受け取る: $ARGUMENTS
-2. 以下の構造で Issue を作成する（`soloscrum-define-issue-format` 参照）
-   - title: 動詞から始まる簡潔なタイトル
-   - background: なぜこの機能が必要か
-   - goal: 何を達成するか
-   - acceptance_criteria: 検証可能な完了条件（箇条書き）
-   - out_of_scope: 今回対象外のもの（明示する）
-3. `soloscrum-define-issue-size` で粒度を評価する
-4. 粒度超過の場合は分割案を作成してユーザーに提示する
-5. `soloscrum-define-priority` で優先度を判定する
-6. `soloscrum-define-story-points` で SP を算出する
+1. Receive the following idea or request text: $ARGUMENTS
+2. Create Issue with this structure (see `soloscrum-define-issue-format`):
+   - title: concise title starting with a verb
+   - background: why this feature is needed
+   - goal: what to achieve
+   - acceptance_criteria: verifiable completion conditions (bullet list)
+   - out_of_scope: explicitly state what is out of scope
+3. Evaluate size with `soloscrum-define-issue-size`
+4. If size exceeds threshold, create split proposal and present to user
+5. Determine priority with `soloscrum-define-priority`
+6. Calculate SP with `soloscrum-define-story-points`
 
-## 出力形式
+## Output Format
 
 ```markdown
-## [Issue タイトル]
+## [Issue Title]
 
 ### Background
-[背景・課題]
+[Background and problem]
 
 ### Goal
-[達成目標]
+[Achievement target]
 
 ### Acceptance Criteria
-- [ ] [検証可能な条件1]
-- [ ] [検証可能な条件2]
+- [ ] [Verifiable condition 1]
+- [ ] [Verifiable condition 2]
 
 ### Out of Scope
-- [対象外1]
+- [Out of scope item 1]
 
 ---
 Priority: Medium | SP: 3
 ```
 
-## 依存スキル
+## Depends On
 
 - `soloscrum-define-issue-format`
 - `soloscrum-define-issue-size`

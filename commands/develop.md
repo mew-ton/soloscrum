@@ -8,32 +8,32 @@ effort: high
 
 # /develop
 
-develop subtaskを実装する。
+Implement a develop subtask.
 
-## 動作
+## Behavior
 
-1. 対象 Linear subtask（type: develop）を受け取る（`$ARGUMENTS`）
-2. `dev-agent` を起動し以下を実行させる
-   - `soloscrum-define-branch-commit` 規約に従いブランチ作成
-   - `.claude/rules/stack.md` を参照してコード実装
-   - `soloscrum-define-dod` と `.claude/rules/dod-extra.md` で DoD 確認
-   - PR 本文生成（Issue 番号・変更概要・テスト方法）
-   - PR 作成
-3. Linear subtask を In Review にステート遷移
-4. ユーザーに PR URL を提示
+1. Receive target Linear subtask (type: develop) (`$ARGUMENTS`)
+2. Launch `dev-agent` to:
+   - Create branch following `soloscrum-define-branch-commit` conventions
+   - Implement code referencing `.claude/rules/stack.md`
+   - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
+   - Generate PR body (issue number, change summary, test instructions)
+   - Create PR
+3. Transition Linear subtask to In Review
+4. Present PR URL to user
 
-## 入力
+## Input
 
-- Linear subtask URL または ID
-- （省略時）Linear の In Progress 状態の subtask を自動選択
+- Linear subtask URL or ID
+- (If omitted) auto-select the subtask in Linear In Progress state
 
-## 出力
+## Output
 
-- 作成された PR URL
-- 実装サマリー
-- DoD チェックリスト結果
+- Created PR URL
+- Implementation summary
+- DoD checklist result
 
-## 使用リソース
+## Resources
 
 - Subagent: `dev-agent`
 - Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`

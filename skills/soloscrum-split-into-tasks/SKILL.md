@@ -7,41 +7,41 @@ disable-model-invocation: true
 
 # soloscrum-split-into-tasks
 
-Issueをsubtaskへ分解・タイプ付与・SP算出する。
+Decompose an Issue into subtasks with type and SP.
 
-## 概要
+## Overview
 
-Issue の AC と Goal をもとに、実装可能な subtask に分解する。各 subtask にタイプ（develop / design-ui）と SP を付与し、Linear に登録する。
+Decomposes an Issue into implementable subtasks based on its AC and Goal. Assigns type (develop / design-ui) and SP to each subtask, then registers them in Linear.
 
-## 手順
+## Steps
 
-1. 対象 Issue の AC・Goal・Out of Scope を読み込む: $ARGUMENTS
-2. AC を実装単位に分解する
-   - 1 subtask = 単一の明確な成果物
-   - subtask 間の依存関係を整理する
-   - `soloscrum-define-task-type` でタイプを付与する
-3. 各 subtask の SP を算出する（`soloscrum-define-story-points` 参照）
-4. subtask 数が `soloscrum-define-issue-size` の `max_subtasks` を超える場合はユーザーに確認する
-5. ユーザー承認後、Linear MCP で subtask を登録する
-   - parent: 対象 Issue の Linear Task
-   - title: subtask タイトル
-   - type label: develop または design-ui
+1. Read target Issue AC, Goal, and Out of Scope: $ARGUMENTS
+2. Decompose AC into implementation units:
+   - 1 subtask = 1 clear deliverable
+   - Organize dependencies between subtasks
+   - Assign type using `soloscrum-define-task-type`
+3. Calculate SP for each subtask (see `soloscrum-define-story-points`)
+4. If subtask count exceeds `max_subtasks` in `soloscrum-define-issue-size`, confirm with user
+5. After user approval, register subtasks in Linear MCP:
+   - parent: Linear Task of target Issue
+   - title: subtask title
+   - type label: develop or design-ui
    - estimate: SP
 
-## 出力形式
+## Output Format
 
 ```
-## subtask 分解案
+## Subtask Breakdown Proposal
 
-| # | タイトル | タイプ | SP |
-|---|---------|--------|-----|
-| 1 | [タイトル] | develop | 2 |
-| 2 | [タイトル] | design-ui | 1 |
+| # | Title | Type | SP |
+|---|-------|------|----|
+| 1 | [Title] | develop | 2 |
+| 2 | [Title] | design-ui | 1 |
 
-合計 SP: 3
+Total SP: 3
 ```
 
-## 依存スキル
+## Depends On
 
 - `soloscrum-define-task-type`
 - `soloscrum-define-story-points`

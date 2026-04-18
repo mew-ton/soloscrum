@@ -6,40 +6,40 @@ disable-model-invocation: true
 
 # /next
 
-次にやるべきことを提示する。
+Recommend the next action.
 
-## 動作
+## Behavior
 
-1. Linear MCP でバックログを取得
-2. 優先度・SP・依存関係を考慮して次のアクションを判定
-3. 推奨アクションをユーザーに提示
+1. Fetch backlog from Linear MCP
+2. Determine next action considering priority, SP, and dependencies
+3. Present recommended action to user
 
-## 判定ロジック
+## Decision Logic
 
-1. In Progress の subtask がある → `そのまま続けてください`
-2. In Review の subtask がある → `/review` を提案
-3. Backlog に未着手 subtask がある → 最優先の subtask で `/develop` または `/design-ui` を提案
-4. 全 subtask 完了・未分解 Issue がある → `/breakdown` を提案
-5. バックログが空 → 新しいアイデアを `/refine` することを提案
+1. In Progress subtask exists → `Continue as-is`
+2. In Review subtask exists → Suggest `/review`
+3. Untouched subtask in Backlog → Suggest `/develop` or `/design-ui` for highest-priority subtask
+4. All subtasks done, undecomposed Issue exists → Suggest `/breakdown`
+5. Backlog empty → Suggest refining a new idea with `/refine`
 
-## 入力
+## Input
 
-なし
+None
 
-## 出力
+## Output
 
 ```
-## 次のアクション
+## Next Action
 
-推奨: /develop [subtask-id]
-理由: 優先度 High、SP: 2、依存なし
+Recommended: /develop [subtask-id]
+Reason: Priority High, SP: 2, no dependencies
 
-または
+or
 
-推奨: /review PR #N
-理由: In Review の subtask があります
+Recommended: /review PR #N
+Reason: There is a subtask In Review
 ```
 
-## 使用リソース
+## Resources
 
-- Linear MCP（直接）
+- Linear MCP (direct)
