@@ -1,3 +1,10 @@
+---
+name: soloscrum-design-ui-task
+description: Designs a Linear subtask (type design-ui) in Figma with design tokens, components, all component states, and state transition diagrams. Checks DoD on completion.
+argument-hint: <subtask-id>
+disable-model-invocation: true
+---
+
 # soloscrum-design-ui-task
 
 Figma制作・トークン・パターン構築を行う。

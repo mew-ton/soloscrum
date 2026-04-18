@@ -1,3 +1,9 @@
+---
+name: soloscrum-define-design-criteria
+description: Reference: criteria for validating feature design across scope clarity (Goal and AC alignment), dependency identification, and technical feasibility against the project stack.
+user-invocable: false
+---
+
 # soloscrum-define-design-criteria
 
 機能妥当性の判断基準。

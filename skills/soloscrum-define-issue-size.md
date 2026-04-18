@@ -1,3 +1,9 @@
+---
+name: soloscrum-define-issue-size
+description: Reference: issue size thresholds (max SP 5, max subtasks 5, max days 2). Defines the suggest_split action triggered when any threshold is exceeded.
+user-invocable: false
+---
+
 # soloscrum-define-issue-size
 
 粒度ゲートの基準値定義。

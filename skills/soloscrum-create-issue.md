@@ -1,3 +1,10 @@
+---
+name: soloscrum-create-issue
+description: Structures an idea into a GitHub Issue with Background, Goal, AC, and Out of Scope. Checks issue size, suggests splitting if over threshold, and determines priority and story points.
+argument-hint: <idea or feature description>
+disable-model-invocation: true
+---
+
 # soloscrum-create-issue
 
 アイデアをIssueに構造化・粒度判定・分割提案する。

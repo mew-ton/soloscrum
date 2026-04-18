@@ -1,3 +1,9 @@
+---
+name: soloscrum-define-dod
+description: Reference: soloscrum Definition of Done checklist. All AC satisfied, tests exist if applicable, PR body links issue number with Closes/Fixes, lint passes, review approved.
+user-invocable: false
+---
+
 # soloscrum-define-dod
 
 Definition of Done（汎用）。

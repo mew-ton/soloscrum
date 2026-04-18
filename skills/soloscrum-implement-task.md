@@ -1,3 +1,11 @@
+---
+name: soloscrum-implement-task
+description: Implements a Linear subtask (type develop) by creating a branch, writing code and tests, committing with Conventional Commits, generating a PR body, and creating the PR.
+argument-hint: <subtask-id>
+disable-model-invocation: true
+allowed-tools: Read Edit Write Glob Grep Bash
+---
+
 # soloscrum-implement-task
 
 コード実装・PR本文生成を行う。

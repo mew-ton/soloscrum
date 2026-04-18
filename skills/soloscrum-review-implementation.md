@@ -1,3 +1,11 @@
+---
+name: soloscrum-review-implementation
+description: Reviews a PR or Figma file against the DoD checklist and all Acceptance Criteria. Returns Pass or Fail with specific feedback. Merges the PR and closes the Issue when all subtasks pass.
+argument-hint: <pr-url or figma-url>
+disable-model-invocation: true
+allowed-tools: Read Glob Grep
+---
+
 # soloscrum-review-implementation
 
 DoD照合・コード品質・クローズ判断を行う。

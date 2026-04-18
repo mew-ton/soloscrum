@@ -1,3 +1,10 @@
+---
+name: soloscrum-split-into-tasks
+description: Breaks a GitHub Issue into Linear subtasks with type (develop or design-ui) and story point estimates. Registers subtasks via Linear MCP after user approval.
+argument-hint: <issue-url or issue-number>
+disable-model-invocation: true
+---
+
 # soloscrum-split-into-tasks
 
 Issueをsubtaskへ分解・タイプ付与・SP算出する。

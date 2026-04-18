@@ -1,3 +1,10 @@
+---
+name: soloscrum-validate-feature
+description: Validates a feature's design for scope clarity, dependencies, and technical feasibility. Returns Pass/Conditional Pass/Fail with recommended actions.
+argument-hint: <issue-url or issue-number>
+disable-model-invocation: true
+---
+
 # soloscrum-validate-feature
 
 機能設計の妥当性・スコープ・依存関係を検証する。

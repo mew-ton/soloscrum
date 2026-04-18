@@ -1,3 +1,9 @@
+---
+name: soloscrum-define-issue-format
+description: Reference: required format for GitHub Issue titles and bodies. Title starts with a verb. Body uses Background, Goal, Acceptance Criteria, and Out of Scope sections.
+user-invocable: false
+---
+
 # soloscrum-define-issue-format
 
 Issue title/body のフォーマット定義。
