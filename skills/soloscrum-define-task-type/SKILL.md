@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-task-type
-description: Reference: task type definitions. develop=code changes handled by dev-agent, design-ui=Figma and design tokens handled by ui-agent. UI features always split into design-ui then develop.
+description: "Reference: task type definitions. develop=code changes handled by dev-agent, design-ui=Figma and design tokens handled by ui-agent. UI features always split into design-ui then develop."
 user-invocable: false
 ---
 

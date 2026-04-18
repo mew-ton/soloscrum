@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-design-criteria
-description: Reference: criteria for validating feature design across scope clarity (Goal and AC alignment), dependency identification, and technical feasibility against the project stack.
+description: "Reference: criteria for validating feature design across scope clarity (Goal and AC alignment), dependency identification, and technical feasibility against the project stack."
 user-invocable: false
 ---
 

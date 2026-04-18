@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-branch-commit
-description: Reference: branch naming pattern {type}/{issue-id}-{slug} and Conventional Commits format for all soloscrum development work. Repo-specific strategy in .claude/rules/branch.md takes precedence.
+description: "Reference: branch naming pattern {type}/{issue-id}-{slug} and Conventional Commits format for all soloscrum development work. Repo-specific strategy in .claude/rules/branch.md takes precedence."
 user-invocable: false
 ---
 

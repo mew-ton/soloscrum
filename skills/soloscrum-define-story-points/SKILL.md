@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-story-points
-description: Reference: story point scale and estimation criteria. SP 1=2h, 2=half day, 3=1 day, 5=2 days. Issues estimated over SP 5 must be split before proceeding.
+description: "Reference: story point scale and estimation criteria. SP 1=2h, 2=half day, 3=1 day, 5=2 days. Issues estimated over SP 5 must be split before proceeding."
 user-invocable: false
 ---
 
