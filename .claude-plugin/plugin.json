@@ -1,0 +1,9 @@
+{
+  "name": "soloscrum",
+  "description": "One-person AI-driven development framework. Automates the cycle from idea to GitHub Issue, task decomposition, implementation, and review using Linear + GitHub.",
+  "version": "0.1.0",
+  "author": {
+    "name": "mew-ton"
+  },
+  "repository": "https://github.com/mew-ton/soloscrum"
+}

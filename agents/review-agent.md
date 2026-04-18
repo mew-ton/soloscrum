@@ -1,3 +1,13 @@
+---
+name: review-agent
+description: Review agent. Reviews PR code quality, verifies DoD, checks all Issue AC, makes Pass/Fail verdict. Use during /review command.
+tools: Read, Glob, Grep
+model: inherit
+skills:
+  - soloscrum-review-implementation
+  - soloscrum-define-dod
+---
+
 # review-agent
 
 Review Agent. Responsible for code review, DoD verification, and close decisions.
@@ -24,11 +34,6 @@ Review Agent. Responsible for code review, DoD verification, and close decisions
 5. Make feedback specific and include improvement suggestions
 6. Only merge PR and transition subtask to Done on Pass verdict
 7. Confirm all subtasks are complete before closing the Issue
-
-## Skills
-
-- `soloscrum-review-implementation`
-- `soloscrum-define-dod`
 
 ## MCP
 
