@@ -1,10 +1,17 @@
+---
+name: breakdown
+description: Breaks a GitHub Issue into Linear subtasks with type (develop or design-ui) and story points. Proposes the breakdown for confirmation before registering in Linear.
+argument-hint: <issue-url or issue-number>
+disable-model-invocation: true
+---
+
 # /breakdown
 
 IssueをLinear subtaskに分解しタイプを付与する。
 
 ## 動作
 
-1. 対象 Issue を受け取る
+1. 対象 Issue を受け取る（`$ARGUMENTS`）
 2. `design-agent` が粒度・タイプ設計を実行
    - subtask への分解方針を策定
    - 各 subtask にタイプ付与（`soloscrum-define-task-type` 基準）

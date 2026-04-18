@@ -1,10 +1,17 @@
+---
+name: validate
+description: Validates feature design for scope clarity, dependencies, and technical feasibility. Returns Pass/Conditional Pass/Fail with recommended actions.
+argument-hint: <issue-url or issue-number>
+disable-model-invocation: true
+---
+
 # /validate
 
 機能設計の妥当性を検証する。
 
 ## 動作
 
-1. 対象 Issue（またはアイデア）を受け取る
+1. 対象 Issue（またはアイデア）を受け取る（`$ARGUMENTS`）
 2. `design-agent` を起動し以下を実行させる
    - 機能設計の妥当性評価（`soloscrum-define-design-criteria` 基準）
    - スコープの明確性チェック

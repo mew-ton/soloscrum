@@ -15,7 +15,7 @@ Issue または機能設計を受け取り、`soloscrum-define-design-criteria` 
 
 ## 手順
 
-1. Issue の内容を読み込む
+1. 対象 Issue の内容を読み込む: $ARGUMENTS
 2. 以下の観点で評価する（`soloscrum-define-design-criteria` 参照）
 
    **スコープ評価**

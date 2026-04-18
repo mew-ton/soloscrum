@@ -1,10 +1,17 @@
+---
+name: refine
+description: Structures an idea into a GitHub Issue. Checks size, suggests splitting when too large, determines priority and SP, then creates the issue after confirmation.
+argument-hint: <idea or feature description>
+disable-model-invocation: true
+---
+
 # /refine
 
 アイデアをIssueに構造化する。
 
 ## 動作
 
-1. ユーザーからアイデアや要望を受け取る
+1. ユーザーからアイデアや要望を受け取る（`$ARGUMENTS`）
 2. `po-agent` を起動し以下を実行させる
    - アイデアを GitHub Issue 形式に構造化
    - 粒度チェック（`soloscrum-define-issue-size` 基準）

@@ -1,10 +1,18 @@
+---
+name: review
+description: Reviews a PR or Figma file against the DoD and all AC. Merges the PR and closes the Issue when all subtasks pass.
+argument-hint: <pr-url or figma-url>
+disable-model-invocation: true
+effort: high
+---
+
 # /review
 
 実装・デザインをレビューしIssueをクローズする。
 
 ## 動作
 
-1. 対象 PR または Figma ファイルを受け取る
+1. 対象 PR または Figma ファイルを受け取る（`$ARGUMENTS`）
 2. `review-agent` を起動し以下を実行させる
    - `soloscrum-define-dod` と `.claude/rules/dod-extra.md` で DoD 照合
    - コード品質チェック（PR の場合）

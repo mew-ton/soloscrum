@@ -15,7 +15,7 @@ disable-model-invocation: true
 
 ## 手順
 
-1. アイデアのテキストを受け取る
+1. 以下のアイデアや要望のテキストを受け取る: $ARGUMENTS
 2. 以下の構造で Issue を作成する（`soloscrum-define-issue-format` 参照）
    - title: 動詞から始まる簡潔なタイトル
    - background: なぜこの機能が必要か

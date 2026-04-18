@@ -1,10 +1,18 @@
+---
+name: develop
+description: Implements a Linear subtask of type develop. Creates a branch, writes code and tests, generates a PR, and transitions the subtask to In Review.
+argument-hint: <subtask-id>
+disable-model-invocation: true
+effort: high
+---
+
 # /develop
 
 develop subtaskを実装する。
 
 ## 動作
 
-1. 対象 Linear subtask（type: develop）を受け取る
+1. 対象 Linear subtask（type: develop）を受け取る（`$ARGUMENTS`）
 2. `dev-agent` を起動し以下を実行させる
    - `soloscrum-define-branch-commit` 規約に従いブランチ作成
    - `.claude/rules/stack.md` を参照してコード実装
@@ -17,7 +25,7 @@ develop subtaskを実装する。
 ## 入力
 
 - Linear subtask URL または ID
-- （省略時）カレントの subtask を自動選択
+- （省略時）Linear の In Progress 状態の subtask を自動選択
 
 ## 出力
 

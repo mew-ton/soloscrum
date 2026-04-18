@@ -1,10 +1,17 @@
+---
+name: design-ui
+description: Designs a Linear subtask of type design-ui in Figma with tokens, components, and state flows. Transitions the subtask to In Review on completion.
+argument-hint: <subtask-id>
+disable-model-invocation: true
+---
+
 # /design-ui
 
 design-ui subtaskをFigmaで制作する。
 
 ## 動作
 
-1. 対象 Linear subtask（type: design-ui）を受け取る
+1. 対象 Linear subtask（type: design-ui）を受け取る（`$ARGUMENTS`）
 2. `ui-agent` を起動し以下を実行させる
    - `soloscrum-define-ui-standards` を参照してデザイントークン・パターン確認
    - Figma MCP でデザイン制作
@@ -19,7 +26,7 @@ design-ui subtaskをFigmaで制作する。
 ## 入力
 
 - Linear subtask URL または ID
-- （省略時）カレントの subtask を自動選択
+- （省略時）Linear の In Progress 状態の subtask を自動選択
 
 ## 出力
 

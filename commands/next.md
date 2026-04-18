@@ -1,3 +1,9 @@
+---
+name: next
+description: Recommends the next action based on Linear backlog state — continues in-progress work, suggests review, starts next subtask, or prompts to refine a new idea.
+disable-model-invocation: true
+---
+
 # /next
 
 次にやるべきことを提示する。

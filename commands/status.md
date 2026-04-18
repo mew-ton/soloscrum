@@ -1,3 +1,10 @@
+---
+name: status
+description: Shows current work state from Linear — In Progress, In Review, and recently completed subtasks with corresponding PR or Figma links.
+argument-hint: [issue-number]
+disable-model-invocation: true
+---
+
 # /status
 
 現在の作業状況を確認する。
@@ -13,7 +20,7 @@
 
 ## 入力
 
-なし（オプションで Issue 番号を指定して絞り込み可）
+なし（オプションで Issue 番号を指定して絞り込み可: `$ARGUMENTS`）
 
 ## 出力
 
