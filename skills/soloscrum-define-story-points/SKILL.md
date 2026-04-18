@@ -21,7 +21,7 @@ The lightweight estimate in the PO layer serves as this **entry gate**.
 ### Issue SP (PO Layer)
 
 - **Purpose**: Determine whether the Issue is a manageable size
-- **Owner**: `po-agent` (during `/refine`)
+- **Owner**: `soloscrum-po` (during `/refine`)
 - **Precision**: Rough is fine. Estimate from intuition without detailing every aspect
 - **Threshold**: Trigger `suggest_split` when SP > 5 or estimated days > 2
 - **Registered in Linear**: No — this is a size-check value only
@@ -31,7 +31,7 @@ When Issue SP exceeds the threshold, split the Issue per `soloscrum-define-issue
 ### Subtask SP (Dev Layer)
 
 - **Purpose**: The actual value registered in Linear, used for planning and progress tracking
-- **Owner**: `dev-agent` (during `/breakdown`)
+- **Owner**: `soloscrum-dev` (during `/breakdown`)
 - **Precision**: Calculate after carefully reviewing AC, affected files, and novelty
 - **Registered in Linear**: Yes — set on the subtask's estimate field
 

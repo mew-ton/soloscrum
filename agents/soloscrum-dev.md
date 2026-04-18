@@ -1,5 +1,5 @@
 ---
-name: dev-agent
+name: soloscrum-dev
 description: Development agent. Decomposes Issues into Linear subtasks, implements code, creates PRs, transitions state. Use during /breakdown and /develop commands.
 tools: Read, Edit, Write, Glob, Grep, Bash
 model: inherit
@@ -11,7 +11,7 @@ skills:
   - soloscrum-define-story-points
 ---
 
-# dev-agent
+# soloscrum-dev
 
 Development Agent. Responsible for subtask decomposition, code implementation, PR generation, and state transitions.
 

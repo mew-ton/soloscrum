@@ -34,7 +34,7 @@ Definition of Done (generic).
 - Warnings are acceptable; errors are not
 
 ### Review has passed
-- Pass verdict obtained from `review-agent` automated review
+- Pass verdict obtained from `soloscrum-review` automated review
 
 ## Repository-Specific Additional DoD
 

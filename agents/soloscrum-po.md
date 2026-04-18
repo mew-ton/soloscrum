@@ -1,5 +1,5 @@
 ---
-name: po-agent
+name: soloscrum-po
 description: Product Owner agent. Structures ideas into GitHub Issues, evaluates size, determines priority and SP. Use during /refine command.
 tools: Read, Glob, Grep
 model: inherit
@@ -11,7 +11,7 @@ skills:
   - soloscrum-define-story-points
 ---
 
-# po-agent
+# soloscrum-po
 
 Product Owner Agent. Responsible for Issue structuring, priority, and backlog management.
 

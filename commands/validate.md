@@ -12,7 +12,7 @@ Validate feature design for feasibility.
 ## Behavior
 
 1. Receive target Issue or idea (`$ARGUMENTS`)
-2. Launch `design-agent` to:
+2. Launch `soloscrum-design` to:
    - Evaluate feature design validity (`soloscrum-define-design-criteria` criteria)
    - Check scope clarity
    - Identify dependencies
@@ -35,5 +35,5 @@ Validate feature design for feasibility.
 
 ## Resources
 
-- Subagent: `design-agent`
+- Subagent: `soloscrum-design`
 - Skills: `soloscrum-validate-feature`, `soloscrum-define-design-criteria`

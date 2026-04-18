@@ -1,5 +1,5 @@
 ---
-name: ui-agent
+name: soloscrum-ui
 description: UI agent. Creates Figma components, applies design tokens, maintains UI pattern consistency. Use during /design-ui command.
 model: inherit
 skills:
@@ -8,7 +8,7 @@ skills:
   - soloscrum-define-dod
 ---
 
-# ui-agent
+# soloscrum-ui
 
 UI Agent. Responsible for Figma production, tokens, pattern construction, and state transitions.
 

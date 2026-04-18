@@ -1,5 +1,5 @@
 ---
-name: design-agent
+name: soloscrum-design
 description: Design agent. Validates feature design, plans subtask decomposition, assigns task types. Use during /validate and /breakdown commands.
 tools: Read, Glob, Grep
 model: inherit
@@ -9,7 +9,7 @@ skills:
   - soloscrum-define-task-type
 ---
 
-# design-agent
+# soloscrum-design
 
 Design Agent. Responsible for feature design validity and functional granularity design.
 

@@ -13,7 +13,7 @@ Implement a develop subtask.
 ## Behavior
 
 1. Receive target Linear subtask (type: develop) (`$ARGUMENTS`)
-2. Launch `dev-agent` to:
+2. Launch `soloscrum-dev` to:
    - Create branch following `soloscrum-define-branch-commit` conventions
    - Implement code referencing `.claude/rules/stack.md`
    - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
@@ -35,6 +35,6 @@ Implement a develop subtask.
 
 ## Resources
 
-- Subagent: `dev-agent`
+- Subagent: `soloscrum-dev`
 - Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`
 - Rules: `.claude/rules/stack.md`, `.claude/rules/branch.md`, `.claude/rules/dod-extra.md`
