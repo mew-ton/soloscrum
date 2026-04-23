@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-dod
-description: Reference: soloscrum Definition of Done checklist. All AC satisfied, tests exist if applicable, PR body links issue number with Closes/Fixes, lint passes, review approved.
+description: "Reference: soloscrum Definition of Done checklist. All AC satisfied, tests exist if applicable, PR body links issue number with Closes/Fixes, lint passes, review approved."
 user-invocable: false
 ---
 
@@ -34,7 +34,7 @@ Definition of Done (generic).
 - Warnings are acceptable; errors are not
 
 ### Review has passed
-- Pass verdict obtained from `review-agent` automated review
+- Pass verdict obtained from `soloscrum-review` automated review
 
 ## Repository-Specific Additional DoD
 

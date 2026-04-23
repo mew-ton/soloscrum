@@ -12,12 +12,12 @@ Break an Issue into Linear subtasks with type and story points.
 ## Behavior
 
 1. Receive target Issue (`$ARGUMENTS`)
-2. `design-agent` performs size and type design:
+2. `soloscrum-design` performs size and type design:
    - Plan subtask decomposition strategy
    - Assign type to each subtask (`soloscrum-define-task-type` criteria)
    - Verify decomposition validity with `soloscrum-validate-feature`
 3. Present breakdown proposal to user for confirmation
-4. Upon approval, `dev-agent` registers subtasks in Linear via MCP:
+4. Upon approval, `soloscrum-dev` registers subtasks in Linear via MCP:
    - Calculate SP (`soloscrum-define-story-points` criteria)
    - Assign task type as label
 
@@ -35,5 +35,5 @@ Break an Issue into Linear subtasks with type and story points.
 
 ## Resources
 
-- Subagents: `design-agent` (size and type design), `dev-agent` (subtask registration)
+- Subagents: `soloscrum-design` (size and type design), `soloscrum-dev` (subtask registration)
 - Skills: `soloscrum-validate-feature`, `soloscrum-define-task-type`, `soloscrum-split-into-tasks`, `soloscrum-define-story-points`

@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-ui-standards
-description: Reference: UI design standards including token categories and naming convention, required component states (Default/Hover/Focus/Disabled/Error), and WCAG AA accessibility requirements.
+description: "Reference: UI design standards including token categories and naming convention, required component states (Default/Hover/Focus/Disabled/Error), and WCAG AA accessibility requirements."
 user-invocable: false
 ---
 

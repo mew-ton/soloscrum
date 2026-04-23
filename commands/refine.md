@@ -12,7 +12,7 @@ Structure an idea into a GitHub Issue.
 ## Behavior
 
 1. Receive idea or request from user (`$ARGUMENTS`)
-2. Launch `po-agent` to:
+2. Launch `soloscrum-po` to:
    - Structure the idea into GitHub Issue format
    - Check size against `soloscrum-define-issue-size` criteria
    - Suggest splitting if size exceeds threshold
@@ -34,5 +34,5 @@ Structure an idea into a GitHub Issue.
 
 ## Resources
 
-- Subagent: `po-agent`
+- Subagent: `soloscrum-po`
 - Skills: `soloscrum-create-issue`, `soloscrum-define-issue-format`, `soloscrum-define-issue-size`, `soloscrum-define-priority`

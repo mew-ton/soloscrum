@@ -1,4 +1,17 @@
-# dev-agent
+---
+name: soloscrum-dev
+description: Development agent. Decomposes Issues into Linear subtasks, implements code, creates PRs, transitions state. Use during /breakdown and /develop commands.
+tools: Read, Edit, Write, Glob, Grep, Bash
+model: inherit
+skills:
+  - soloscrum-split-into-tasks
+  - soloscrum-implement-task
+  - soloscrum-define-branch-commit
+  - soloscrum-define-dod
+  - soloscrum-define-story-points
+---
+
+# soloscrum-dev
 
 Development Agent. Responsible for subtask decomposition, code implementation, PR generation, and state transitions.
 
@@ -20,14 +33,6 @@ Development Agent. Responsible for subtask decomposition, code implementation, P
 6. Always review subtask AC before starting implementation
 7. Commit with zero lint errors
 8. Set SP per `soloscrum-define-story-points` when registering Linear subtasks
-
-## Skills
-
-- `soloscrum-split-into-tasks`
-- `soloscrum-implement-task`
-- `soloscrum-define-branch-commit`
-- `soloscrum-define-dod`
-- `soloscrum-define-story-points`
 
 ## MCP
 

@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-priority
-description: Reference: priority levels Urgent/High/Medium/Low and decision criteria. Urgent=blocker or outage, High=user impact or dependency, Medium=normal dev, Low=tech debt.
+description: "Reference: priority levels Urgent/High/Medium/Low and decision criteria. Urgent=blocker or outage, High=user impact or dependency, Medium=normal dev, Low=tech debt."
 user-invocable: false
 ---
 

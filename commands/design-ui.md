@@ -12,7 +12,7 @@ Design a design-ui subtask in Figma.
 ## Behavior
 
 1. Receive target Linear subtask (type: design-ui) (`$ARGUMENTS`)
-2. Launch `ui-agent` to:
+2. Launch `soloscrum-ui` to:
    - Check design tokens and pattern conventions via `soloscrum-define-ui-standards`
    - Produce design in Figma MCP:
      - Component creation
@@ -36,6 +36,6 @@ Design a design-ui subtask in Figma.
 
 ## Resources
 
-- Subagent: `ui-agent`
+- Subagent: `soloscrum-ui`
 - Skills: `soloscrum-design-ui-task`, `soloscrum-define-ui-standards`, `soloscrum-define-dod`
 - MCP: Figma MCP (`mcp.figma.com/mcp`)
