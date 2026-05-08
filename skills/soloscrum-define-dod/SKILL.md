@@ -36,9 +36,10 @@ Definition of Done (generic).
 
 ### Code review pipeline executed and findings addressed
 - CodeRabbit run executed (or explicitly skipped due to environment)
-- Multi-agent review run, agent findings ≥80 confidence consolidated
-- Each CodeRabbit finding (any severity) is either fixed or has a one-line skip reason; silent drops are not allowed
-- See `soloscrum-define-code-review-process` for the canonical rules
+- Multi-agent review run; surviving agent findings (≥80 confidence) consolidated
+- Each surfaced finding (CodeRabbit any severity, agent ≥80) is decided individually: fix, or skip with a stated reason
+- Severity / score is informational, not a skip reason
+- See `soloscrum-define-code-review-process` for the per-item decision rules
 
 ### Review has passed
 - Pass verdict obtained from `soloscrum-review` automated review
