@@ -32,6 +32,7 @@ Declares a blocking dependency between two Issues by editing the dependent Issue
    ```
    gh issue edit <issue_number> --body-file <updated>
    ```
+4. Verify the edit succeeded — `gh issue edit` returns non-zero on failure. If it failed (auth expired, rate limit, or the issue body was mutated mid-flight by Linear native sync), re-fetch the body, recompute the Dependencies section, and retry once. Surface a clear error if the second attempt also fails so the user can resolve manually.
 
 ## Output
 

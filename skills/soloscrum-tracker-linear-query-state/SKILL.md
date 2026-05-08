@@ -22,7 +22,7 @@ Returns active Linear subtasks — items in `In Progress` or `In Review`. Active
    - Linear MCP — `list_issues` with filter `state.name = "In Progress"`
 2. Fetch in-review items:
    - Linear MCP — `list_issues` with filter `state.name = "In Review"`
-3. For each subtask, attach links from `attachments` (PR URL via GH MCP for develop type, Figma URL for design-ui type)
+3. For each subtask, attach links from `attachments` (PR URL via `gh pr list` CLI for develop type, Figma URL for design-ui type)
 4. (If `parent_issue_number` given) restrict to that parent's subtree by matching `parentId`
 
 ## Output
