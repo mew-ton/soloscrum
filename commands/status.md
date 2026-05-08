@@ -1,6 +1,6 @@
 ---
 name: status
-description: Shows current work state from Linear — In Progress, In Review, and recently completed subtasks with corresponding PR or Figma links.
+description: Shows current work state — In Progress, In Review, and recently completed Subtasks with corresponding PR or Figma links.
 argument-hint: [issue-number]
 disable-model-invocation: true
 ---
@@ -11,16 +11,16 @@ Show current work status.
 
 ## Behavior
 
-1. Fetch current state from Linear MCP:
-   - In Progress subtasks
-   - In Review subtasks
-   - Recently completed subtasks
-2. Check corresponding PR status on GitHub
-3. Present status summary
+1. Resolve the active tracker profile via `soloscrum-define-tracker-profile`
+2. Fetch state via `soloscrum-tracker-{github|linear}-query-state`:
+   - In Progress Subtasks
+   - In Review Subtasks
+3. Resolve corresponding PR / Figma URL for each in-review Subtask
+4. Present status summary
 
 ## Input
 
-None (optionally specify issue number to filter: `$ARGUMENTS`)
+None (optionally specify issue number to filter the subtree: `$ARGUMENTS`)
 
 ## Output
 
@@ -39,5 +39,4 @@ None (optionally specify issue number to filter: `$ARGUMENTS`)
 
 ## Resources
 
-- Linear MCP (direct)
-- GitHub MCP (PR status check)
+- Skills: `soloscrum-define-tracker-profile`, `soloscrum-tracker-{github|linear}-query-state`

@@ -1,9 +1,17 @@
 {
   "name": "soloscrum",
-  "description": "One-person AI-driven development framework. Automates the cycle from idea to GitHub Issue, task decomposition, implementation, and review using Linear + GitHub.",
-  "version": "0.1.0",
+  "description": "One-person AI-driven development framework. Automates the cycle from idea to GitHub Issue, task decomposition, implementation, and review. Supports github-only or linear+github tracker profiles.",
+  "version": "0.2.0",
   "author": {
     "name": "mew-ton"
   },
-  "repository": "https://github.com/mew-ton/soloscrum"
+  "repository": "https://github.com/mew-ton/soloscrum",
+  "userConfig": {
+    "tracker_profile": {
+      "type": "string",
+      "title": "Tracker Profile",
+      "description": "Where SP, dependencies, and state are stored. Use 'github-only' (default) for repos restricted to GitHub Issues, or 'linear+github' for repos with Linear native sync configured.",
+      "default": "github-only"
+    }
+  }
 }

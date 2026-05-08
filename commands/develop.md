@@ -1,6 +1,6 @@
 ---
 name: develop
-description: Implements a Linear subtask of type develop. Creates a branch, writes code and tests, generates a PR, and transitions the subtask to In Review.
+description: Implements a Subtask of type develop. Creates a branch, writes code and tests, generates a PR, and transitions the Subtask to In Review.
 argument-hint: <subtask-id>
 disable-model-invocation: true
 effort: high
@@ -8,24 +8,24 @@ effort: high
 
 # /develop
 
-Implement a develop subtask.
+Implement a develop Subtask.
 
 ## Behavior
 
-1. Receive target Linear subtask (type: develop) (`$ARGUMENTS`)
+1. Receive target Subtask (type: develop) (`$ARGUMENTS`)
 2. Launch `soloscrum-dev` to:
    - Create branch following `soloscrum-define-branch-commit` conventions
    - Implement code referencing `.claude/rules/stack.md`
    - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
    - Generate PR body (issue number, change summary, test instructions)
    - Create PR
-3. Transition Linear subtask to In Review
+3. Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `in-review`
 4. Present PR URL to user
 
 ## Input
 
-- Linear subtask URL or ID
-- (If omitted) auto-select the subtask in Linear In Progress state
+- Subtask URL or ID (GH issue number `#N` or Linear ID `PRJ-N` depending on active profile)
+- (If omitted) auto-select an `in-progress` Subtask via `soloscrum-tracker-{profile}-query-state`
 
 ## Output
 
@@ -36,5 +36,5 @@ Implement a develop subtask.
 ## Resources
 
 - Subagent: `soloscrum-dev`
-- Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`
+- Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`, `soloscrum-define-tracker-profile`
 - Rules: `.claude/rules/stack.md`, `.claude/rules/branch.md`, `.claude/rules/dod-extra.md`

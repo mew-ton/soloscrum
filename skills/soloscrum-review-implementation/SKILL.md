@@ -1,9 +1,14 @@
 ---
 name: soloscrum-review-implementation
-description: Reviews a PR or Figma file against the DoD checklist and all Acceptance Criteria. Returns Pass or Fail with specific feedback. Merges the PR and closes the Issue when all subtasks pass.
+description: Reviews a PR or Figma file against the DoD checklist and all Acceptance Criteria. Returns Pass or Fail with specific feedback. On Pass, transitions the Subtask to Done via the active profile's tracker operation skill and closes the Issue when all subtasks complete.
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
-allowed-tools: Read Glob Grep
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh pr:*)
+  - Bash(gh issue view:*)
 ---
 
 # soloscrum-review-implementation
@@ -12,7 +17,7 @@ Verify DoD, code quality, and make close decision.
 
 ## Overview
 
-Receives a PR or Figma file, evaluates DoD, AC, and code quality. Makes Pass / Fail verdict and executes close procedure on Pass.
+Receives a PR or Figma file, evaluates DoD, AC, and code quality. Makes Pass / Fail verdict and executes close procedure on Pass. State transitions delegate to the active profile's `transition-state` operation skill (per `soloscrum-define-tracker-profile`).
 
 ## Steps
 
@@ -29,13 +34,16 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. Makes Pass / F
    - Readability and maintainability
 4. Compile all evaluation results into a report
 5. **On Pass:**
-   - Approve PR review
-   - Transition Linear subtask to Done
-   - Confirm all subtasks complete
-   - Close GitHub Issue if all complete
+   - Approve PR review (`gh pr review --approve`)
+   - Merge PR (`gh pr merge`)
+   - Resolve active profile, then invoke the matching `transition-state` operation skill to move the Subtask to `done`:
+     - `github-only` → `soloscrum-tracker-github-transition-state`
+     - `linear+github` → `soloscrum-tracker-linear-transition-state`
+   - Confirm all sibling Subtasks under the parent Issue are also `done`
+   - If all complete, invoke the same `transition-state` skill on the parent Issue to close it
 6. **On Fail:**
    - Comment specific issues and improvement suggestions on PR
-   - Revert Linear subtask to In Progress
+   - Invoke the matching `transition-state` operation skill to revert the Subtask to `in-progress`
 
 ## Output Format
 
@@ -57,3 +65,5 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. Makes Pass / F
 ## Depends On
 
 - `soloscrum-define-dod`
+- `soloscrum-define-tracker-profile` (routing)
+- `soloscrum-tracker-{github|linear}-transition-state` (delegated)

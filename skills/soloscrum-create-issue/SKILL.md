@@ -1,8 +1,11 @@
 ---
 name: soloscrum-create-issue
-description: Structures an idea into a GitHub Issue with Background, Goal, AC, and Out of Scope. Checks issue size, suggests splitting if over threshold, and determines priority and story points.
+description: Structures an idea into a GitHub Issue with Background, Goal, AC, and Out of Scope. Checks issue size, suggests splitting if over threshold, and determines priority and story points. Profile-agnostic.
 argument-hint: <idea or feature description>
 disable-model-invocation: true
+allowed-tools:
+  - Bash(gh issue create:*)
+  - Bash(gh label:*)
 ---
 
 # soloscrum-create-issue
@@ -11,7 +14,7 @@ Structure an idea into an Issue with size check and split proposal.
 
 ## Overview
 
-Receives a free-form idea or request and converts it into GitHub Issue format following `soloscrum-define-issue-format`. Proposes splitting when size exceeds threshold.
+Receives a free-form idea or request and converts it into GitHub Issue format following `soloscrum-define-issue-format`. Proposes splitting when size exceeds threshold. Tracker-profile-agnostic — Issue creation always lands on GitHub regardless of active profile.
 
 ## Steps
 
@@ -25,7 +28,14 @@ Receives a free-form idea or request and converts it into GitHub Issue format fo
 3. Evaluate size with `soloscrum-define-issue-size`
 4. If size exceeds threshold, create split proposal and present to user
 5. Determine priority with `soloscrum-define-priority`
-6. Calculate SP with `soloscrum-define-story-points`
+6. Calculate Issue-level SP (size-check) with `soloscrum-define-story-points`
+7. Create the GitHub Issue:
+   ```
+   gh issue create --title "<title>" --body "<body>" \
+     --label "priority:<level>"
+   ```
+   - Issue-level SP is **not** registered anywhere (size-check value only, per `soloscrum-define-story-points`)
+   - In `linear+github` profile, Linear's native sync will replicate the Issue automatically; no extra step is needed here
 
 ## Output Format
 
@@ -46,7 +56,7 @@ Receives a free-form idea or request and converts it into GitHub Issue format fo
 - [Out of scope item 1]
 
 ---
-Priority: Medium | SP: 3
+Priority: Medium | SP: 3 (size-check only)
 ```
 
 ## Depends On
@@ -55,3 +65,4 @@ Priority: Medium | SP: 3
 - `soloscrum-define-issue-size`
 - `soloscrum-define-priority`
 - `soloscrum-define-story-points`
+- `soloscrum-define-tracker-profile` (priority label convention is shared)

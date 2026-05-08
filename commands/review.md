@@ -22,8 +22,11 @@ Review implementation or design and close the Issue.
 4. Optional: `soloscrum-ui` checks design fidelity
 5. On Pass:
    - Approve and merge PR
-   - Transition Linear subtask to Done
-   - Close GitHub Issue when all subtasks are complete
+   - Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `done`
+   - When all sibling Subtasks are done, invoke the same `transition-state` skill on the parent Issue to close it
+6. On Fail:
+   - Post specific feedback on PR
+   - Invoke `soloscrum-tracker-{github|linear}-transition-state` to revert the Subtask to `in-progress`
 
 ## Input
 
@@ -41,5 +44,5 @@ Review implementation or design and close the Issue.
 ## Resources
 
 - Subagents: `soloscrum-review` (required), `soloscrum-design` (optional), `soloscrum-ui` (optional)
-- Skills: `soloscrum-review-implementation`, `soloscrum-define-dod`
+- Skills: `soloscrum-review-implementation`, `soloscrum-define-dod`, `soloscrum-define-tracker-profile`
 - Rules: `.claude/rules/dod-extra.md`

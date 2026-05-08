@@ -17,10 +17,10 @@ Structure an idea into a GitHub Issue.
    - Check size against `soloscrum-define-issue-size` criteria
    - Suggest splitting if size exceeds threshold
    - Determine priority using `soloscrum-define-priority` criteria
-   - Calculate SP using `soloscrum-define-story-points` criteria
+   - Calculate Issue-level SP using `soloscrum-define-story-points` criteria (size-check only — not registered)
 3. Present structured result to user for confirmation
-4. Create GitHub Issue upon approval
-5. After Linear auto-sync, set SP and priority via Linear MCP
+4. Create the GitHub Issue (with priority label `priority:*` applied at creation)
+5. In `linear+github` profile, Linear's native sync replicates the Issue automatically — no extra MCP call needed
 
 ## Input
 
@@ -29,10 +29,10 @@ Structure an idea into a GitHub Issue.
 ## Output
 
 - Created GitHub Issue URL
-- Linear Task URL (after sync)
-- Configured SP and priority
+- Configured priority label
+- Issue-level SP (size-check value only; for routing decisions like splitting)
 
 ## Resources
 
 - Subagent: `soloscrum-po`
-- Skills: `soloscrum-create-issue`, `soloscrum-define-issue-format`, `soloscrum-define-issue-size`, `soloscrum-define-priority`
+- Skills: `soloscrum-create-issue`, `soloscrum-define-issue-format`, `soloscrum-define-issue-size`, `soloscrum-define-priority`, `soloscrum-define-tracker-profile`
