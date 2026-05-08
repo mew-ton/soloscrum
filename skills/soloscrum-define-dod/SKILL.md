@@ -14,6 +14,7 @@ Definition of Done (generic).
 - [ ] Tests exist (when applicable)
 - [ ] PR body contains Issue number (`Closes #N` or `Fixes #N` format)
 - [ ] Zero lint errors
+- [ ] Code review pipeline executed and findings addressed (per `soloscrum-define-code-review-process`)
 - [ ] Review has passed
 
 ## Criteria for Each Item
@@ -32,6 +33,12 @@ Definition of Done (generic).
 ### Zero lint errors
 - No errors from the project's lint configuration (ESLint, Prettier, Rubocop, etc.)
 - Warnings are acceptable; errors are not
+
+### Code review pipeline executed and findings addressed
+- CodeRabbit run executed (or explicitly skipped due to environment)
+- Multi-agent review run, agent findings ≥80 confidence consolidated
+- Each CodeRabbit finding (any severity) is either fixed or has a one-line skip reason; silent drops are not allowed
+- See `soloscrum-define-code-review-process` for the canonical rules
 
 ### Review has passed
 - Pass verdict obtained from `soloscrum-review` automated review

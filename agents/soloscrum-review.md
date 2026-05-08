@@ -6,6 +6,7 @@ model: inherit
 skills:
   - soloscrum-review-implementation
   - soloscrum-define-dod
+  - soloscrum-define-code-review-process
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
 ---
