@@ -15,7 +15,8 @@ Records a Subtask's SP value in a GitHub Projects v2 custom field named `SP` (Nu
 
 - `issue_number` — Sub-issue number
 - `sp` — story points integer (per `soloscrum-define-story-points`)
-- `project_id` — GH Project v2 ID (resolved from repo config or user prompt)
+- `project_number` — GH Project v2 number, the human-readable id used by `gh project` CLI commands
+- `project_id` — GH Project v2 node ID (GraphQL), used by the `updateProjectV2ItemFieldValue` mutation
 - `field_id` — Project field ID for `SP` (resolved from project)
 
 ## Steps

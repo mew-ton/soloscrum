@@ -18,7 +18,8 @@ Declares a blocking relation between two Linear issues. Active when `tracker_pro
 ## Steps
 
 1. For each `<dep>` in `depends_on`, create a relation:
-   - Linear MCP — `save_issue` with `id = <linear_id>`, `relationsToAdd = [{ type: "blockedBy", relatedId: "<dep>" }]`
+   - Linear MCP — `save_issue` with `id = <linear_id>`, `relationsToAdd = [{ relatedIssueId: "<dep>", type: "blocked_by" }]`
+   - The valid `IssueRelationType` enum values are `blocks` / `blocked_by` / `related` / `duplicate` / `duplicate_of` (snake_case)
 
 ## Output
 

@@ -20,7 +20,7 @@ Returns the backlog (open Issues and Sub-issues without state labels) ordered by
 1. List open Issues without `state:in-progress` and `state:in-review` labels:
    ```
    gh issue list --state open \
-     --search "no:label state:in-progress no:label state:in-review" \
+     --search "-label:\"state:in-progress\" -label:\"state:in-review\"" \
      --json number,title,labels,url \
      --limit 100
    ```

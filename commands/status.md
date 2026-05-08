@@ -15,6 +15,7 @@ Show current work status.
 2. Fetch state via `soloscrum-tracker-{github|linear}-query-state`:
    - In Progress Subtasks
    - In Review Subtasks
+   - Recently Completed Subtasks (most recent first, capped at ~5)
 3. Resolve corresponding PR / Figma URL for each in-review Subtask
 4. Present status summary
 

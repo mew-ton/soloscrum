@@ -33,14 +33,15 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. Makes Pass / F
    - Performance: no obvious bottlenecks
    - Readability and maintainability
 4. Compile all evaluation results into a report
-5. **On Pass:**
-   - Approve PR review (`gh pr review --approve`)
-   - Merge PR (`gh pr merge`)
+5. **On Pass** (transition state first, then merge so a tracker failure does not leave a merged PR with stale state):
+   - Approve PR review (`gh pr review --approve`) — non-mutating; safe to do early
    - Resolve active profile, then invoke the matching `transition-state` operation skill to move the Subtask to `done`:
      - `github-only` → `soloscrum-tracker-github-transition-state`
      - `linear+github` → `soloscrum-tracker-linear-transition-state`
    - Confirm all sibling Subtasks under the parent Issue are also `done`
    - If all complete, invoke the same `transition-state` skill on the parent Issue to close it
+   - Merge PR (`gh pr merge`) — last, so state is consistent before merge
+   - If `transition-state` fails after merge has happened (rare race), surface a clear notice and prompt the user to manually transition
 6. **On Fail:**
    - Comment specific issues and improvement suggestions on PR
    - Invoke the matching `transition-state` operation skill to revert the Subtask to `in-progress`

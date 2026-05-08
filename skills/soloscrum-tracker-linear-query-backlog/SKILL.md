@@ -18,7 +18,7 @@ Returns the Linear backlog (items in Backlog or Todo states) ordered by priority
 ## Steps
 
 1. Fetch backlog items:
-   - Linear MCP — `list_issues` with filter `state.type in (backlog, unstarted)`, ordered by `priority` desc then `createdAt` asc
+   - Linear MCP — `list_issues` with `filter: { state: { type: { in: ["backlog", "unstarted"] } } }`, ordered by `priority` desc then `createdAt` asc
 2. Group by priority bucket: Urgent / High / Medium / Low / No priority
 
 ## Output
