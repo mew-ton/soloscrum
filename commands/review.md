@@ -28,13 +28,17 @@ Review implementation or design and close the Issue.
    - Flag issues and post review comments
 3. Optional: `soloscrum-design` checks for feature scope deviation
 4. Optional: `soloscrum-ui` checks design fidelity
-5. On Pass:
-   - Approve and merge PR
+5. On Pass / Pass with follow-ups (per `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`):
+   - For Pass with follow-ups: ensure a follow-up Issue exists for each out-of-scope skip and that its number is recorded in the skip note
+   - Approve PR (`gh pr review --approve`)
    - Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `done`
    - When all sibling Subtasks are done, invoke the same `transition-state` skill on the parent Issue to close it
+   - Promote the PR to ready (`gh pr ready`) — reversible; runs without pre-confirm
+   - **Hand the merge off to the user** — surface the exact `gh pr merge` command. Do not run `gh pr merge`; merge is the user's gate.
 6. On Fail:
    - Post specific feedback on PR
    - Invoke `soloscrum-tracker-{github|linear}-transition-state` to revert the Subtask to `in-progress`
+   - Leave the PR in draft (do not call `gh pr ready`)
 
 ## Input
 
@@ -46,11 +50,11 @@ Review implementation or design and close the Issue.
 - Review report
   - DoD checklist
   - Issues list (if any)
-  - Pass / Fail verdict
-- On Pass: Issue close confirmation
+  - Pass / Pass with follow-ups / Fail verdict
+- On Pass / Pass with follow-ups: Subtask-done confirmation, parent Issue close confirmation (when applicable), PR promoted to ready, and the exact `gh pr merge` command for the user to run
 
 ## Resources
 
 - Subagents: `soloscrum-review` (required), `soloscrum-design` (optional), `soloscrum-ui` (optional)
-- Skills: `soloscrum-review-implementation`, `soloscrum-define-dod`, `soloscrum-define-tracker-profile`
+- Skills: `soloscrum-review-implementation`, `soloscrum-define-dod`, `soloscrum-define-code-review-process`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`
 - Rules: `.claude/rules/dod-extra.md`

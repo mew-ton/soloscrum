@@ -36,7 +36,7 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 | Subtask State | dev (develop type) / ui (design-ui type) — to In Review | review — to Done | review |
 | Branch | dev | — | review (PR check) |
 | Commit | dev | — | review |
-| PR | dev | review (merge) | review |
+| PR | dev (creates as draft) | review (promote to ready) — **user merges** | review |
 | Figma artifact | ui | ui | review (optional design fidelity check) |
 | Code | dev | dev | review |
 | DoD self-check | dev/ui (own work) | — | review (final) |
@@ -49,10 +49,11 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 /validate      design   → reads Issue, asks for refinement if invalid
 /breakdown     design   → proposes subtasks (with type, AC)
                dev      → registers subtasks (with SP, type label)
-/develop       dev      → branch + code + PR; transitions Subtask to In Review
+/develop       dev      → branch + code + draft PR; transitions Subtask to In Review
 /design-ui     ui       → Figma + tokens + states; transitions Subtask to In Review
-/review        review   → DoD + AC + code; merges PR; transitions Subtask to Done;
-                           closes Issue when all Subtasks are Done
+/review        review   → DoD + AC + code; promotes PR to ready; transitions Subtask to Done;
+                           closes Issue when all Subtasks are Done; surfaces merge command to user
+user           user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate)
 ```
 
 ## Cross-cutting Rules

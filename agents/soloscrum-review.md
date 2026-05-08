@@ -7,6 +7,7 @@ skills:
   - soloscrum-review-implementation
   - soloscrum-define-dod
   - soloscrum-define-code-review-process
+  - soloscrum-define-pr-lifecycle
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
 ---
@@ -20,7 +21,9 @@ Review Agent. Responsible for code review, DoD verification, and close decisions
 Per `soloscrum-define-agent-responsibilities`:
 
 - **Verifier** of: every concept on close
-- **Mutator** of: Issue (close), Subtask State (→ `done`), PR (merge)
+- **Mutator** of: Issue (close), Subtask State (→ `done`), PR (promotion to ready)
+
+PR merge itself is **not** an agent action — it is the user's gate, per `soloscrum-define-pr-lifecycle`. The review agent's mutation surface ends at `gh pr ready` and approval; it surfaces the merge command for the user to run.
 
 ## Guidelines
 
@@ -34,13 +37,15 @@ Per `soloscrum-define-agent-responsibilities`:
    - Performance concerns
    - Readability and maintainability
 6. Make feedback specific and include improvement suggestions
-7. Only merge PR and transition Subtask to `done` on Pass verdict
-8. Confirm all sibling Subtasks are complete before closing the parent Issue
-9. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
+7. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. On Fail, leave the PR in draft.
+8. Never run `gh pr merge`. Surface the exact merge command to the user; merge is the user's gate.
+9. Confirm all sibling Subtasks are complete before closing the parent Issue
+10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
 
 ## External Access
 
-- Direct: `gh pr` (review, merge)
+- Direct: `gh pr review`, `gh pr ready`, `gh pr comment` (reversible — autonomous)
+- User-gated (surfaced as a command, never executed): `gh pr merge`
 - Delegated (via tracker operation skills): subtask/Issue state transition
 
 ## Invoked by
