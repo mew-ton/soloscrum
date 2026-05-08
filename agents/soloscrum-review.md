@@ -27,15 +27,16 @@ Per `soloscrum-define-agent-responsibilities`:
 1. Confirm DoD criteria with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
 2. Check every DoD item without exception and state results explicitly
 3. Verify all Issue AC and mark as Fail if any are unmet
-4. For code reviews, check:
+4. Run the automated code review pipeline per `soloscrum-define-code-review-process` (CodeRabbit + multi-agent), apply the per-item decision (fix / skip with stated reason) to every surviving finding, and consolidate into the PR comment using the canonical template
+5. Complement the automated pipeline with a manual code review for items the tools cannot judge:
    - Logic correctness
    - Security (OWASP Top 10 perspective)
    - Performance concerns
    - Readability and maintainability
-5. Make feedback specific and include improvement suggestions
-6. Only merge PR and transition Subtask to `done` on Pass verdict
-7. Confirm all sibling Subtasks are complete before closing the parent Issue
-8. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
+6. Make feedback specific and include improvement suggestions
+7. Only merge PR and transition Subtask to `done` on Pass verdict
+8. Confirm all sibling Subtasks are complete before closing the parent Issue
+9. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
 
 ## External Access
 

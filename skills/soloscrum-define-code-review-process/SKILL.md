@@ -37,14 +37,19 @@ Severity and confidence scores are **inputs to a per-item decision**, never auto
 
 For every surfaced finding, choose one:
 
-- **Fix** — when:
-  - The finding is in scope of the current PR
-  - The suggestion is correct and well-bounded
-  - Even if it's a `nitpick`, fix it if the cost is small and it improves the diff
-- **Skip with stated reason** — when:
-  - Out of scope (track as a follow-up Issue and write the issue number in the skip note)
-  - The suggestion is wrong or based on a misread of the diff
+- **Fix** — when **all** of the following hold:
+  1. The finding is in scope (see definition below)
+  2. The suggestion is correct (it identifies a real issue and the proposed change addresses it)
+  3. The fix is well-bounded (see definition below)
+  Even a `nitpick` should be fixed when these three hold and the cost is small.
+- **Skip with stated reason** — when at least one of the following:
+  - Out of scope — track as a follow-up Issue and write the issue number in the skip note
+  - The suggestion is wrong or based on a misread of the diff (cite the specific misread)
   - Conflicts with an explicit project convention (cite which one)
+
+**In scope** means the finding touches code or behavior introduced or directly modified by this PR's diff. A finding that points to pre-existing code outside the diff is out of scope by default unless the PR explicitly intended to refactor it.
+
+**Well-bounded** means the fix can be applied within files already touched by the PR (or trivially adjacent ones), without cascading into unrelated refactors that would balloon the diff.
 
 **Reasons that are not valid skip rationale:**
 
@@ -60,7 +65,7 @@ For every surfaced finding, choose one:
 
 ## PR Comment Format
 
-A single comment combining both sources:
+A single comment combining both sources. Every surfaced finding records the action taken (fix or skip + reason) — agent and CodeRabbit rows use the same shape.
 
 ```
 ### Code review
@@ -72,13 +77,19 @@ A single comment combining both sources:
 
 #### Agent findings (≥80 confidence)
 
-1. <one-line description> (<rule or rationale>)
+1. <one-line description> (<rule or rationale>) — <action: fix | skip + reason>
    <link to file with full SHA + line range>
 
 #### Verdict
 
 Pass | Pass with follow-ups | Fail
 ```
+
+### Verdict legend
+
+- **Pass** — every surfaced finding was decided to fix and the fix has landed in this PR (or was already correct and no fix needed).
+- **Pass with follow-ups** — every finding was decided, but one or more were skipped *as out-of-scope* and tracked as follow-up Issues. The PR is mergeable; the follow-ups exist as separate Issues.
+- **Fail** — at least one finding identifies a real correctness, security, or DoD violation that has not been fixed and is not legitimately out of scope.
 
 If both sources produce zero findings to decide on (CodeRabbit "No findings ✔" and no agent finding ≥80), post the canonical "No issues found" comment.
 
