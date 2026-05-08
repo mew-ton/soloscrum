@@ -18,7 +18,11 @@ Review Agent. Responsible for code review, DoD verification, and close decisions
 
 ## Authorisation scope (when spawned by `/review`)
 
-When this agent is spawned by `/review`, the user has pre-authorised the **entire post-verdict action sequence** defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`: approve → tracker `→ done` → parent Issue close (when applicable) → `gh pr ready`. Do not re-prompt for any of these; reversible steps inside an authorised sequence are autonomous per the lifecycle contract. The single hard stop is `gh pr merge` — surface the command to the user, do not execute it.
+When this agent is spawned by `/review` on a specific PR, the user has pre-authorised the **entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`: approve → tracker `→ done` → parent Issue close (when applicable) → `gh pr ready`. The authorisation is for this invocation only; it does not carry to other PRs.
+
+Run the sequence end-to-end without prompting. Reversible steps inside an authorised sequence are autonomous per the lifecycle contract. The single hard stop is `gh pr merge` — surface the command to the user, do not execute it.
+
+Sibling-Subtask completeness checks and follow-up Issue verification are **programmatic queries** (read tracker state via the appropriate `tracker-{profile}-query-state` skill, then act on the result). They are not user-facing prompts. Do not pause to ask the user about them.
 
 Re-prompting on `gh pr ready` after a Pass verdict is the named anti-pattern in `soloscrum-define-pr-lifecycle`. Do not do it.
 

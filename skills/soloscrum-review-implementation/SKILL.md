@@ -39,13 +39,13 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
    - Performance: no obvious bottlenecks
    - Readability and maintainability
 5. Compile all evaluation results into a single report following the format in `soloscrum-define-code-review-process`
-6. **On Pass / Pass with follow-ups** (transition state first, then promote to ready so a tracker failure does not leave a ready PR with stale state):
-   - For Pass with follow-ups only: confirm a follow-up Issue exists for each out-of-scope skip; create any missing Issue and record its number in the skip note before proceeding
+6. **On Pass / Pass with follow-ups** — run **all sub-steps below end-to-end without pausing**; the only stop in this entire sequence is at `gh pr merge`. Transition state first, then promote to ready so a tracker failure does not leave a ready PR with stale state:
+   - For Pass with follow-ups only: programmatically check whether a follow-up Issue exists for each out-of-scope skip; create any missing Issue autonomously and record its number in the skip note before proceeding (no user prompt)
    - Approve PR review (`gh pr review --approve`) — reversible
    - Resolve active profile, then invoke the matching `transition-state` operation skill to move the Subtask to `done`:
      - `github-only` → `soloscrum-tracker-github-transition-state`
      - `linear+github` → `soloscrum-tracker-linear-transition-state`
-   - Confirm all sibling Subtasks under the parent Issue are also `done`
+   - Programmatically check whether all sibling Subtasks under the parent Issue are also `done` (query the tracker via the matching `query-state` skill; this is a tracker lookup, not a user prompt)
    - If all complete, invoke the same `transition-state` skill on the parent Issue to close it
    - Promote the PR to ready (`gh pr ready`) — reversible (`gh pr ready --undo`); per `soloscrum-define-pr-lifecycle` this runs without pre-confirm
    - **Stop here.** Surface the exact `gh pr merge` command for the user to run; merge is irreversible and is the user's gate. Do not run `gh pr merge`.

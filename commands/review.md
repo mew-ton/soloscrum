@@ -20,7 +20,9 @@ Review implementation or design and close the Issue.
 
 ## Authorisation scope
 
-Invoking `/review` constitutes **pre-authorisation for the entire post-verdict action sequence** defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`. The user is asking for the verdict *and* the standard follow-through it implies — including `gh pr review --approve`, the tracker `→ done` transition, parent Issue close, and `gh pr ready`. None of those steps require an additional confirmation prompt; pausing on any reversible step is the failure mode the lifecycle skill exists to prevent.
+Invoking `/review` on a given PR constitutes **pre-authorisation for the entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`. The user is asking, for this invocation, for the verdict *and* the standard follow-through it implies — including `gh pr review --approve`, the tracker `→ done` transition, parent Issue close (when sibling Subtasks check passes), and `gh pr ready`. **None** of those steps require an additional confirmation prompt; pausing on any reversible step is the failure mode the lifecycle skill exists to prevent.
+
+The pre-authorisation applies to **this** invocation only and does not carry over to other PRs or to a re-run of `/review` on the same PR.
 
 The scope **stops** at `gh pr merge`. Merge is irreversible and is always the user's gate, regardless of verdict. The agent surfaces the exact merge command and does not execute it.
 
