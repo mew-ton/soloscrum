@@ -2,6 +2,15 @@
 name: next
 description: Recommends the next action based on backlog and active-work state — continues in-progress work, suggests review, starts the next subtask, or prompts to refine a new idea.
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Bash(gh issue list:*)
+  - Bash(gh issue view:*)
+  - Bash(gh pr list:*)
+  - Bash(gh api:*)
+  - Bash(gh project:*)
+  - mcp__claude_ai_Linear__list_issues
+  - mcp__claude_ai_Linear__list_issue_statuses
 ---
 
 # /next

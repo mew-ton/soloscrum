@@ -8,7 +8,8 @@ allowed-tools:
   - Glob
   - Grep
   - Bash(gh pr:*)
-  - Bash(gh issue view:*)
+  - Bash(gh issue:*)
+  - Bash(gh api:*)
 ---
 
 # soloscrum-review-implementation

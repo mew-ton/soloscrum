@@ -4,6 +4,20 @@ description: Reviews a PR or Figma file against the DoD and all AC. Merges the P
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
 effort: high
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh pr:*)
+  - Bash(gh issue:*)
+  - Bash(gh api:*)
+  - Bash(gh label:*)
+  - mcp__claude_ai_Linear__list_issues
+  - mcp__claude_ai_Linear__list_issue_statuses
+  - mcp__claude_ai_Linear__save_issue
+  - mcp__claude_ai_Figma__get_design_context
+  - mcp__claude_ai_Figma__get_screenshot
+  - mcp__claude_ai_Figma__get_metadata
 ---
 
 # /review

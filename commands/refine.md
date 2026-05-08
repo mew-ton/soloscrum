@@ -3,6 +3,14 @@ name: refine
 description: Structures an idea into a GitHub Issue. Checks size, suggests splitting when too large, determines priority and SP, then creates the issue after confirmation.
 argument-hint: <idea or feature description>
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh issue view:*)
+  - Bash(gh issue create:*)
+  - Bash(gh issue edit:*)
+  - Bash(gh label:*)
 ---
 
 # /refine

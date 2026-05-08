@@ -11,7 +11,8 @@ allowed-tools:
   - Grep
   - Bash(git:*)
   - Bash(gh pr:*)
-  - Bash(gh issue view:*)
+  - Bash(gh issue:*)
+  - Bash(gh api:*)
 ---
 
 # soloscrum-implement-task
