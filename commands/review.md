@@ -1,6 +1,6 @@
 ---
 name: review
-description: Reviews a PR or Figma file against the DoD and all AC. Merges the PR and closes the Issue when all subtasks pass.
+description: Reviews a PR or Figma file against the DoD and all AC. On Pass, approves, transitions the Subtask to Done, closes the parent Issue when all siblings are Done, promotes the PR to ready, and surfaces the merge command for the user. Merge itself is always the user's gate.
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
 effort: high
@@ -17,6 +17,12 @@ allowed-tools:
 # /review
 
 Review implementation or design and close the Issue.
+
+## Authorisation scope
+
+Invoking `/review` constitutes **pre-authorisation for the entire post-verdict action sequence** defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`. The user is asking for the verdict *and* the standard follow-through it implies — including `gh pr review --approve`, the tracker `→ done` transition, parent Issue close, and `gh pr ready`. None of those steps require an additional confirmation prompt; pausing on any reversible step is the failure mode the lifecycle skill exists to prevent.
+
+The scope **stops** at `gh pr merge`. Merge is irreversible and is always the user's gate, regardless of verdict. The agent surfaces the exact merge command and does not execute it.
 
 ## Behavior
 

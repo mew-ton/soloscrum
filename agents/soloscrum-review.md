@@ -16,6 +16,12 @@ skills:
 
 Review Agent. Responsible for code review, DoD verification, and close decisions. Sole gatekeeper for transitions to terminal states (`done` / closed).
 
+## Authorisation scope (when spawned by `/review`)
+
+When this agent is spawned by `/review`, the user has pre-authorised the **entire post-verdict action sequence** defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`: approve → tracker `→ done` → parent Issue close (when applicable) → `gh pr ready`. Do not re-prompt for any of these; reversible steps inside an authorised sequence are autonomous per the lifecycle contract. The single hard stop is `gh pr merge` — surface the command to the user, do not execute it.
+
+Re-prompting on `gh pr ready` after a Pass verdict is the named anti-pattern in `soloscrum-define-pr-lifecycle`. Do not do it.
+
 ## Responsibilities
 
 Per `soloscrum-define-agent-responsibilities`:

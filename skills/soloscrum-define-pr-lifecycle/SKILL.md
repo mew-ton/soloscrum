@@ -8,6 +8,18 @@ user-invocable: false
 
 Defines how a PR moves from creation to merge handoff, and which transitions an agent may execute autonomously vs which require the user as the final gate.
 
+## Contract (read this first)
+
+This skill establishes a project-specific autonomy contract that **overrides** any general default of "ask before doing anything PR-related." When the agent executes a soloscrum command (`/develop`, `/review`), the user has already authorised the full action sequence the command implies. Re-prompting for individual reversible steps inside that sequence is the failure mode this skill exists to prevent.
+
+The contract has three rules:
+
+1. **Reversible transitions are autonomous.** `gh pr create --draft`, `gh pr ready`, `gh pr review --approve`, `gh pr comment`, label edits, tracker state transitions — execute, then report. Do not ask.
+2. **Irreversible transitions are user-gated.** `gh pr merge`, force-push to a shared branch, branch deletion. The agent surfaces the exact command and stops.
+3. **The verdict is the decision point.** Once `soloscrum-review` produces a verdict, the post-verdict action sequence in `soloscrum-define-code-review-process` runs through to completion (or to the merge handoff) without further prompts. There is no "I'll just double-check" detour for reversible steps.
+
+The autonomy table below is the authoritative classification for every PR-side transition in soloscrum. If a transition is in the reversible table, the agent executes it without pre-confirm. If it is in the irreversible table, the agent stops and surfaces the command. Any transition not listed defaults to **irreversible until classified here**.
+
 ## Phases
 
 A PR moves through four phases. Each phase has a single owner role and a defined exit transition.
@@ -47,9 +59,9 @@ A transition is reversible when undoing it requires only one further command and
 
 | Transition | Command | How to undo |
 |---|---|---|
-| Create draft PR | `gh pr create --draft` | `gh pr close` (deletes the PR record) |
-| Promote to ready | `gh pr ready` | `gh pr ready --undo` |
-| Approve PR review | `gh pr review --approve` | dismiss review |
+| Create draft PR | `gh pr create --draft` | `gh pr close` — the PR is closed; because it was never marked ready, no reviewer notifications were ever fired |
+| Promote to ready | `gh pr ready` | `gh pr ready --undo` (returns the PR to draft) |
+| Approve PR review | `gh pr review --approve` | dismiss the review (`gh api --method PUT .../reviews/<id>/dismissals`) |
 | Comment on PR | `gh pr comment` | `gh api --method DELETE` on the comment |
 | Add / remove labels | `gh issue edit --add-label / --remove-label` | reverse the edit |
 | Tracker state transition | (delegated to `soloscrum-tracker-{profile}-transition-state`) | call again with previous state |
@@ -88,6 +100,18 @@ This is the bridge between `soloscrum-define-code-review-process` (which produce
 | (any verdict) → merge | User runs `gh pr merge` | **Yes (user gate)** |
 
 On Fail, leaving the PR in draft is intentional: it makes the "needs more work" state externally visible and avoids accidentally inviting a GitHub-side review on an unfinished PR.
+
+## Anti-patterns
+
+These are the specific failure modes this skill exists to prevent. Each one has caused a real incident; do not reintroduce them.
+
+- ❌ **After a Pass verdict, asking the user "may I run `gh pr ready`?"** This is the canonical failure (observed in `pplevrc/cms#17`). The verdict is the decision; `gh pr ready` is a reversible mechanical follow-up. Just run it.
+- ❌ **Mid-sequence pause after `gh pr review --approve` or after the tracker `→ done` transition, "to check before promoting".** The post-verdict sequence runs end-to-end. The only stop is at the merge handoff.
+- ❌ **On Fail, calling `gh pr ready` anyway** because the PR "looks close enough" or because the user might want to review the diff on GitHub. Fail keeps the PR in draft — that signal is part of the contract.
+- ❌ **On Fail, asking the user before reverting the Subtask state to `in-progress`.** State transitions are reversible per the autonomy table; revert and report.
+- ❌ **Running `gh pr merge` autonomously** because the verdict was Pass and the user invoked `/review`. Merge is irreversible and is **always** the user's gate, regardless of how clean the PR looks or how recently the user authorised something else.
+- ❌ **Treating `gh pr create --draft` as needing pre-confirm** because "creating a PR affects shared state". Draft creation is reversible (close removes it from active state with no notifications having fired) and is the standard opening move of `/develop`.
+- ❌ **Inventing a fourth verdict** (e.g. "Pass but I'll wait for the user to look at it first"). The verdict legend in `soloscrum-define-code-review-process` is exhaustive; pick one and execute its mapped sequence.
 
 ## Repository-specific overrides
 
