@@ -3,6 +3,13 @@ name: breakdown
 description: Breaks a GitHub Issue into Subtasks with type (develop or design-ui) and story points. Proposes the breakdown for confirmation, then registers each Subtask via the active tracker profile's operation skill.
 argument-hint: <issue-url or issue-number>
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh issue:*)
+  - Bash(gh api:*)
+  - Bash(gh label:*)
 ---
 
 # /breakdown

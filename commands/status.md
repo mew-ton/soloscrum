@@ -3,6 +3,14 @@ name: status
 description: Shows current work state — In Progress, In Review, and recently completed Subtasks with corresponding PR or Figma links.
 argument-hint: [issue-number]
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Bash(gh issue list:*)
+  - Bash(gh issue view:*)
+  - Bash(gh pr list:*)
+  - Bash(gh pr view:*)
+  - Bash(gh api:*)
+  - Bash(gh project:*)
 ---
 
 # /status

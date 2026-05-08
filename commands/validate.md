@@ -3,6 +3,11 @@ name: validate
 description: Validates feature design for scope clarity, dependencies, and technical feasibility. Returns Pass/Conditional Pass/Fail with recommended actions.
 argument-hint: <issue-url or issue-number>
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh issue view:*)
 ---
 
 # /validate

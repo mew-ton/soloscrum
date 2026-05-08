@@ -4,6 +4,14 @@ description: Reviews a PR or Figma file against the DoD and all AC. Merges the P
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
 effort: high
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh pr:*)
+  - Bash(gh issue:*)
+  - Bash(gh api:*)
+  - Bash(gh label:*)
 ---
 
 # /review

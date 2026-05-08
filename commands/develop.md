@@ -4,6 +4,17 @@ description: Implements a Subtask of type develop. Creates a branch, writes code
 argument-hint: <subtask-id>
 disable-model-invocation: true
 effort: high
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Glob
+  - Grep
+  - Bash(git:*)
+  - Bash(gh issue:*)
+  - Bash(gh pr:*)
+  - Bash(gh api:*)
+  - Bash(gh label:*)
 ---
 
 # /develop

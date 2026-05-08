@@ -3,6 +3,12 @@ name: soloscrum-split-into-tasks
 description: Breaks a GitHub Issue into subtasks with type (develop or design-ui) and story point estimates. Registers each subtask via the tracker operation skill matching the active profile.
 argument-hint: <issue-url or issue-number>
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh issue view:*)
+  - Bash(gh issue list:*)
 ---
 
 # soloscrum-split-into-tasks

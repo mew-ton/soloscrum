@@ -3,6 +3,22 @@ name: soloscrum-design-ui-task
 description: Designs a Subtask (type design-ui) in Figma with design tokens, components, all component states, and state transition diagrams. Checks DoD on completion. Tracker-profile-agnostic except for state transitions.
 argument-hint: <subtask-id>
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh issue view:*)
+  - mcp__claude_ai_Figma__get_design_context
+  - mcp__claude_ai_Figma__get_screenshot
+  - mcp__claude_ai_Figma__get_metadata
+  - mcp__claude_ai_Figma__get_figjam
+  - mcp__claude_ai_Figma__get_libraries
+  - mcp__claude_ai_Figma__get_variable_defs
+  - mcp__claude_ai_Figma__search_design_system
+  - mcp__claude_ai_Figma__create_new_file
+  - mcp__claude_ai_Figma__use_figma
+  - mcp__claude_ai_Figma__upload_assets
+  - mcp__claude_ai_Figma__generate_diagram
 ---
 
 # soloscrum-design-ui-task

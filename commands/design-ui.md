@@ -3,6 +3,11 @@ name: design-ui
 description: Designs a Subtask of type design-ui in Figma with tokens, components, and state flows. Transitions the Subtask to In Review on completion.
 argument-hint: <subtask-id>
 disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(gh issue view:*)
 ---
 
 # /design-ui
