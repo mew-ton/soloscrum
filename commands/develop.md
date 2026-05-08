@@ -29,9 +29,9 @@ Implement a develop Subtask.
    - Implement code referencing `.claude/rules/stack.md`
    - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
    - Generate PR body (issue number, change summary, test instructions)
-   - Create PR
+   - Create PR **as draft** (`gh pr create --draft`) per `soloscrum-define-pr-lifecycle`
 3. Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `in-review`
-4. Present PR URL to user
+4. Present draft PR URL to user and recommend `/review <pr-url>` as the next step. Promotion to ready is owned by `soloscrum-review`, not by this command.
 
 ## Input
 
@@ -47,5 +47,5 @@ Implement a develop Subtask.
 ## Resources
 
 - Subagent: `soloscrum-dev`
-- Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`, `soloscrum-define-tracker-profile`
-- Rules: `.claude/rules/stack.md`, `.claude/rules/branch.md`, `.claude/rules/dod-extra.md`
+- Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`
+- Rules: `.claude/rules/stack.md`, `.claude/rules/branch.md`, `.claude/rules/dod-extra.md`, `.claude/rules/pr.md` (optional draft-window override)

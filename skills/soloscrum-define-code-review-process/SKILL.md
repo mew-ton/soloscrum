@@ -93,6 +93,22 @@ Pass | Pass with follow-ups | Fail
 
 If both sources produce zero findings to decide on (CodeRabbit "No findings ✔" and no agent finding ≥80), post the canonical "No issues found" comment.
 
+### Post-verdict actions
+
+The verdict is the input to a defined sequence of next actions. The full lifecycle phases and the reversible-vs-irreversible autonomy classification live in `soloscrum-define-pr-lifecycle`; this section names the actions and cites that skill for autonomy.
+
+| Verdict | Who acts next | Actions (in order) | Pre-confirm? |
+|---|---|---|---|
+| **Pass** | `soloscrum-review` | (1) `gh pr review --approve` (2) tracker Subtask `→ done` via `soloscrum-tracker-{profile}-transition-state` (3) close parent Issue if all sibling Subtasks are done (4) `gh pr ready` (5) report the merge command to the user | No — every step is reversible per `soloscrum-define-pr-lifecycle` |
+| **Pass with follow-ups** | `soloscrum-review` | (1) confirm a follow-up Issue exists for each out-of-scope skip and that its number appears in the skip note; create any missing ones (2) then identical to **Pass** | No — same reversibility |
+| **Fail** | `soloscrum-review` → `soloscrum-dev` | (1) post per-finding feedback on the PR (2) tracker Subtask `→ in-progress` via `soloscrum-tracker-{profile}-transition-state` (3) **leave the PR in draft** — do not call `gh pr ready` (4) hand back to `soloscrum-dev` to address findings | No for the review-side actions; the dev rework loop then re-enters this pipeline |
+
+Notes on autonomy:
+
+- `gh pr ready` after Pass / Pass with follow-ups is a reversible transition (`gh pr ready --undo`) and runs without pre-confirm. Pausing here to ask the user is the over-cautious failure mode that motivated this skill — see `soloscrum-define-pr-lifecycle` for the full classification.
+- `gh pr merge` is **not** in the table above. Merge is always user-gated; the agent stops after step 5 of Pass and surfaces the merge command for the user to run.
+- On Fail, the PR is intentionally left in draft so that the "needs more work" state is externally visible and GitHub-side auto-reviewers stay suppressed during rework.
+
 ## When to run
 
 - Triggered by `/review` after the PR has been created and the `soloscrum-review` agent has completed DoD/AC verification.

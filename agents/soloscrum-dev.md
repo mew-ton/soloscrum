@@ -8,6 +8,7 @@ skills:
   - soloscrum-implement-task
   - soloscrum-define-branch-commit
   - soloscrum-define-dod
+  - soloscrum-define-pr-lifecycle
   - soloscrum-define-story-points
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
@@ -32,13 +33,13 @@ Per `soloscrum-define-agent-responsibilities`:
 4. Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
 5. Always include the corresponding Issue number in the PR body
 6. Always review subtask AC before starting implementation
-7. Commit with zero lint errors
+7. Commit with zero lint errors. Create the PR as draft (`gh pr create --draft`); promotion to ready is owned by `soloscrum-review`. The draft creation itself is reversible per `soloscrum-define-pr-lifecycle` and does not require a pre-confirm.
 8. Set Subtask SP per `soloscrum-define-story-points` when registering Subtasks
 9. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every tracker **write** operation (create-subtask / set-sp / transition-state / add-dependency) through the matching `soloscrum-tracker-{profile}-<op>` skill — never call Linear MCP or `gh issue create` / `gh issue edit` / `gh issue close` for tracker mutations directly. **Read** operations (e.g. `gh issue view` to read an Issue's AC) are allowed to run directly without going through a tracker operation skill
 
 ## External Access
 
-- Direct (reads + non-tracker writes): `git`, `gh pr` (PR creation/review/merge), `gh issue view` / `gh issue list` (read-only Issue queries)
+- Direct (reads + non-tracker writes): `git`, `gh pr create --draft` (initial PR creation), `gh pr` review/comment subcommands, `gh issue view` / `gh issue list` (read-only Issue queries). `gh pr ready` and `gh pr merge` are not dev surface — they belong to `soloscrum-review` and the user respectively per `soloscrum-define-pr-lifecycle`.
 - Delegated (via tracker operation skills): subtask creation, SP, state transitions, dependency declaration — i.e. anything that mutates tracker state
 
 ## Invoked by
