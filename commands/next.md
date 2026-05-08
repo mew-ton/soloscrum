@@ -9,8 +9,6 @@ allowed-tools:
   - Bash(gh pr list:*)
   - Bash(gh api:*)
   - Bash(gh project:*)
-  - mcp__claude_ai_Linear__list_issues
-  - mcp__claude_ai_Linear__list_issue_statuses
 ---
 
 # /next

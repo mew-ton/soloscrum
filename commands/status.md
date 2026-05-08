@@ -11,9 +11,6 @@ allowed-tools:
   - Bash(gh pr view:*)
   - Bash(gh api:*)
   - Bash(gh project:*)
-  - mcp__claude_ai_Linear__list_issues
-  - mcp__claude_ai_Linear__list_issue_statuses
-  - mcp__claude_ai_Linear__get_attachment
 ---
 
 # /status

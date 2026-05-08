@@ -10,9 +10,6 @@ allowed-tools:
   - Bash(gh issue:*)
   - Bash(gh api:*)
   - Bash(gh label:*)
-  - mcp__claude_ai_Linear__list_issues
-  - mcp__claude_ai_Linear__list_issue_labels
-  - mcp__claude_ai_Linear__save_issue
 ---
 
 # /breakdown

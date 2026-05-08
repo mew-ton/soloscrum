@@ -12,12 +12,6 @@ allowed-tools:
   - Bash(gh issue:*)
   - Bash(gh api:*)
   - Bash(gh label:*)
-  - mcp__claude_ai_Linear__list_issues
-  - mcp__claude_ai_Linear__list_issue_statuses
-  - mcp__claude_ai_Linear__save_issue
-  - mcp__claude_ai_Figma__get_design_context
-  - mcp__claude_ai_Figma__get_screenshot
-  - mcp__claude_ai_Figma__get_metadata
 ---
 
 # /review

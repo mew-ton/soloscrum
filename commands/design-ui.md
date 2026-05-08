@@ -8,19 +8,6 @@ allowed-tools:
   - Glob
   - Grep
   - Bash(gh issue view:*)
-  - mcp__claude_ai_Figma__get_design_context
-  - mcp__claude_ai_Figma__get_screenshot
-  - mcp__claude_ai_Figma__get_metadata
-  - mcp__claude_ai_Figma__get_libraries
-  - mcp__claude_ai_Figma__get_variable_defs
-  - mcp__claude_ai_Figma__search_design_system
-  - mcp__claude_ai_Figma__create_new_file
-  - mcp__claude_ai_Figma__use_figma
-  - mcp__claude_ai_Figma__upload_assets
-  - mcp__claude_ai_Figma__generate_diagram
-  - mcp__claude_ai_Linear__list_issues
-  - mcp__claude_ai_Linear__list_issue_statuses
-  - mcp__claude_ai_Linear__save_issue
 ---
 
 # /design-ui
