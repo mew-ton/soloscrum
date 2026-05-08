@@ -1,21 +1,21 @@
 ---
 name: soloscrum-design-ui-task
-description: Designs a Linear subtask (type design-ui) in Figma with design tokens, components, all component states, and state transition diagrams. Checks DoD on completion.
+description: Designs a Subtask (type design-ui) in Figma with design tokens, components, all component states, and state transition diagrams. Checks DoD on completion. Tracker-profile-agnostic except for state transitions.
 argument-hint: <subtask-id>
 disable-model-invocation: true
 ---
 
 # soloscrum-design-ui-task
 
-Produce Figma design with tokens and patterns.
+Produce Figma design with tokens and patterns for a Subtask of type `design-ui`.
 
 ## Overview
 
-Produces design in Figma for a Linear subtask (type: design-ui) based on its AC. Follows `soloscrum-define-ui-standards` conventions.
+Produces design in Figma for a Subtask (type: design-ui) based on its AC. Follows `soloscrum-define-ui-standards` conventions. Subtask state transitions delegate to the active profile's tracker operation skill.
 
 ## Steps
 
-1. Read target subtask AC, description, and related Issue: $ARGUMENTS
+1. Read target Subtask AC, description, and related Issue: $ARGUMENTS
 2. Check design token and pattern conventions with `soloscrum-define-ui-standards`
 3. Produce design in Figma MCP:
    - Check and reuse existing components
@@ -40,3 +40,4 @@ Produces design in Figma for a Linear subtask (type: design-ui) based on its AC.
 
 - `soloscrum-define-ui-standards`
 - `soloscrum-define-dod`
+- `soloscrum-define-tracker-profile` (for resolving subtask ID conventions)

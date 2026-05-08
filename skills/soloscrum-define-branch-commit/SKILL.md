@@ -27,8 +27,10 @@ Branch naming and commit conventions.
 
 ### issue-id
 
-- GitHub Issue number (e.g. `123`)
-- Linear subtask ID (e.g. `PRJ-42`)
+Identifier of the Subtask the branch implements. Format depends on the active tracker profile (per `soloscrum-define-tracker-profile`):
+
+- `github-only` → GH Sub-issue number (e.g. `123`)
+- `linear+github` → Linear subtask ID (e.g. `PRJ-42`)
 
 ### slug
 

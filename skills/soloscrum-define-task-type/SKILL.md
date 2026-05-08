@@ -39,6 +39,8 @@ Subtask type definitions (develop / design-ui) and assignment criteria.
 
 ## Labels
 
-Use the following labels in Linear:
+Use the following labels on Subtasks (storage location depends on active profile, per `soloscrum-define-tracker-profile`):
 - `type:develop`
 - `type:design-ui`
+
+In `github-only` profile, these are GH labels on the Sub-issue. In `linear+github` profile, these are Linear labels on the subtask. The label values are identical across profiles.
