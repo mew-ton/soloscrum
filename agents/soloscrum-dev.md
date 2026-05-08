@@ -34,12 +34,12 @@ Per `soloscrum-define-agent-responsibilities`:
 6. Always review subtask AC before starting implementation
 7. Commit with zero lint errors
 8. Set Subtask SP per `soloscrum-define-story-points` when registering Subtasks
-9. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every tracker operation (create-subtask / set-sp / transition-state / add-dependency) through the matching `soloscrum-tracker-{profile}-<op>` skill — never call Linear MCP or `gh issue` for tracker operations directly
+9. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every tracker **write** operation (create-subtask / set-sp / transition-state / add-dependency) through the matching `soloscrum-tracker-{profile}-<op>` skill — never call Linear MCP or `gh issue create` / `gh issue edit` / `gh issue close` for tracker mutations directly. **Read** operations (e.g. `gh issue view` to read an Issue's AC) are allowed to run directly without going through a tracker operation skill
 
 ## External Access
 
-- Direct: `git`, `gh pr` (PR creation), `gh issue view` (read AC)
-- Delegated (via tracker operation skills): subtask creation, SP, state, dependencies
+- Direct (reads + non-tracker writes): `git`, `gh pr` (PR creation/review/merge), `gh issue view` / `gh issue list` (read-only Issue queries)
+- Delegated (via tracker operation skills): subtask creation, SP, state transitions, dependency declaration — i.e. anything that mutates tracker state
 
 ## Invoked by
 
