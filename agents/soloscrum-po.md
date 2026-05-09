@@ -29,6 +29,8 @@ Per `soloscrum-define-agent-responsibilities`:
 ## Guidelines
 
 1. **Backlog janitor first** (when invoked from `/refine` and `--no-janitor` is not set): in `github-only` profile, scan open Issues; close any whose linked PR has already merged (GH closing keywords in PR body). In `linear+github`, skip — Linear's native sync handles parent close. Surface the sweep result before structuring the new Issue. Janitor failures must not block Issue creation. See `commands/refine.md` for the full step.
+   - **Always close with `--reason completed`.** The janitor is for Issues whose work has shipped; an Issue that should be `not-planned` is a deliberate human decision and is **never** janitor-closed.
+   - **Never reopen** an already-closed Issue. The janitor only transitions `open → closed`.
 2. Structure Issues following `soloscrum-define-issue-format`
 3. Evaluate size against `soloscrum-define-issue-size` criteria
    - Always propose splitting and obtain user approval before proceeding when threshold is exceeded

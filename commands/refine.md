@@ -29,6 +29,7 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
    - **`github-only`**: scan open Issues; for each, find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set.
    - **`linear+github`**: skip — Linear's native sync auto-manages parent close (per `soloscrum-tracker-linear-transition-state`), so a janitor sweep on the GH side would dual-update.
    - Surface the result at the start of `/refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`).
+   - **Always use `gh issue close --reason completed`.** Janitor never closes with `--reason not-planned` — that is a deliberate human decision. Janitor never reopens already-closed Issues.
    - **Janitor failures MUST NOT block `/refine`**. If the scan errors (network, permission), log a one-line notice and proceed to the structuring step. The user can re-run with `--no-janitor` to bypass entirely on a flaky environment.
 2. Receive idea or request from user (`$ARGUMENTS`)
 3. Launch `soloscrum-po` to:

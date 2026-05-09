@@ -67,7 +67,8 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
                                          Figma制作・トークン・パターン構築・State遷移
   │
   ▼
-/review             品質・DoD照合・Issueクローズ
+/review             品質・DoD照合・SubtaskをDoneに遷移・PRをreadyに promote
+                     (Issueクローズはマージ時のGH `Closes #N` 自動クローズで発火)
 ```
 
 ---
@@ -81,7 +82,7 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
 | `/breakdown` | IssueをSubtaskに分解しタイプを付与する |
 | `/develop` | develop Subtaskを実装する |
 | `/design-ui` | design-ui SubtaskをFigmaで制作する |
-| `/review` | 実装・デザインをレビューしIssueをクローズする |
+| `/review` | 実装・デザインをレビューしSubtaskをDoneに遷移する（Issueクローズはマージ時に発火） |
 | `/status` | 現在の作業状況を確認する |
 | `/next` | 次にやるべきことを提示する |
 
