@@ -26,31 +26,61 @@ Beyond allowlist hygiene, this also stops the same loop from being reinvented ev
 - (optional) `poll_interval_sec` — default `15`. How often to re-query.
 - (optional) `timeout_sec` — default `1800` (30 minutes). Hard cap on wait time. `0` disables the cap (wait forever — only set when the user knows the CI tail is long).
 
+## Why the rollup is two-shaped
+
+`gh pr view --json statusCheckRollup` returns a mixed array of two GraphQL types:
+
+- **`CheckRun`** — modern Checks API. Has `name` (string), `status` (`QUEUED` / `IN_PROGRESS` / `WAITING` / `PENDING` / `REQUESTED` / `COMPLETED`), `conclusion` (`SUCCESS` / `FAILURE` / `CANCELLED` / `SKIPPED` / `TIMED_OUT` / `NEUTRAL` / `ACTION_REQUIRED` / `STARTUP_FAILURE` / `null` while in flight).
+- **`StatusContext`** — legacy commit-status API (e.g. `vercel`, `ci/codesandbox`, `coderabbit`). Has `context` (string, **not** `name`), `state` (`PENDING` / `EXPECTED` / `SUCCESS` / `FAILURE` / `ERROR`). No `status` / `conclusion` fields.
+
+A naive `select(.name != null)` filter drops every `StatusContext` entry, which makes the loop falsely "complete" the moment a PR's checks are entirely commit-status (legacy CI providers, common CodeRabbit-only configs). The skill MUST normalize the two shapes before deciding completion.
+
 ## Steps
 
-1. Query the PR's status check rollup:
+1. Query the PR's status check rollup, normalizing into a single `{name, status, conclusion}` shape:
 
    ```bash
-   gh pr view "$pr_number" --json statusCheckRollup \
-     --jq '[.statusCheckRollup[] | select(.name != null)]'
+   gh pr view "$pr_number" --json statusCheckRollup --jq '
+     [.statusCheckRollup[] | {
+       name: (.name // .context),
+       status: (.status // (
+         if (.state == "PENDING" or .state == "EXPECTED")
+         then "IN_PROGRESS"
+         else "COMPLETED"
+         end
+       )),
+       conclusion: (.conclusion // .state)
+     }]
+   '
    ```
 
-   The `select(.name != null)` filter drops the rollup overall summary (which has no `name`).
+   - `name` falls back to `context` for legacy commit-status entries.
+   - `status` for StatusContext is synthesized: `PENDING` / `EXPECTED` → `IN_PROGRESS`, anything else → `COMPLETED`.
+   - `conclusion` for StatusContext falls back to `state` (so `SUCCESS` / `FAILURE` / `ERROR` surface in the output).
 
-2. If every check has `.status == "COMPLETED"`, stop. Otherwise sleep `poll_interval_sec` and re-query.
+2. **Empty-rollup guard.** If the normalized array is empty, the PR has not yet registered any check (typical right after `gh pr create --draft` — workflows take a few seconds to dispatch). Treat this as "not ready" rather than "all complete": sleep `poll_interval_sec` and re-query. Without this guard, the all-complete check is vacuously true on an empty array and the loop would exit before any CI starts. The empty-rollup state is bounded by `timeout_sec` like any other in-flight state.
 
-3. If the elapsed wall-clock time exceeds `timeout_sec` (and `timeout_sec > 0`), exit with a non-zero status and surface the in-flight check names so the caller can decide whether to extend the wait or fail the parent step.
+3. **Completion check.** If the normalized array is non-empty AND every entry has `status == "COMPLETED"`, stop. Otherwise sleep `poll_interval_sec` and re-query.
 
-4. On completion, return the conclusions:
+4. **Timeout.** If elapsed wall-clock time exceeds `timeout_sec` (and `timeout_sec > 0`), exit non-zero and surface the names of any entries with `status != "COMPLETED"` so the caller can decide whether to extend the wait or fail the parent step.
+
+5. **On completion**, return:
 
    ```bash
-   gh pr view "$pr_number" --json statusCheckRollup \
-     --jq '[.statusCheckRollup[] | select(.name != null) | {name: .name, conclusion: .conclusion}]'
+   gh pr view "$pr_number" --json statusCheckRollup --jq '
+     [.statusCheckRollup[] | {
+       name: (.name // .context),
+       conclusion: (.conclusion // .state)
+     }]
+   '
    ```
 
 ## Output
 
-A JSON array of `{name, conclusion}` entries — one per check. Conclusions are GitHub's standard set: `SUCCESS`, `FAILURE`, `CANCELLED`, `SKIPPED`, `TIMED_OUT`, `NEUTRAL`, `ACTION_REQUIRED`, `STARTUP_FAILURE`.
+A JSON array of `{name, conclusion}` entries — one per check. Conclusions are normalized across both shapes:
+
+- CheckRun: GitHub's standard set (`SUCCESS`, `FAILURE`, `CANCELLED`, `SKIPPED`, `TIMED_OUT`, `NEUTRAL`, `ACTION_REQUIRED`, `STARTUP_FAILURE`)
+- StatusContext: `SUCCESS`, `FAILURE`, `ERROR` (the `state` value)
 
 Example:
 
@@ -58,11 +88,12 @@ Example:
 [
   {"name": "typecheck", "conclusion": "SUCCESS"},
   {"name": "test", "conclusion": "SUCCESS"},
+  {"name": "vercel", "conclusion": "SUCCESS"},
   {"name": "lint", "conclusion": "FAILURE"}
 ]
 ```
 
-The caller is responsible for deciding what to do with non-`SUCCESS` conclusions — this skill only waits for completion, it does not interpret pass/fail.
+The caller is responsible for deciding what to do with non-`SUCCESS` conclusions — this skill only waits for completion, it does not interpret pass/fail. Callers that want green-only should treat `SUCCESS`, `SKIPPED`, and `NEUTRAL` as acceptable; everything else as fail.
 
 ## When to invoke
 
