@@ -10,7 +10,7 @@ Defines the four detection rule sets the `soloscrum-auditor` subagent applies wh
 
 ## Why this skill exists
 
-soloscrum's behaviour is defined by the prose body of files under `skills/`, `agents/`, `commands/`, `CLAUDE.md`, and `README.md`. Every Issue / PR cycle adds, modifies, or removes prose across multiple files. The corpus has grown to a size where a human cannot reliably check end-to-end consistency on every change, and Issue / PR review only catches what reviewers happen to look at — not the long tail of drift.
+soloscrum's behaviour is defined by the prose body of files under `skills/`, `agents/`, `commands/`, `CLAUDE.md`, and `README.md`. The corpus spans dozens of files; cross-file consistency cannot be enforced by per-PR human review alone, and PR review only catches what reviewers happen to look at — not the long tail of drift introduced as new Issues, agents, or commands are added over time.
 
 This skill formalises four classes of drift the auditor must detect, so that the audit pass is reproducible and not reliant on whoever happens to be reviewing.
 
@@ -52,16 +52,17 @@ Not in scope (regardless of `--scope`):
 
 **Heuristics**:
 
-- Build a concept index across files. Concepts to track at minimum:
-  - "Issue close timing" (verdict vs merge)
-  - "Subtask state mapping" (closed vs open + label)
-  - "Post-verdict actions sequence" (approve / tracker → done / gh pr ready)
-  - "Draft-window purpose"
-  - "Self-approve refusal handling"
-  - "Janitor scope and trigger"
-  - "Merge handoff: who runs `gh pr merge`"
-- For each concept, extract the prose snippet from each file that mentions it. If two snippets disagree on the rule, classification, or sequence, that pair is a finding.
-- Detection is structural, not regex-based: the auditor reads the relevant sections and judges agreement at the claim level (e.g. "file A says X is reversible, file B says X is irreversible" → finding).
+- The concept index is **closed for v1**. The auditor checks only these seven concepts; expanding the list is a separate spec change, not an in-audit decision:
+  1. **Issue close timing** — verdict-time vs merge-time
+  2. **Subtask state mapping** — open + label vs closed
+  3. **Post-verdict actions sequence** — exact ordered step list (approve / tracker `→ done` / `gh pr ready` / merge surface)
+  4. **Draft-window purpose** — auto-reviewer suppression vs self-quality-gate
+  5. **Self-approve refusal handling** — verdict comment as Pass record + try-and-fall-through
+  6. **`/refine` janitor scope and trigger** — what it closes, when, with which `--reason`
+  7. **Merge handoff** — who runs `gh pr merge` (always user)
+- For each concept, extract the prose snippet from each file that mentions it (concept index → file → snippet). If two snippets state different rules / classifications / sequences for the same concept, the pair is a finding.
+- Detection compares specific snippets against specific snippets — not free-form paraphrase. Worked example: if `soloscrum-define-pr-lifecycle` says *"`gh pr review --approve` is reversible"* and a hypothetical `agents/foo.md` says *"`gh pr review --approve` requires user confirmation,"* both snippets are extracted and the auditor flags the disagreement on the autonomy classification of that exact command.
+- A concept absent from a file is **not** a finding (silence is allowed). Only mutually inconsistent presence triggers R2.
 
 **Severity**: error. Cross-file contradictions silently mislead agents and need a fix (which file is correct? update the other).
 
@@ -109,7 +110,7 @@ Every finding from any of R1–R4 goes through the same per-item decision as `so
 
 Severity (warning / error) is **informational only** — never an auto-skip filter. A warning that is a real drift is still worth fixing; an error that is a false positive is still skipped with reason.
 
-There is no confidence pre-filter on auditor findings. The auditor is run on the soloscrum repo, not on a fresh PR diff, so there is no corresponding noise floor; every match goes through the per-item decision.
+There is no confidence pre-filter on auditor findings. The agent-finding pre-filter in `soloscrum-define-code-review-process` exists because multi-agent reviewers spawn fresh per PR and are prone to inventing constraints — that is a hallucination floor specific to that pipeline. The auditor is a single deterministic subagent applying a fixed rule set against a fixed corpus; it has no equivalent floor, so every match goes straight to the per-item decision.
 
 ## Report format
 
@@ -168,12 +169,13 @@ The auditor is read-only; **all fixes go through normal `/develop` cycles**. The
 ## Notes
 
 - This skill is profile-agnostic. The audit corpus is soloscrum's own docs, which are profile-independent.
-- This skill is `disable-model-invocation: true` and `user-invocable: false`. It is consumed by `soloscrum-auditor` (per sub-issue #24); the user-facing entry point is `/audit` (per sub-issue #25).
+- This skill is `disable-model-invocation: true` and `user-invocable: false`. It is consumed by the `soloscrum-auditor` subagent; the user-facing entry point is the `/audit` command. (Both are tracked separately under #18's breakdown.)
 - The auditor MUST NOT edit any file. The report is the output; per-finding fixes go through `/refine` → `/develop`.
 - When a finding repeats across multiple files (e.g. same workaround prose copied to three skills), report once with all locations listed; do not generate N separate findings.
+- **Self-applicability**: this skill is itself part of the audit corpus. Running `/audit` against the repo MUST not flag this skill on R1/R3/R4 false-positives caused by the rules' own example phrases. Phrases that appear inside Markdown quotes (`*"..."*`) or fenced code blocks as illustrations of a heuristic are not findings; this carve-out applies in **all** in-scope files, not only CLAUDE.md.
 
 ## Depends On
 
 - `soloscrum-define-code-review-process` — per-finding decision rules; report format follows the same pattern
 - `soloscrum-define-pr-lifecycle` — autonomy classification (the source of truth for R4 cross-checks)
-- `soloscrum-define-issue-format` — for the format of follow-up Issues filed from Audit findings (sub-issue #26 dogfooding round)
+- `soloscrum-define-issue-format` — for the format of follow-up Issues filed from Audit findings during the dogfood smoke run
