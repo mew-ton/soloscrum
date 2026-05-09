@@ -61,7 +61,7 @@ A transition is reversible when undoing it requires only one further command and
 |---|---|---|
 | Create draft PR | `gh pr create --draft` | `gh pr close` — the PR is closed; because it was never marked ready, no reviewer notifications were ever fired |
 | Promote to ready | `gh pr ready` | `gh pr ready --undo` (returns the PR to draft) |
-| Approve PR review | `gh pr review --approve` | dismiss the review (`gh api --method PUT .../reviews/<id>/dismissals`) |
+| Approve PR review | `gh pr review --approve` (degrades to a no-op on self-approve refusal — see "Self-approve refusal in solo-dev contexts" below) | dismiss the review (`gh api --method PUT .../reviews/<id>/dismissals`) |
 | Comment on PR | `gh pr comment` | `gh api --method DELETE` on the comment |
 | Add / remove labels | `gh issue edit --add-label / --remove-label` | reverse the edit |
 | Tracker state transition | (delegated to `soloscrum-tracker-{profile}-transition-state`) | call again with previous state |
@@ -81,12 +81,34 @@ A transition is irreversible when undoing it is impossible, requires admin inter
 
 `gh pr merge` is **always** user-gated in soloscrum, regardless of verdict. The agent's role ends at "PR is ready, tracker is `done`, here is the merge command." The user runs the merge.
 
+### Self-approve refusal in solo-dev contexts
+
+GitHub does not allow a PR's author to approve their own PR. When the same human (or token) authored the PR and is now running `/review`, `gh pr review --approve` fails with:
+
+```
+failed to create review: GraphQL: Review Can not approve your own pull request (addPullRequestReview)
+```
+
+This is the default state in solo-dev — the design point soloscrum's `/review` is built around. The post-verdict sequence is built so a self-approve refusal does **not** abort it:
+
+- **The verdict comment IS the formal Pass record.** The PR comment posted per `soloscrum-define-code-review-process` "PR Comment Format" is the canonical record of the verdict; an approving review from GitHub's API on top of it is a duplicate signal that solo-dev cannot produce by design. When `gh pr review --approve` fails with self-approve refusal, the verdict comment already carries the Pass; subsequent steps (tracker `→ done`, parent Issue close, `gh pr ready`) MUST still run.
+- **Self-approve refusal is not Fail.** The verdict was already decided before the approve call; the API-side acknowledgement is a follow-up that is structurally unavailable here. Do not flip the verdict.
+- **Try-and-fall-through is the implementation pattern.** No probe call to detect identity is needed; just attempt the approve and continue when it fails:
+
+  ```bash
+  gh pr review --approve "$PR_URL" \
+    || echo "approve skipped (likely self-approve refusal); verdict comment is the formal Pass record"
+  ```
+
+- **Branch-protection requiring an approving review from another account is out of scope.** Repos that enforce such a rule cannot merge under solo-dev `/review`. Either disable that branch-protection rule for the owner, add a separate human reviewer, or configure CodeRabbit to leave the approving review. soloscrum does not paper over this with bot accounts.
+
 ### How agents apply this
 
 - Before executing a transition, classify it by the table above.
 - If reversible: execute, then report what was done in one line.
 - If irreversible: surface a one-line summary + the exact command, and wait.
 - Do **not** invent a third "I'll ask just to be safe" path for reversible transitions. The autonomy rules are the contract.
+- **Treat self-approve refusal as a no-op, not a failure** — continue the post-verdict sequence per the section above.
 
 ## Verdict → next-action mapping
 
@@ -112,6 +134,7 @@ These are the specific failure modes this skill exists to prevent. Each one has 
 - ❌ **Running `gh pr merge` autonomously** because the verdict was Pass and the user invoked `/review`. Merge is irreversible and is **always** the user's gate, regardless of how clean the PR looks or how recently the user authorised something else.
 - ❌ **Treating `gh pr create --draft` as needing pre-confirm** because "creating a PR affects shared state". Draft creation is reversible (close removes it from active state with no notifications having fired) and is the standard opening move of `/develop`.
 - ❌ **Inventing a fourth verdict** (e.g. "Pass but I'll wait for the user to look at it first"). The verdict legend in `soloscrum-define-code-review-process` is exhaustive; pick one and execute its mapped sequence.
+- ❌ **Treating self-approve refusal as a Fail or as cause to abort the post-verdict sequence.** In solo-dev, `gh pr review --approve` failing with "Can not approve your own pull request" is the **default, expected** outcome. The verdict comment is the formal Pass record; tracker transition, parent-Issue close, and `gh pr ready` MUST still run. See "Self-approve refusal in solo-dev contexts" above.
 
 ## Repository-specific overrides
 
