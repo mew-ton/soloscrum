@@ -41,7 +41,7 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
    - Approve PR (`gh pr review --approve`)
    - Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `done`
    - **Wait for CI to complete** before promoting to ready. Invoke `soloscrum-tracker-github-wait-for-pr-checks`:
-     ```
+     ```bash
      skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number>
      ```
      Then treat conclusions of `SUCCESS` / `SKIPPED` / `NEUTRAL` as acceptable. Anything else (`FAILURE` / `CANCELLED` / `TIMED_OUT` / `ERROR` / `ACTION_REQUIRED` / `STARTUP_FAILURE`) downgrades the verdict to **Fail**: post the failed conclusions on the PR, revert the Subtask to `in-progress`, and skip the remaining Pass actions. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).

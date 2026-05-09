@@ -52,7 +52,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
      - `linear+github` → `soloscrum-tracker-linear-transition-state`
    - **Do not close the parent Issue here.** Parent and Subtask Issue closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close, not as part of the post-verdict sequence. For parent Issues whose closing event was missed, the `/refine` janitor cleans them up on the next backlog touch. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
    - **Wait for CI to complete** before promoting to ready. Invoke `soloscrum-tracker-github-wait-for-pr-checks`:
-     ```
+     ```bash
      skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number>
      ```
      If any conclusion is **not** `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as **Fail** retroactively: post the failed conclusions on the PR, revert the Subtask to `in-progress` via the `transition-state` skill, and skip the remaining Pass actions (do **not** promote to ready). A green CI is part of the Pass contract — promoting a ready PR with red checks is the failure mode this step exists to prevent. Inline `until` loops over `gh pr view` are the anti-pattern this skill replaces.

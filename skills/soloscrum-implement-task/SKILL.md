@@ -50,7 +50,7 @@ Implements code for a Subtask (type: develop) based on its AC and generates a **
 
 7. Create the PR **as draft**: `gh pr create --draft ...`. This is a reversible transition per `soloscrum-define-pr-lifecycle` and runs without pre-confirm. If `.claude/rules/pr.md` documents a repository-level override that makes the draft window unnecessary, follow that file; otherwise default to `--draft`.
 8. Confirm CI started cleanly via `soloscrum-tracker-github-wait-for-pr-checks` (short `timeout_sec`, e.g. `300`):
-   ```
+   ```bash
    skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number> 15 300
    ```
    This is a startup-confirmation step, not a green-gate — surface non-`SUCCESS` conclusions if any but proceed to handoff regardless. The intent is to catch CI startup failures (workflow syntax errors, missing secrets) early. **Do not** write inline `until` loops over `gh pr view`; that pattern is the named anti-pattern in `CLAUDE.md` and the reason this skill exists (see `soloscrum-tracker-github-wait-for-pr-checks`).
