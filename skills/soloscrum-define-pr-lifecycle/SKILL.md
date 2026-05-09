@@ -129,7 +129,7 @@ The Subtask state machine and the GH Issue closed/open dimension are **decoupled
 | `in-progress` | open + `state:in-progress` label | Implementation in progress |
 | `in-review` | open + `state:in-review` label | Draft PR exists, `/review` in flight |
 | `done` (pre-merge) | open + `state:done` label | `/review` Pass verdict reached, awaiting `gh pr merge` |
-| `done` (post-merge) | closed + `state:done` label retained | The PR merged; GH auto-close fired via `Closes #N` |
+| `done` (post-merge) | closed + `state:done` label retained | The PR merged; GH auto-close fired via `Closes #N` (this is **not** an agent transition — it is a side-effect of `gh pr merge`) |
 
 The `state:done` label is what `soloscrum-tracker-github-transition-state` writes at verdict time. The transition skill **never** calls `gh issue close` — that is the merge consequence. See `soloscrum-tracker-github-transition-state` for the GH mapping.
 
