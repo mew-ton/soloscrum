@@ -20,7 +20,7 @@ Review implementation or design and close the Issue.
 
 ## Authorisation scope
 
-Invoking `/review` on a given PR constitutes **pre-authorisation for the entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`. The user is asking, for this invocation, for the verdict *and* the standard follow-through it implies — including `gh pr review --approve`, the tracker `→ done` transition, and `gh pr ready`. **None** of those steps require an additional confirmation prompt; pausing on any reversible step is the failure mode the lifecycle skill exists to prevent. Issue close is not part of this sequence — it happens at merge time via the PR body's `Closes #` keyword.
+Invoking `/review` on a given PR constitutes **pre-authorisation for the entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`. The user is asking, for this invocation, for the verdict *and* the standard follow-through it implies — including `gh pr review --approve`, the tracker `→ done` transition, the **CI-green wait gate** via `soloscrum-tracker-github-wait-for-pr-checks` (which can retroactively downgrade Pass to Fail on red checks), and `gh pr ready`. **None** of those steps require an additional confirmation prompt; pausing on any reversible step is the failure mode the lifecycle skill exists to prevent. Issue close is not part of this sequence — it happens at merge time via the PR body's `Closes #` keyword.
 
 The pre-authorisation applies to **this** invocation only and does not carry over to other PRs or to a re-run of `/review` on the same PR.
 

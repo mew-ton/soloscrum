@@ -19,7 +19,7 @@ Review Agent. Responsible for code review, DoD verification, and the verdict tha
 
 ## Authorisation scope (when spawned by `/review`)
 
-When this agent is spawned by `/review` on a specific PR, the user has pre-authorised the **entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`: approve → tracker `→ done` → `gh pr ready`. The authorisation is for this invocation only; it does not carry to other PRs. Issue close is **not** in this sequence — it happens at merge time via the PR body's `Closes #` keyword (see `soloscrum-define-pr-lifecycle`, "Issue close happens at merge").
+When this agent is spawned by `/review` on a specific PR, the user has pre-authorised the **entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`: approve → tracker `→ done` → wait for CI green via `soloscrum-tracker-github-wait-for-pr-checks` (red CI retroactively downgrades to Fail) → `gh pr ready`. The authorisation is for this invocation only; it does not carry to other PRs. Issue close is **not** in this sequence — it happens at merge time via the PR body's `Closes #` keyword (see `soloscrum-define-pr-lifecycle`, "Issue close happens at merge").
 
 Run the sequence end-to-end without prompting. Reversible steps inside an authorised sequence are autonomous per the lifecycle contract. The single hard stop is `gh pr merge` — surface the command to the user, do not execute it.
 
