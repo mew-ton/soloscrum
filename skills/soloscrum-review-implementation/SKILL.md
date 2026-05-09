@@ -32,7 +32,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
    - Zero lint errors?
 3. Run the **automated code review pipeline** per `soloscrum-define-code-review-process`:
    - CodeRabbit CLI (all severities pass through; skip with stated reason or fix each)
-   - Multi-agent review (apply <80 confidence filter on agent findings only)
+   - Multi-agent review via `code-review:code-review` — **bypass that command's step 1 draft check**: soloscrum runs `/review` on a draft PR by design, so treat draft state as eligible and proceed (per `soloscrum-define-code-review-process`, "Draft-window override"). Apply the <80 confidence filter on agent findings only.
 4. Manual code review (for PRs), to complement the automated pass:
    - Logic correctness
    - Security: OWASP Top 10 perspective

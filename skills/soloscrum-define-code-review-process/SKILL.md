@@ -13,9 +13,20 @@ Defines the standard code review pipeline run during `/review`, plus the rules f
 A code review combines two complementary sources, run in parallel:
 
 1. **CodeRabbit** (`coderabbit review --plain --base main`) — produces findings with its own severity classification: `critical` / `major` / `minor` / `nitpick`.
-2. **Multi-agent review** — N parallel Sonnet agents, each with a focused lens (security, architecture, bug scan, history, in-file rules, coverage gap), produces free-text findings.
+2. **Multi-agent review** — implemented via the `code-review:code-review` slash command (N parallel Sonnet agents, each with a focused lens: security, architecture, bug scan, history, in-file rules, coverage gap). Produces free-text findings, scored 0–100 by a Haiku agent per the rubric in that command.
 
 Both sources' findings are then consolidated into a single PR comment.
+
+### Draft-window override for `code-review:code-review`
+
+`code-review:code-review` ships with an eligibility check (its step 1) that **skips PRs still in draft**. In soloscrum, that check MUST be bypassed: the PR is *intentionally* in draft when `/review` runs, because the draft window is where the local quality gate fires (see `soloscrum-define-pr-lifecycle`, "Why a draft window exists"). Honouring the upstream skip here silently drops half the review pipeline and defeats the draft-window design.
+
+When invoking `code-review:code-review` from the soloscrum review pipeline (i.e. from `soloscrum-review-implementation` step 3 or any caller of this skill):
+
+- **Treat `draft` as eligible** — proceed past step 1 as if the PR were ready.
+- All other eligibility checks (closed, automated, already reviewed by you) still apply.
+
+If `code-review:code-review` later exposes an explicit override argument, prefer that argument; until then, this directive is the authoritative override for soloscrum's `/review`.
 
 ## Finding Handling Rules
 
