@@ -1,6 +1,6 @@
 ---
 name: soloscrum-implement-task
-description: Implements a Subtask (type develop) by creating a branch, writing code and tests, committing with Conventional Commits, generating a PR body, and creating the PR as draft. Tracker-profile-agnostic except for state transitions.
+description: Implements a Subtask (type develop) by creating a branch, writing code and tests, committing with Conventional Commits, generating a PR body, creating the PR as draft, and transitioning the Subtask to In Review via the active profile's tracker operation skill.
 argument-hint: <subtask-id>
 disable-model-invocation: true
 allowed-tools:
@@ -55,12 +55,18 @@ Implements code for a Subtask (type: develop) based on its AC and generates a **
    ```
    This is a startup-confirmation step, not a green-gate — surface non-`SUCCESS` conclusions if any but proceed to handoff regardless. The intent is to catch CI startup failures (workflow syntax errors, missing secrets) early. **Do not** write inline `until` loops over `gh pr view`; that pattern is the named anti-pattern in `CLAUDE.md` and the reason this skill exists (see `soloscrum-tracker-github-wait-for-pr-checks`).
 9. Verify DoD self-check with `soloscrum-define-dod` (every item except "Review has passed", which is owned by `soloscrum-review`).
-10. Hand off to `/review` (which launches `soloscrum-review-implementation`). Do **not** promote the PR to ready from this skill — `gh pr ready` is owned by the review phase.
+10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then invoke the matching `transition-state` operation skill to move the Subtask to `in-review`:
+    - `github-only` → `soloscrum-tracker-github-transition-state`
+    - `linear+github` → `soloscrum-tracker-linear-transition-state`
+    Reversible per `soloscrum-define-pr-lifecycle`'s autonomy table; runs without pre-confirm. This is the creator-side `→ in-review` transition assigned to `dev` in `soloscrum-define-agent-responsibilities`.
+11. Hand off to `/review` (which launches `soloscrum-review-implementation`). Do **not** promote the PR to ready from this skill — `gh pr ready` is owned by the review phase.
 
 ## Depends On
 
 - `soloscrum-define-branch-commit`
 - `soloscrum-define-dod`
 - `soloscrum-define-pr-lifecycle` (draft creation, autonomy of reversible transitions, handoff boundary)
-- `soloscrum-define-tracker-profile` (for resolving subtask ID conventions)
+- `soloscrum-define-tracker-profile` (for resolving subtask ID conventions and routing the transition)
+- `soloscrum-define-agent-responsibilities` (creator-side Subtask State ownership)
+- `soloscrum-tracker-{github|linear}-transition-state` (delegated `→ in-review` transition in step 10)
 - `soloscrum-tracker-github-wait-for-pr-checks` (CI-startup confirmation step 8)
