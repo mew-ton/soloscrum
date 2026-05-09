@@ -30,8 +30,13 @@ Implement a develop Subtask.
    - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
    - Generate PR body (issue number, change summary, test instructions)
    - Create PR **as draft** (`gh pr create --draft`) per `soloscrum-define-pr-lifecycle`
-3. Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `in-review`
-4. Present draft PR URL to user and recommend `/review <pr-url>` as the next step. Promotion to ready is owned by `soloscrum-review`, not by this command.
+3. Confirm CI started cleanly. Invoke `soloscrum-tracker-github-wait-for-pr-checks` with a short `timeout_sec` (e.g. `300`):
+   ```bash
+   skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number> 15 300
+   ```
+   This is a confirmation step, not a green-gate — the `/develop` handoff does not block on `SUCCESS`. The intent is to surface CI startup failures (workflow file syntax errors, missing secrets) here rather than at `/review`. If the script returns non-zero (timeout), surface the in-flight names and proceed; if it returns zero with non-`SUCCESS` conclusions, surface the conclusions and proceed. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).
+4. Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `in-review`
+5. Present draft PR URL to user and recommend `/review <pr-url>` as the next step. Promotion to ready is owned by `soloscrum-review`, not by this command.
 
 ## Input
 

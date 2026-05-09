@@ -33,6 +33,7 @@ These are the specific failure modes this file exists to prevent. Each has been 
 - ❌ **Treating `code-review:code-review`'s draft-skip as authoritative inside soloscrum's `/review`.** soloscrum's draft window is where the local quality gate fires by design; the bypass is mandated (per `soloscrum-define-code-review-process` "Draft-window override").
 - ❌ **Running `gh pr merge` autonomously.** Merge is always the user's gate, regardless of verdict — `gh pr merge` is irreversible. Surface the exact command and stop.
 - ❌ **Re-prompting on reversible post-verdict steps** ("may I run `gh pr ready`?"). The verdict is the decision point; reversible steps execute without pre-confirm per `soloscrum-define-pr-lifecycle`.
+- ❌ **Writing inline `until ... gh pr view ... sleep ...` loops to wait for PR CI.** Use `soloscrum-tracker-github-wait-for-pr-checks` (invoke its colocated script from the repo root). Inline loops embed the PR number in the command string, defeat harness allowlist matching (causing per-PR re-prompts), and reinvent the rollup-normalisation `jq` filter every session.
 
 ## When the flow does NOT apply
 
