@@ -25,8 +25,8 @@ Design a design-ui Subtask in Figma.
      - UI pattern consistency check
    - Create state transition diagram (if applicable)
    - Verify DoD with `soloscrum-define-dod`
-3. Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `in-review`
-4. Present Figma URL to user
+   - Resolve the active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `in-review` (owned by `soloscrum-design-ui-task` step 8; reversible per `soloscrum-define-pr-lifecycle`)
+3. Present Figma URL to user
 
 ## Input
 

@@ -1,6 +1,6 @@
 ---
 name: soloscrum-design-ui-task
-description: Designs a Subtask (type design-ui) in Figma with design tokens, components, all component states, and state transition diagrams. Checks DoD on completion. Tracker-profile-agnostic except for state transitions.
+description: Designs a Subtask (type design-ui) in Figma with design tokens, components, all component states, and state transition diagrams. Checks DoD and transitions the Subtask to In Review via the active profile's tracker operation skill on completion.
 argument-hint: <subtask-id>
 disable-model-invocation: true
 allowed-tools:
@@ -45,6 +45,10 @@ Produces design in Figma for a Subtask (type: design-ui) based on its AC. Follow
    - Contrast ratio: WCAG AA or above
    - Touch target: 44px × 44px or larger
 7. Verify DoD with `soloscrum-define-dod`
+8. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then invoke the matching `transition-state` operation skill to move the Subtask to `in-review`:
+   - `github-only` → `soloscrum-tracker-github-transition-state`
+   - `linear+github` → `soloscrum-tracker-linear-transition-state`
+   Reversible per `soloscrum-define-pr-lifecycle`'s autonomy table; runs without pre-confirm. This is the creator-side `→ in-review` transition assigned to `ui` in `soloscrum-define-agent-responsibilities`.
 
 ## Output
 
@@ -56,4 +60,7 @@ Produces design in Figma for a Subtask (type: design-ui) based on its AC. Follow
 
 - `soloscrum-define-ui-standards`
 - `soloscrum-define-dod`
-- `soloscrum-define-tracker-profile` (for resolving subtask ID conventions)
+- `soloscrum-define-pr-lifecycle` (autonomy of reversible transitions)
+- `soloscrum-define-tracker-profile` (for resolving subtask ID conventions and routing the transition)
+- `soloscrum-define-agent-responsibilities` (creator-side Subtask State ownership)
+- `soloscrum-tracker-{github|linear}-transition-state` (delegated `→ in-review` transition in step 8)
