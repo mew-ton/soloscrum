@@ -3,22 +3,29 @@ name: soloscrum-tracker-github-wait-for-pr-checks
 description: "Operation: poll a GitHub PR's CI status checks until all of them complete (or until a timeout) and return their conclusions. Used by /develop and /review when the next step depends on green CI. Profile-agnostic — PRs live on GitHub regardless of tracker_profile, so both `github-only` and `linear+github` route here."
 user-invocable: false
 allowed-tools:
-  - Bash(gh pr view:*)
-  - Bash(sleep:*)
+  - Bash(./scripts/wait-for-pr-checks.sh:*)
 ---
 
 # soloscrum-tracker-github-wait-for-pr-checks
 
 Wait for all status checks on a GitHub PR to complete (success or failure), then return the per-check conclusions. Active in **both** `github-only` and `linear+github` profiles — PRs are on GitHub in either case.
 
-## Why this is a skill, not an inline shell loop
+## How it works
 
-Until now, agents (Claude Code et al.) wrote a bespoke `until` loop with the PR number embedded in the command string and an inline `jq` filter. That has two problems:
+The implementation is a single shell script colocated with this skill at `./scripts/wait-for-pr-checks.sh`. The script encapsulates the polling loop, the `gh pr view` invocation, the rollup-normalisation `jq` filter, the empty-rollup guard, and the timeout logic. The skill itself is documentation; agents invoke the script directly.
 
-1. **Permission allowlist cannot match.** Each PR has a different number, so the command string changes per PR; a harness allowlist like `Bash(gh pr view:*)` matches but the user gets prompted for every distinct invocation. Wrapping the wait in a stable skill surface lets harnesses match on the skill name and skip per-PR re-prompting.
-2. **The `jq` filter drifts.** Each agent writes the filter slightly differently (e.g. handling of `null`-named rollup entries), so allowlist matching at the command-string level breaks. A canonical implementation here removes the variance.
+```
+./scripts/wait-for-pr-checks.sh <pr_number> [poll_interval_sec] [timeout_sec]
+```
 
-Beyond allowlist hygiene, this also stops the same loop from being reinvented every session.
+### Why a script and not an inline loop
+
+Two practical reasons beyond reinvention:
+
+1. **Permission allowlist matches a stable surface.** An inline `until ...; do gh pr view <N> ... ; sleep ...` loop has the PR number in the command string, so a harness allowlist on `Bash(gh pr view:*)` re-prompts the user on every distinct invocation. With the wait extracted to `./scripts/wait-for-pr-checks.sh`, the allowlist entry `Bash(./scripts/wait-for-pr-checks.sh:*)` matches every call regardless of PR number, and the inner `gh` / `sleep` calls happen inside the already-allowed script.
+2. **The polling logic is fixed.** The script is the canonical implementation of the rollup normalisation (see "Why the rollup is two-shaped" below); agents do not re-derive the `jq` filter per session.
+
+This is also why the skill's `allowed-tools` lists only the script path — not `gh pr view` or `sleep`. Inner calls are a script-private concern.
 
 ## Inputs
 
@@ -26,58 +33,15 @@ Beyond allowlist hygiene, this also stops the same loop from being reinvented ev
 - (optional) `poll_interval_sec` — default `15`. How often to re-query.
 - (optional) `timeout_sec` — default `1800` (30 minutes). Hard cap on wait time. `0` disables the cap (wait forever — only set when the user knows the CI tail is long).
 
-## Why the rollup is two-shaped
-
-`gh pr view --json statusCheckRollup` returns a mixed array of two GraphQL types:
-
-- **`CheckRun`** — modern Checks API. Has `name` (string), `status` (`QUEUED` / `IN_PROGRESS` / `WAITING` / `PENDING` / `REQUESTED` / `COMPLETED`), `conclusion` (`SUCCESS` / `FAILURE` / `CANCELLED` / `SKIPPED` / `TIMED_OUT` / `NEUTRAL` / `ACTION_REQUIRED` / `STARTUP_FAILURE` / `null` while in flight).
-- **`StatusContext`** — legacy commit-status API (e.g. `vercel`, `ci/codesandbox`, `coderabbit`). Has `context` (string, **not** `name`), `state` (`PENDING` / `EXPECTED` / `SUCCESS` / `FAILURE` / `ERROR`). No `status` / `conclusion` fields.
-
-A naive `select(.name != null)` filter drops every `StatusContext` entry, which makes the loop falsely "complete" the moment a PR's checks are entirely commit-status (legacy CI providers, common CodeRabbit-only configs). The skill MUST normalize the two shapes before deciding completion.
-
-## Steps
-
-1. Query the PR's status check rollup, normalizing into a single `{name, status, conclusion}` shape:
-
-   ```bash
-   gh pr view "$pr_number" --json statusCheckRollup --jq '
-     [.statusCheckRollup[] | {
-       name: (.name // .context),
-       status: (.status // (
-         if (.state == "PENDING" or .state == "EXPECTED")
-         then "IN_PROGRESS"
-         else "COMPLETED"
-         end
-       )),
-       conclusion: (.conclusion // .state)
-     }]
-   '
-   ```
-
-   - `name` falls back to `context` for legacy commit-status entries.
-   - `status` for StatusContext is synthesized: `PENDING` / `EXPECTED` → `IN_PROGRESS`, anything else → `COMPLETED`.
-   - `conclusion` for StatusContext falls back to `state` (so `SUCCESS` / `FAILURE` / `ERROR` surface in the output).
-
-2. **Empty-rollup guard.** If the normalized array is empty, the PR has not yet registered any check (typical right after `gh pr create --draft` — workflows take a few seconds to dispatch). Treat this as "not ready" rather than "all complete": sleep `poll_interval_sec` and re-query. Without this guard, the all-complete check is vacuously true on an empty array and the loop would exit before any CI starts. The empty-rollup state is bounded by `timeout_sec` like any other in-flight state.
-
-3. **Completion check.** If the normalized array is non-empty AND every entry has `status == "COMPLETED"`, stop. Otherwise sleep `poll_interval_sec` and re-query.
-
-4. **Timeout.** If elapsed wall-clock time exceeds `timeout_sec` (and `timeout_sec > 0`), exit non-zero and surface the names of any entries with `status != "COMPLETED"` so the caller can decide whether to extend the wait or fail the parent step.
-
-5. **On completion**, return:
-
-   ```bash
-   gh pr view "$pr_number" --json statusCheckRollup --jq '
-     [.statusCheckRollup[] | {
-       name: (.name // .context),
-       conclusion: (.conclusion // .state)
-     }]
-   '
-   ```
-
 ## Output
 
-A JSON array of `{name, conclusion}` entries — one per check. Conclusions are normalized across both shapes:
+On success (exit `0`): a JSON array of `{name, conclusion}` entries — one per check — written to stdout.
+
+On timeout (exit `1`): nothing on stdout; the names of in-flight checks are written to stderr.
+
+On argument error (exit `2`): a usage message on stderr.
+
+Conclusions are normalized across the two GraphQL types `gh pr view --json statusCheckRollup` mixes (see next section):
 
 - CheckRun: GitHub's standard set (`SUCCESS`, `FAILURE`, `CANCELLED`, `SKIPPED`, `TIMED_OUT`, `NEUTRAL`, `ACTION_REQUIRED`, `STARTUP_FAILURE`)
 - StatusContext: `SUCCESS`, `FAILURE`, `ERROR` (the `state` value)
@@ -93,7 +57,18 @@ Example:
 ]
 ```
 
-The caller is responsible for deciding what to do with non-`SUCCESS` conclusions — this skill only waits for completion, it does not interpret pass/fail. Callers that want green-only should treat `SUCCESS`, `SKIPPED`, and `NEUTRAL` as acceptable; everything else as fail.
+The caller decides what to do with non-`SUCCESS` conclusions — this skill only waits for completion, it does not interpret pass/fail. Callers that want green-only should treat `SUCCESS`, `SKIPPED`, and `NEUTRAL` as acceptable; everything else as fail.
+
+## Why the rollup is two-shaped
+
+`gh pr view --json statusCheckRollup` returns a mixed array of two GraphQL types. The script normalises both into `{name, status, conclusion}` before deciding completion, so callers do not need to know about the difference:
+
+- **`CheckRun`** — modern Checks API. Has `name` (string), `status` (`QUEUED` / `IN_PROGRESS` / `WAITING` / `PENDING` / `REQUESTED` / `COMPLETED`), `conclusion` (`SUCCESS` / `FAILURE` / `CANCELLED` / `SKIPPED` / `TIMED_OUT` / `NEUTRAL` / `ACTION_REQUIRED` / `STARTUP_FAILURE` / `null` while in flight).
+- **`StatusContext`** — legacy commit-status API (e.g. `vercel`, `ci/codesandbox`, `coderabbit`). Has `context` (string, **not** `name`), `state` (`PENDING` / `EXPECTED` / `SUCCESS` / `FAILURE` / `ERROR`). No `status` / `conclusion` fields.
+
+A naive `select(.name != null)` filter would drop every `StatusContext` entry, falsely "completing" the loop the moment a PR's checks are entirely commit-status. The script normalisation maps `name = .name // .context`, synthesises `status` from `.state` for StatusContext (`PENDING` / `EXPECTED` → `IN_PROGRESS`, else `COMPLETED`), and falls back `conclusion = .conclusion // .state`.
+
+The empty-rollup case (workflows have not yet registered, typical right after `gh pr create --draft`) is treated as "not ready" rather than "all complete" — without that guard, the all-complete predicate is vacuously true on an empty array and the loop would exit before any CI starts.
 
 ## When to invoke
 
@@ -103,10 +78,10 @@ The caller is responsible for deciding what to do with non-`SUCCESS` conclusions
 
 ## Notes
 
-- This skill is the **only** sanctioned way to wait for PR CI inside soloscrum. Inline `until` loops over `gh pr view` are an anti-pattern (permission allowlist + reinvention).
-- `gh pr view --json statusCheckRollup` returns checks both for the head SHA's `commit_status` API and the `check_runs` API; both are flattened into `statusCheckRollup`. The `select(.name != null)` filter is required because the rollup overall summary entry has no name and would otherwise pollute results.
+- This skill is the **only** sanctioned way to wait for PR CI inside soloscrum. Inline `until` loops over `gh pr view` are an anti-pattern (permission-allowlist churn + reinvention).
 - Both tracker profiles route here. There is **no** `soloscrum-tracker-linear-wait-for-pr-checks` because the operation has no Linear-side variant — Linear does not manage PR CI; PRs live on GitHub regardless of profile.
-- For `--draft` PRs, `statusCheckRollup` still populates as soon as workflows run on the head ref. This skill works on draft and ready PRs alike.
+- For `--draft` PRs, `statusCheckRollup` populates as soon as workflows run on the head ref. The script works on draft and ready PRs alike.
+- The script has no external dependencies beyond `gh`, `jq`, and a POSIX shell — these are already required by every soloscrum operation.
 
 ## Depends On
 
