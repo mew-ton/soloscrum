@@ -35,6 +35,32 @@ These are the specific failure modes this file exists to prevent. Each has been 
 - ❌ **Re-prompting on reversible post-verdict steps** ("may I run `gh pr ready`?"). The verdict is the decision point; reversible steps execute without pre-confirm per `soloscrum-define-pr-lifecycle`.
 - ❌ **Writing inline `until ... gh pr view ... sleep ...` loops to wait for PR CI.** Use `soloscrum-tracker-github-wait-for-pr-checks` (invoke its colocated script from the repo root). Inline loops embed the PR number in the command string, defeat harness allowlist matching (causing per-PR re-prompts), and reinvent the rollup-normalisation `jq` filter every session.
 
+## Permission settings
+
+Two layered files under `.claude/`:
+
+- **`.claude/settings.json`** — repo-shared, **committed**. Curated allowlist of safe / reversible operations (read-only `gh` queries, `gh pr create` / `gh pr ready` / `gh pr review` / `gh pr comment`, `gh issue create` / `gh issue edit` / `gh issue comment`, `gh api` / `gh label`, all `git` operations except force-push / hard-reset, `coderabbit review`, `find` / `grep` / `rg` / `ls` / `cat` / `jq`, `Write(/tmp/**)`, the `wait-for-pr-checks.sh` script). Plus a `deny` list for truly destructive ops (`rm`, force-push, `git reset --hard`, `gh repo delete`, `gh issue delete`).
+- **`.claude/settings.local.json`** — per-user, **gitignored**. Personal additions (e.g. paths to local plugin caches, ad-hoc `tee` patterns picked up during a session). Never committed.
+
+Operations **deliberately not pre-approved** (require per-invocation user prompt by design):
+
+- `gh pr merge` — always user-gated per `soloscrum-define-pr-lifecycle`
+- `gh issue close` — `/refine` janitor uses it but each invocation should be visible to the user (per #20 discussion: closing is reversible but its semantics matter)
+- `gh pr close` — same reasoning
+
+Operations **denied entirely** (cannot be approved without editing settings):
+
+- `rm` / `rmdir` family — destructive filesystem changes
+- `git push --force` / `git push -f` / `git push --force-with-lease` — overwrites shared history
+- `git reset --hard` / `git clean -f` — discards uncommitted work
+- `git branch -D` — force-deletes branches without merge check
+- `gh repo delete` / `gh issue delete` — irreversible
+- `gh api -X DELETE:*` / `gh api --method DELETE:*` — REST DELETE through the generic gh client (since `gh api:*` itself is allowed, the explicit deny is required to block destructive verbs)
+
+**Caveat about `gh api`**: the allow entry `Bash(gh api:*)` covers read-mostly use (REST queries, GraphQL queries-and-mutations) but inherently includes writes via `--method PUT/POST/PATCH`. The deny rules above cover DELETE; PUT/POST/PATCH writes are left to per-call user judgment because some are routine (e.g. dismissing reviews) and some are not (e.g. modifying repo settings). When unsure, prefer specific `gh issue …` / `gh pr …` subcommands over generic `gh api`.
+
+When the user accepts an unfamiliar command at the harness prompt, that decision applies to that invocation only — it does not persist to `settings.json` automatically. Patterns observed across multiple sessions and judged universally safe should be promoted from `settings.local.json` (or per-prompt acceptance) into the committed `settings.json` via a `/develop` flow that explains the addition.
+
 ## When the flow does NOT apply
 
 These exemptions exist so the flow stays cheap to follow elsewhere:

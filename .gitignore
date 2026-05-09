@@ -1,0 +1,7 @@
+# Claude Code per-user settings (committed: .claude/settings.json)
+.claude/settings.local.json
+
+# OS / editor scratch
+.DS_Store
+*.swp
+*~
