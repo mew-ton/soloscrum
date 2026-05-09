@@ -1,8 +1,6 @@
 {
   "permissions": {
     "allow": [
-      "Read(//home/mew-ton/.claude/plugins/marketplaces/**)",
-
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(find:*)",
@@ -73,7 +71,9 @@
       "Bash(git clean -f:*)",
       "Bash(git branch -D:*)",
       "Bash(gh repo delete:*)",
-      "Bash(gh issue delete:*)"
+      "Bash(gh issue delete:*)",
+      "Bash(gh api -X DELETE:*)",
+      "Bash(gh api --method DELETE:*)"
     ]
   }
 }
