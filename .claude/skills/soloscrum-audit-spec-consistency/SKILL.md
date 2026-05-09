@@ -16,16 +16,17 @@ This skill formalises four classes of drift the auditor must detect, so that the
 
 ## File scope
 
-Unless the caller restricts via `--scope`, the audit covers:
+Unless the caller restricts via `--scope`, the audit covers the **plugin-distributed corpus** of this repo — what consumers get when they install soloscrum:
 
-- `skills/**/SKILL.md` — every skill spec
-- `agents/**/*.md` — every agent definition
-- `commands/**/*.md` — every command definition
-- `CLAUDE.md` — repo-level dogfooding rules
+- `skills/**/SKILL.md` — every plugin-distributed skill spec
+- `agents/**/*.md` — every plugin-distributed agent definition
+- `commands/**/*.md` — every plugin-distributed command definition
+- `CLAUDE.md` — repo-level dogfooding rules (part of the public surface)
 - `README.md` — public-facing entry doc
 
 Not in scope (regardless of `--scope`):
 
+- `.claude/skills/`, `.claude/agents/`, `.claude/commands/` — **this skill, the auditor subagent, and the `/audit` command live under `.claude/`**; they are soloscrum's *own* repo-local dev tooling, not shipped in the plugin. Auditing the auditor is a tail-chase that adds no signal.
 - `.claude/rules/*` (consumer-side overrides; soloscrum core does not own their content)
 - `.github/`, `.git/`, `.claude-plugin/` (config / metadata, not behavior prose)
 - Memory, Issue / PR bodies, commit messages (transient by design)
@@ -172,7 +173,7 @@ The auditor is read-only; **all fixes go through normal `/develop` cycles**. The
 - This skill is `disable-model-invocation: true` and `user-invocable: false`. It is consumed by the `soloscrum-auditor` subagent; the user-facing entry point is the `/audit` command. (Both are tracked separately under #18's breakdown.)
 - The auditor MUST NOT edit any file. The report is the output; per-finding fixes go through `/refine` → `/develop`.
 - When a finding repeats across multiple files (e.g. same workaround prose copied to three skills), report once with all locations listed; do not generate N separate findings.
-- **Self-applicability**: this skill is itself part of the audit corpus. Running `/audit` against the repo MUST not flag this skill on R1/R3/R4 false-positives caused by the rules' own example phrases. Phrases that appear inside Markdown quotes (`*"..."*`) or fenced code blocks as illustrations of a heuristic are not findings; this carve-out applies in **all** in-scope files, not only CLAUDE.md.
+- **Self-applicability**: the audit corpus does not include `.claude/skills/`, `.claude/agents/`, or `.claude/commands/`, where this skill and its consumers live (see "File scope" above). The auditor never audits itself. Within the in-scope corpus, however, the same kind of false positive can arise from any spec body that legitimately quotes a heuristic phrase as an example: phrases that appear inside Markdown quotes (`*"..."*`) or fenced code blocks as illustrations of a heuristic are not findings, in any in-scope file.
 
 ## Depends On
 
