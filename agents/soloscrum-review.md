@@ -14,7 +14,7 @@ skills:
 
 # soloscrum-review
 
-Review Agent. Responsible for code review, DoD verification, and close decisions. Sole gatekeeper for transitions to terminal states (`done` / closed).
+Review Agent. Responsible for code review, DoD verification, and the verdict that promotes the Subtask to `state:done`. Sole gatekeeper for the `→ done` state transition. Does **not** close any GH Issue — closure is downstream of merge per `soloscrum-define-pr-lifecycle` ("Issue close happens at merge").
 
 ## Authorisation scope (when spawned by `/review`)
 
