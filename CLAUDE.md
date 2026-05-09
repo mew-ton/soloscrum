@@ -34,6 +34,29 @@ These are the specific failure modes this file exists to prevent. Each has been 
 - ❌ **Running `gh pr merge` autonomously.** Merge is always the user's gate, regardless of verdict — `gh pr merge` is irreversible. Surface the exact command and stop.
 - ❌ **Re-prompting on reversible post-verdict steps** ("may I run `gh pr ready`?"). The verdict is the decision point; reversible steps execute without pre-confirm per `soloscrum-define-pr-lifecycle`.
 
+## Permission settings
+
+Two layered files under `.claude/`:
+
+- **`.claude/settings.json`** — repo-shared, **committed**. Curated allowlist of safe / reversible operations (read-only `gh` queries, `gh pr create` / `gh pr ready` / `gh pr review` / `gh pr comment`, `gh issue create` / `gh issue edit` / `gh issue comment`, `gh api` / `gh label`, all `git` operations except force-push / hard-reset, `coderabbit review`, `find` / `grep` / `rg` / `ls` / `cat` / `jq`, `Write(/tmp/**)`, the `wait-for-pr-checks.sh` script). Plus a `deny` list for truly destructive ops (`rm`, force-push, `git reset --hard`, `gh repo delete`, `gh issue delete`).
+- **`.claude/settings.local.json`** — per-user, **gitignored**. Personal additions (e.g. paths to local plugin caches, ad-hoc `tee` patterns picked up during a session). Never committed.
+
+Operations **deliberately not pre-approved** (require per-invocation user prompt by design):
+
+- `gh pr merge` — always user-gated per `soloscrum-define-pr-lifecycle`
+- `gh issue close` — `/refine` janitor uses it but each invocation should be visible to the user (per #20 discussion: closing is reversible but its semantics matter)
+- `gh pr close` — same reasoning
+
+Operations **denied entirely** (cannot be approved without editing settings):
+
+- `rm` / `rmdir` family — destructive filesystem changes
+- `git push --force` / `git push -f` / `git push --force-with-lease` — overwrites shared history
+- `git reset --hard` / `git clean -f` — discards uncommitted work
+- `git branch -D` — force-deletes branches without merge check
+- `gh repo delete` / `gh issue delete` — irreversible
+
+When the user accepts an unfamiliar command at the harness prompt, that decision applies to that invocation only — it does not persist to `settings.json` automatically. Patterns observed across multiple sessions and judged universally safe should be promoted from `settings.local.json` (or per-prompt acceptance) into the committed `settings.json` via a `/develop` flow that explains the addition.
+
 ## When the flow does NOT apply
 
 These exemptions exist so the flow stays cheap to follow elsewhere:
