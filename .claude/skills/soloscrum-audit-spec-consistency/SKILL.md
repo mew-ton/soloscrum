@@ -125,8 +125,8 @@ The auditor reads that file, substitutes the angle-bracket placeholders (`<repo>
 
 Required substitutions per finding:
 
-- **R1 / R3 / R4** (single-file findings): `<one-line description>`, `<path>:<line-range>`, `<prose excerpt>`, `<which heuristic matched>`, `<concrete edit, or "track as follow-up Issue">`
-- **R2** (cross-file findings): `<one-line description of the concept that drifted>`, `<path-a>:<line-range>` + `<claim-a>`, `<path-b>:<line-range>` + `<claim-b>`, `<what disagrees>`, `<which file is canonical, what to change in the other>`
+- **R1 / R3 / R4**: `<one-line description>`, one or more `<path>:<line-range>` + `<prose excerpt>` pairs (the `Files:` field is a list — see "De-duplication" in the auditor agent guidelines), `<which heuristic matched>`, `<concrete edit, or "track as follow-up Issue">`
+- **R2** (inherently cross-file): `<one-line description of the concept that drifted>`, `<path-a>:<line-range>` + `<claim-a>`, `<path-b>:<line-range>` + `<claim-b>`, `<what disagrees>`, `<which file is canonical, what to change in the other>`
 
 Sections for rules with zero findings MUST still appear, with the finding list replaced by `(no findings)`. The Summary line totals MUST agree with the per-rule section counts.
 
