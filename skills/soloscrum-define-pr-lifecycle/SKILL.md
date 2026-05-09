@@ -151,7 +151,7 @@ This is the bridge between `soloscrum-define-code-review-process` (which produce
 
 | Verdict | Next action by `soloscrum-review` | User pre-confirm? |
 |---|---|---|
-| **Pass** | `gh pr review --approve` → tracker Subtask `→ done` → `gh pr ready` → report merge command to user | No (all reversible) |
+| **Pass** | `gh pr review --approve` → tracker Subtask `→ done` → wait for CI green via `soloscrum-tracker-github-wait-for-pr-checks` (non-`SUCCESS`/`SKIPPED`/`NEUTRAL` retroactively downgrades to **Fail**) → `gh pr ready` → report merge command to user | No (all reversible) |
 | **Pass with follow-ups** | Confirm follow-up Issues exist for each out-of-scope skip → same actions as Pass | No (all reversible) |
 | **Fail** | Post per-finding feedback → tracker Subtask `→ in-progress` → leave PR in `draft` (do **not** call `gh pr ready`) | No (all reversible) |
 | (any verdict) → merge | User runs `gh pr merge` | **Yes (user gate)** |
