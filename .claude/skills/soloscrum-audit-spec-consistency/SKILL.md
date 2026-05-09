@@ -115,55 +115,20 @@ There is no confidence pre-filter on auditor findings. The agent-finding pre-fil
 
 ## Report format
 
-The auditor emits a single Markdown report:
+The auditor emits a single Markdown report. The canonical template is colocated with this skill at:
 
-```markdown
-## soloscrum spec audit
-
-Repo: <repo>
-Commit: <sha>
-Scope: <skill | agent | command | docs | all>
-
-### Summary
-
-- R1 (leaked session context): N findings
-- R2 (cross-file contradictions): N findings
-- R3 (fresh-memory completability): N findings
-- R4 (automation blockers): N findings
-
-### R1 — Leaked session context
-
-#### F1.1 <one-line description>
-- File: `<path>:<line-range>`
-- Snippet: > <prose excerpt>
-- Why: <which heuristic matched>
-- Suggested fix: <concrete edit, or "track as follow-up Issue">
-
-#### F1.2 ...
-
-### R2 — Cross-file contradictions
-
-#### F2.1 <one-line description of the concept that drifted>
-- File A: `<path-a>:<line-range>` claims: <claim-a>
-- File B: `<path-b>:<line-range>` claims: <claim-b>
-- Inconsistency: <what disagrees>
-- Suggested fix: <which file is canonical, what to change in the other>
-
-#### F2.2 ...
-
-### R3 — Fresh-memory completability
-
-(same shape as R1)
-
-### R4 — Automation blockers
-
-(same shape as R1)
-
-### Verdict
-
-- Clean — no findings
-- Findings present — <total> (<errors> errors, <warnings> warnings) — see per-rule sections above
 ```
+.claude/skills/soloscrum-audit-spec-consistency/references/report-template.md
+```
+
+The auditor reads that file, substitutes the angle-bracket placeholders (`<repo>` / `<sha>` / `<scope>` / `<finding-fields>`) with concrete values, and writes the result to stdout. Editing the template file is the only way to change the report shape; the SKILL.md does not duplicate the template body.
+
+Required substitutions per finding:
+
+- **R1 / R3 / R4** (single-file findings): `<one-line description>`, `<path>:<line-range>`, `<prose excerpt>`, `<which heuristic matched>`, `<concrete edit, or "track as follow-up Issue">`
+- **R2** (cross-file findings): `<one-line description of the concept that drifted>`, `<path-a>:<line-range>` + `<claim-a>`, `<path-b>:<line-range>` + `<claim-b>`, `<what disagrees>`, `<which file is canonical, what to change in the other>`
+
+Sections for rules with zero findings MUST still appear, with the finding list replaced by `(no findings)`. The Summary line totals MUST agree with the per-rule section counts.
 
 The auditor is read-only; **all fixes go through normal `/develop` cycles**. The report is the artifact, not file edits.
 
