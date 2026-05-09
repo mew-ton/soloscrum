@@ -85,4 +85,12 @@ Skills (the soloscrum spec — read these for the contract):
 
 Commands the user invokes:
 
-- `/refine`, `/breakdown`, `/develop`, `/review` — see `commands/`
+- `/refine`, `/breakdown`, `/develop`, `/review` — see `commands/` (these ship in the plugin to consumer repos)
+
+## Local commands (this repo only)
+
+These commands live under `.claude/commands/` and are **not** distributed in the plugin — they are soloscrum's own dev tooling. They are not added to the README Commands table or to `soloscrum-define-agent-responsibilities`'s Lifecycle Summary on purpose.
+
+- `/audit` (`.claude/commands/audit.md`) — runs the consistency audit on this repo's plugin-distributed spec corpus per `soloscrum-audit-spec-consistency`. Read-only; surfaces drift across four rule sets (leaked session context, cross-file contradictions, fresh-memory completability, automation blockers). Findings worth fixing route through `/refine` → `/develop` like any other change — `/audit` does not file Issues itself and does not edit files.
+
+Run `/audit` after any non-trivial change to the spec corpus, and especially before a release or after a long session.
