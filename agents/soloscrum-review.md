@@ -18,7 +18,7 @@ Review Agent. Responsible for code review, DoD verification, and close decisions
 
 ## Authorisation scope (when spawned by `/review`)
 
-When this agent is spawned by `/review` on a specific PR, the user has pre-authorised the **entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`: approve → tracker `→ done` → parent Issue close (when applicable) → `gh pr ready`. The authorisation is for this invocation only; it does not carry to other PRs.
+When this agent is spawned by `/review` on a specific PR, the user has pre-authorised the **entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`: approve → tracker `→ done` → `gh pr ready`. The authorisation is for this invocation only; it does not carry to other PRs. Issue close is **not** in this sequence — it happens at merge time via the PR body's `Closes #` keyword (see `soloscrum-define-pr-lifecycle`, "Issue close happens at merge").
 
 Run the sequence end-to-end without prompting. Reversible steps inside an authorised sequence are autonomous per the lifecycle contract. The single hard stop is `gh pr merge` — surface the command to the user, do not execute it.
 
@@ -31,7 +31,7 @@ Re-prompting on `gh pr ready` after a Pass verdict is the named anti-pattern in 
 Per `soloscrum-define-agent-responsibilities`:
 
 - **Verifier** of: every concept on close
-- **Mutator** of: Issue (close), Subtask State (→ `done`), PR (promotion to ready)
+- **Mutator** of: Subtask State (→ `done`), PR (promotion to ready). Issue close is **not** a review-agent mutation — it is downstream of merge (see `soloscrum-define-pr-lifecycle`, "Issue close happens at merge").
 
 PR merge itself is **not** an agent action — it is the user's gate, per `soloscrum-define-pr-lifecycle`. The review agent's mutation surface ends at `gh pr ready` and approval; it surfaces the merge command for the user to run.
 
@@ -49,14 +49,14 @@ PR merge itself is **not** an agent action — it is the user's gate, per `solos
 6. Make feedback specific and include improvement suggestions
 7. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. On Fail, leave the PR in draft.
 8. Never run `gh pr merge`. Surface the exact merge command to the user; merge is the user's gate.
-9. Confirm all sibling Subtasks are complete before closing the parent Issue
+9. Do **not** close any Issue (Subtask or parent) as part of `/review`. Closure happens at merge via the PR body's `Closes #` keyword; missed parents are picked up by the `/refine` janitor. Per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
 10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
 
 ## External Access
 
 - Direct: `gh pr review`, `gh pr ready`, `gh pr comment` (reversible — autonomous)
 - User-gated (surfaced as a command, never executed): `gh pr merge`
-- Delegated (via tracker operation skills): subtask/Issue state transition
+- Delegated (via tracker operation skills): Subtask state transition. **Not** Issue close — that is the merge consequence, not a review-agent action.
 
 ## Invoked by
 

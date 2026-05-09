@@ -91,7 +91,7 @@ failed to create review: GraphQL: Review Can not approve your own pull request (
 
 This is the default state in solo-dev — the design point soloscrum's `/review` is built around. The post-verdict sequence is built so a self-approve refusal does **not** abort it:
 
-- **The verdict comment IS the formal Pass record.** The PR comment posted per `soloscrum-define-code-review-process` "PR Comment Format" is the canonical record of the verdict; an approving review from GitHub's API on top of it is a duplicate signal that solo-dev cannot produce by design. When `gh pr review --approve` fails with self-approve refusal, the verdict comment already carries the Pass; subsequent steps (tracker `→ done`, parent Issue close, `gh pr ready`) MUST still run.
+- **The verdict comment IS the formal Pass record.** The PR comment posted per `soloscrum-define-code-review-process` "PR Comment Format" is the canonical record of the verdict; an approving review from GitHub's API on top of it is a duplicate signal that solo-dev cannot produce by design. When `gh pr review --approve` fails with self-approve refusal, the verdict comment already carries the Pass; subsequent steps (tracker `→ done`, `gh pr ready`) MUST still run.
 - **Self-approve refusal is not Fail.** The verdict was already decided before the approve call; the API-side acknowledgement is a follow-up that is structurally unavailable here. Do not flip the verdict.
 - **Try-and-fall-through is the implementation pattern.** No probe call to detect identity is needed; just attempt the approve and continue when it fails:
 
@@ -109,6 +109,26 @@ This is the default state in solo-dev — the design point soloscrum's `/review`
 - If irreversible: surface a one-line summary + the exact command, and wait.
 - Do **not** invent a third "I'll ask just to be safe" path for reversible transitions. The autonomy rules are the contract.
 - **Treat self-approve refusal as a no-op, not a failure** — continue the post-verdict sequence per the section above.
+
+## Issue close happens at merge
+
+Issue closure is **not** part of the post-verdict action sequence. The verdict only transitions the *Subtask* state to `done`; the Issue itself stays open until the PR merges.
+
+Why merge-time, not verdict-time:
+
+- "Closed" in GitHub conventionally means "the change shipped into the base branch." Closing at verdict (pre-merge) breaks that convention: a Pass verdict followed by a user decision not to merge would leave the Issue closed without the work landing.
+- GitHub already provides the right mechanism — `Closes #N` (and the synonyms `Fixes #N`, `Resolves #N`, plus the `closed`/`fixed`/`resolved` past-tense forms) in a PR body auto-closes the referenced Issue on merge. The DoD requires this keyword in every PR body (`soloscrum-define-dod`); rely on it.
+- The `merge-handoff` phase is the user's gate. The agent's role ends at "PR is ready, here is the merge command." Issue close is a downstream consequence of the user running `gh pr merge`.
+
+Mechanism per concept:
+
+| Concept | When closed | By what |
+|---|---|---|
+| Subtask Issue | At merge of its `/develop` PR | GH auto-close on `Closes #subtask` in PR body |
+| Parent Issue (with sub-issues) | At merge of the last subtask PR (if it includes `Closes #parent`), OR the next `/refine` janitor sweep | GH auto-close, or `/refine` janitor for missed cases |
+| Stand-alone Issue (no sub-issues, single PR) | At merge of its PR | GH auto-close on `Closes #issue` in PR body |
+
+The `/refine` janitor exists because GitHub does **not** auto-close a parent Issue when its sub-issues all close. For the github-only profile, the janitor scans open Issues at the start of `/refine` and closes any whose closing PR has already merged. For `linear+github`, parent state is already auto-managed by Linear's native sync (per `soloscrum-tracker-linear-transition-state`), so the janitor is a no-op. See `commands/refine.md` for the janitor step.
 
 ## Verdict → next-action mapping
 
@@ -134,7 +154,8 @@ These are the specific failure modes this skill exists to prevent. Each one has 
 - ❌ **Running `gh pr merge` autonomously** because the verdict was Pass and the user invoked `/review`. Merge is irreversible and is **always** the user's gate, regardless of how clean the PR looks or how recently the user authorised something else.
 - ❌ **Treating `gh pr create --draft` as needing pre-confirm** because "creating a PR affects shared state". Draft creation is reversible (close removes it from active state with no notifications having fired) and is the standard opening move of `/develop`.
 - ❌ **Inventing a fourth verdict** (e.g. "Pass but I'll wait for the user to look at it first"). The verdict legend in `soloscrum-define-code-review-process` is exhaustive; pick one and execute its mapped sequence.
-- ❌ **Treating self-approve refusal as a Fail or as cause to abort the post-verdict sequence.** In solo-dev, `gh pr review --approve` failing with "Can not approve your own pull request" is the **default, expected** outcome. The verdict comment is the formal Pass record; tracker transition, parent-Issue close, and `gh pr ready` MUST still run. See "Self-approve refusal in solo-dev contexts" above.
+- ❌ **Treating self-approve refusal as a Fail or as cause to abort the post-verdict sequence.** In solo-dev, `gh pr review --approve` failing with "Can not approve your own pull request" is the **default, expected** outcome. The verdict comment is the formal Pass record; tracker transition and `gh pr ready` MUST still run. See "Self-approve refusal in solo-dev contexts" above.
+- ❌ **Closing the parent Issue (or any Issue) as part of the post-verdict sequence.** Issue closure happens at merge time via the PR body's `Closes #` keyword + GitHub's auto-close, not at verdict time. Closing pre-merge is premature: if the user decides not to merge, the Issue is wrongly closed; "closed = merged into main" is the GH convention soloscrum follows. See "Issue close happens at merge" below. For parent Issues whose closing event is missed (sub-issue tree where the parent is not directly referenced by any PR), the `/refine` janitor cleans up on the next backlog touch.
 
 ## Repository-specific overrides
 

@@ -110,16 +110,17 @@ The verdict is the input to a defined sequence of next actions. The full lifecyc
 
 | Verdict | Who acts next | Actions (in order) | Pre-confirm? |
 |---|---|---|---|
-| **Pass** | `soloscrum-review` | (1) `gh pr review --approve` — falls through on self-approve refusal; the verdict comment posted per "PR Comment Format" above is the formal Pass record (2) tracker Subtask `→ done` via `soloscrum-tracker-{profile}-transition-state` (3) close parent Issue if all sibling Subtasks are done (4) `gh pr ready` (5) report the merge command to the user | No — every step is reversible per `soloscrum-define-pr-lifecycle` |
+| **Pass** | `soloscrum-review` | (1) `gh pr review --approve` — falls through on self-approve refusal; the verdict comment posted per "PR Comment Format" above is the formal Pass record (2) tracker Subtask `→ done` via `soloscrum-tracker-{profile}-transition-state` (3) `gh pr ready` (4) report the merge command to the user | No — every step is reversible per `soloscrum-define-pr-lifecycle` |
 | **Pass with follow-ups** | `soloscrum-review` | (1) confirm a follow-up Issue exists for each out-of-scope skip and that its number appears in the skip note; create any missing ones (2) then identical to **Pass** | No — same reversibility |
 | **Fail** | `soloscrum-review` → `soloscrum-dev` | (1) post per-finding feedback on the PR (2) tracker Subtask `→ in-progress` via `soloscrum-tracker-{profile}-transition-state` (3) **leave the PR in draft** — do not call `gh pr ready` (4) hand back to `soloscrum-dev` to address findings | No for the review-side actions; the dev rework loop then re-enters this pipeline |
 
 Notes on autonomy:
 
 - `gh pr ready` after Pass / Pass with follow-ups is a reversible transition (`gh pr ready --undo`) and runs without pre-confirm. Pausing here to ask the user is the over-cautious failure mode that motivated this skill — see `soloscrum-define-pr-lifecycle` for the full classification.
-- `gh pr merge` is **not** in the table above. Merge is always user-gated; the agent stops after step 5 of Pass and surfaces the merge command for the user to run.
+- `gh pr merge` is **not** in the table above. Merge is always user-gated; the agent stops after the last Pass step and surfaces the merge command for the user to run.
 - On Fail, the PR is intentionally left in draft so that the "needs more work" state is externally visible and GitHub-side auto-reviewers stay suppressed during rework.
-- Step 1 (`gh pr review --approve`) is **expected to fail in solo-dev** with "Can not approve your own pull request"; this is the default state, not an error condition. The verdict comment posted per "PR Comment Format" above is the formal Pass record, and steps 2–4 still run. See `soloscrum-define-pr-lifecycle`, "Self-approve refusal in solo-dev contexts" for the full contract and the try-and-fall-through implementation pattern.
+- Step 1 (`gh pr review --approve`) is **expected to fail in solo-dev** with "Can not approve your own pull request"; this is the default state, not an error condition. The verdict comment posted per "PR Comment Format" above is the formal Pass record, and the remaining Pass steps still run. See `soloscrum-define-pr-lifecycle`, "Self-approve refusal in solo-dev contexts" for the full contract and the try-and-fall-through implementation pattern.
+- **Issue close is not in the table.** The post-verdict sequence transitions the Subtask state to `done` but does **not** close any Issue. Closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close; parent Issues whose closing event is missed are cleaned up by the `/refine` janitor. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
 
 ## When to run
 

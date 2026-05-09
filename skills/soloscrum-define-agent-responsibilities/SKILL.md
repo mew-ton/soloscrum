@@ -24,7 +24,7 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 
 | Concept | Creator | Mutator | Verifier |
 |---|---|---|---|
-| Issue (parent) | po | po (refine), review (close) | review |
+| Issue (parent) | po | po (refine; close via `/refine` janitor when sub-issues are all done) — agents do **not** close at verdict time; merge-time GH auto-close + janitor cover this (see `soloscrum-define-pr-lifecycle`, "Issue close happens at merge") | review |
 | Issue SP (size-check) | po | po | po (entry gate) |
 | Issue Priority | po | po | — |
 | Issue dependencies | po | design (refine plan) | review |
@@ -52,8 +52,12 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 /develop       dev      → branch + code + draft PR; transitions Subtask to In Review
 /design-ui     ui       → Figma + tokens + states; transitions Subtask to In Review
 /review        review   → DoD + AC + code; promotes PR to ready; transitions Subtask to Done;
-                           closes Issue when all Subtasks are Done; surfaces merge command to user
-user           user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate)
+                           surfaces merge command to user (Issue close happens at merge,
+                           not at verdict — see soloscrum-define-pr-lifecycle)
+user           user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate);
+                           merge fires GH `Closes #` auto-close on referenced Issues
+/refine        po       → janitor sweep at start: closes open Issues whose closing PR has merged
+                           (cleans up parent Issues GH did not auto-close)
 ```
 
 ## Cross-cutting Rules
