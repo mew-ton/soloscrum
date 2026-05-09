@@ -41,7 +41,12 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
 5. Compile all evaluation results into a single report following the format in `soloscrum-define-code-review-process`
 6. **On Pass / Pass with follow-ups** — run **all sub-steps below end-to-end without pausing**; the only stop in this entire sequence is at `gh pr merge`. Transition state first, then promote to ready so a tracker failure does not leave a ready PR with stale state:
    - For Pass with follow-ups only: programmatically check whether a follow-up Issue exists for each out-of-scope skip; create any missing Issue autonomously and record its number in the skip note before proceeding (no user prompt)
-   - Approve PR review (`gh pr review --approve`) — reversible
+   - Approve PR review — reversible. In solo-dev contexts this call fails with "Can not approve your own pull request" by design; the verdict comment posted in step 5 is the formal Pass record and steps below still run. Use try-and-fall-through (no probe call):
+     ```bash
+     gh pr review --approve "$PR_URL" \
+       || echo "approve skipped (likely self-approve refusal); verdict comment is the formal Pass record"
+     ```
+     See `soloscrum-define-pr-lifecycle`, "Self-approve refusal in solo-dev contexts".
    - Resolve active profile, then invoke the matching `transition-state` operation skill to move the Subtask to `done`:
      - `github-only` → `soloscrum-tracker-github-transition-state`
      - `linear+github` → `soloscrum-tracker-linear-transition-state`
