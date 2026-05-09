@@ -10,6 +10,7 @@ skills:
   - soloscrum-define-pr-lifecycle
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
+  - soloscrum-tracker-github-wait-for-pr-checks
 ---
 
 # soloscrum-review
@@ -47,7 +48,7 @@ PR merge itself is **not** an agent action — it is the user's gate, per `solos
    - Performance concerns
    - Readability and maintainability
 6. Make feedback specific and include improvement suggestions
-7. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. On Fail, leave the PR in draft.
+7. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. **Wait for CI green** via `soloscrum-tracker-github-wait-for-pr-checks` before `gh pr ready`; if any conclusion is not `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as Fail and revert the Subtask to `in-progress`. Inline `until` loops over `gh pr view` are an anti-pattern (per `CLAUDE.md`). On Fail, leave the PR in draft.
 8. Never run `gh pr merge`. Surface the exact merge command to the user; merge is the user's gate.
 9. Do **not** close any Issue (Subtask or parent) as part of `/review`. Closure happens at merge via the PR body's `Closes #` keyword; missed parents are picked up by the `/refine` janitor. Per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
 10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly

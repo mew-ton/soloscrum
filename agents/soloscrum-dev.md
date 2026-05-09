@@ -12,6 +12,7 @@ skills:
   - soloscrum-define-story-points
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
+  - soloscrum-tracker-github-wait-for-pr-checks
 ---
 
 # soloscrum-dev
@@ -33,7 +34,7 @@ Per `soloscrum-define-agent-responsibilities`:
 4. Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
 5. Always include the corresponding Issue number in the PR body
 6. Always review subtask AC before starting implementation
-7. Commit with zero lint errors. Create the PR as draft (`gh pr create --draft`); promotion to ready is owned by `soloscrum-review`. The draft creation itself is reversible per `soloscrum-define-pr-lifecycle` and does not require a pre-confirm.
+7. Commit with zero lint errors. Create the PR as draft (`gh pr create --draft`); promotion to ready is owned by `soloscrum-review`. The draft creation itself is reversible per `soloscrum-define-pr-lifecycle` and does not require a pre-confirm. After PR creation, confirm CI started cleanly via `soloscrum-tracker-github-wait-for-pr-checks` (short `timeout_sec`, e.g. `300`); never write inline `until ... gh pr view ... sleep ...` loops — see `CLAUDE.md` anti-patterns.
 8. Set Subtask SP per `soloscrum-define-story-points` when registering Subtasks
 9. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every tracker **write** operation (create-subtask / set-sp / transition-state / add-dependency) through the matching `soloscrum-tracker-{profile}-<op>` skill — never call Linear MCP or `gh issue create` / `gh issue edit` / `gh issue close` for tracker mutations directly. **Read** operations (e.g. `gh issue view` to read an Issue's AC) are allowed to run directly without going through a tracker operation skill
 

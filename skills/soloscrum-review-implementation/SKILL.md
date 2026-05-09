@@ -51,6 +51,11 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
      - `github-only` → `soloscrum-tracker-github-transition-state`
      - `linear+github` → `soloscrum-tracker-linear-transition-state`
    - **Do not close the parent Issue here.** Parent and Subtask Issue closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close, not as part of the post-verdict sequence. For parent Issues whose closing event was missed, the `/refine` janitor cleans them up on the next backlog touch. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
+   - **Wait for CI to complete** before promoting to ready. Invoke `soloscrum-tracker-github-wait-for-pr-checks`:
+     ```
+     skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number>
+     ```
+     If any conclusion is **not** `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as **Fail** retroactively: post the failed conclusions on the PR, revert the Subtask to `in-progress` via the `transition-state` skill, and skip the remaining Pass actions (do **not** promote to ready). A green CI is part of the Pass contract — promoting a ready PR with red checks is the failure mode this step exists to prevent. Inline `until` loops over `gh pr view` are the anti-pattern this skill replaces.
    - Promote the PR to ready (`gh pr ready`) — reversible (`gh pr ready --undo`); per `soloscrum-define-pr-lifecycle` this runs without pre-confirm
    - **Stop here.** Surface the exact `gh pr merge` command for the user to run; merge is irreversible and is the user's gate. Do not run `gh pr merge`.
    - If `transition-state` fails after `gh pr ready` has happened (rare race), surface a clear notice and prompt the user to manually transition before they merge
@@ -88,3 +93,4 @@ Follow the comment template defined in `soloscrum-define-code-review-process` (C
 - `soloscrum-define-pr-lifecycle` (draft premise, `gh pr ready` autonomy, merge user-gate)
 - `soloscrum-define-tracker-profile` (routing)
 - `soloscrum-tracker-{github|linear}-transition-state` (delegated)
+- `soloscrum-tracker-github-wait-for-pr-checks` (CI gate before `gh pr ready`)

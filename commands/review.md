@@ -40,6 +40,11 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
    - For Pass with follow-ups: ensure a follow-up Issue exists for each out-of-scope skip and that its number is recorded in the skip note
    - Approve PR (`gh pr review --approve`)
    - Resolve active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the Subtask to `done`
+   - **Wait for CI to complete** before promoting to ready. Invoke `soloscrum-tracker-github-wait-for-pr-checks`:
+     ```
+     skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number>
+     ```
+     Then treat conclusions of `SUCCESS` / `SKIPPED` / `NEUTRAL` as acceptable. Anything else (`FAILURE` / `CANCELLED` / `TIMED_OUT` / `ERROR` / `ACTION_REQUIRED` / `STARTUP_FAILURE`) downgrades the verdict to **Fail**: post the failed conclusions on the PR, revert the Subtask to `in-progress`, and skip the remaining Pass actions. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).
    - Promote the PR to ready (`gh pr ready`) — reversible; runs without pre-confirm
    - **Hand the merge off to the user** — surface the exact `gh pr merge` command. Do not run `gh pr merge`; merge is the user's gate. Issue close is downstream of merge: GH auto-closes referenced Issues via the PR body's `Closes #` keyword. Parent Issues that GH does not auto-close are picked up by the next `/refine` janitor sweep.
 6. On Fail:
