@@ -3,8 +3,13 @@
 # wait-for-pr-checks.sh — poll a GitHub PR's status checks until all are
 # COMPLETED, then output the per-check conclusions as JSON.
 #
-# Usage:
-#   wait-for-pr-checks.sh <pr_number> [poll_interval_sec] [timeout_sec]
+# Usage (invoke from the repository root, using the full path):
+#   skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh \
+#     <pr_number> [poll_interval_sec] [timeout_sec]
+#
+# Do NOT cd into the skill directory and do NOT call as ./scripts/...
+# The harness allowlist matches the literal command string; using a single
+# canonical full-path form avoids per-form re-prompting.
 #
 # Args:
 #   pr_number          GitHub PR number on the active repo (required).

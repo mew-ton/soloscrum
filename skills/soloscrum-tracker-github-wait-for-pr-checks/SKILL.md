@@ -3,7 +3,7 @@ name: soloscrum-tracker-github-wait-for-pr-checks
 description: "Operation: poll a GitHub PR's CI status checks until all of them complete (or until a timeout) and return their conclusions. Used by /develop and /review when the next step depends on green CI. Profile-agnostic — PRs live on GitHub regardless of tracker_profile, so both `github-only` and `linear+github` route here."
 user-invocable: false
 allowed-tools:
-  - Bash(./scripts/wait-for-pr-checks.sh:*)
+  - Bash(skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh:*)
 ---
 
 # soloscrum-tracker-github-wait-for-pr-checks
@@ -12,17 +12,21 @@ Wait for all status checks on a GitHub PR to complete (success or failure), then
 
 ## How it works
 
-The implementation is a single shell script colocated with this skill at `./scripts/wait-for-pr-checks.sh`. The script encapsulates the polling loop, the `gh pr view` invocation, the rollup-normalisation `jq` filter, the empty-rollup guard, and the timeout logic. The skill itself is documentation; agents invoke the script directly.
+The implementation is a single shell script colocated with this skill at `skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh`. The script encapsulates the polling loop, the `gh pr view` invocation, the rollup-normalisation `jq` filter, the empty-rollup guard, and the timeout logic. The skill itself is documentation; agents invoke the script directly.
+
+**Invocation is from the repository root, using the full path** (so a harness allowlist matches a single stable command-string surface):
 
 ```
-./scripts/wait-for-pr-checks.sh <pr_number> [poll_interval_sec] [timeout_sec]
+skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr_number> [poll_interval_sec] [timeout_sec]
 ```
+
+Do not `cd` into the skill directory and do not use `./scripts/…`; both forms produce different command strings that an allowlist would have to enumerate separately.
 
 ### Why a script and not an inline loop
 
 Two practical reasons beyond reinvention:
 
-1. **Permission allowlist matches a stable surface.** An inline `until ...; do gh pr view <N> ... ; sleep ...` loop has the PR number in the command string, so a harness allowlist on `Bash(gh pr view:*)` re-prompts the user on every distinct invocation. With the wait extracted to `./scripts/wait-for-pr-checks.sh`, the allowlist entry `Bash(./scripts/wait-for-pr-checks.sh:*)` matches every call regardless of PR number, and the inner `gh` / `sleep` calls happen inside the already-allowed script.
+1. **Permission allowlist matches a stable surface.** An inline `until ...; do gh pr view <N> ... ; sleep ...` loop has the PR number in the command string, so a harness allowlist on `Bash(gh pr view:*)` re-prompts the user on every distinct invocation. With the wait extracted to the script above, the allowlist entry `Bash(skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh:*)` matches every call regardless of PR number, and the inner `gh` / `sleep` / `jq` calls happen inside the already-allowed script.
 2. **The polling logic is fixed.** The script is the canonical implementation of the rollup normalisation (see "Why the rollup is two-shaped" below); agents do not re-derive the `jq` filter per session.
 
 This is also why the skill's `allowed-tools` lists only the script path — not `gh pr view` or `sleep`. Inner calls are a script-private concern.
