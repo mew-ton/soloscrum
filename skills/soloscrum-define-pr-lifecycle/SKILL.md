@@ -112,7 +112,7 @@ This is the default state in solo-dev — the design point soloscrum's `/review`
 
 ## Issue close happens at merge
 
-Issue closure is **not** part of the post-verdict action sequence. The verdict only transitions the *Subtask* state to `done`; the Issue itself stays open until the PR merges.
+Issue closure is **not** part of the post-verdict action sequence. The verdict only transitions the *Subtask state* to `done`; neither the Subtask Issue nor the parent Issue is closed until the PR merges.
 
 Why merge-time, not verdict-time:
 
@@ -120,7 +120,22 @@ Why merge-time, not verdict-time:
 - GitHub already provides the right mechanism — `Closes #N` (and the synonyms `Fixes #N`, `Resolves #N`, plus the `closed`/`fixed`/`resolved` past-tense forms) in a PR body auto-closes the referenced Issue on merge. The DoD requires this keyword in every PR body (`soloscrum-define-dod`); rely on it.
 - The `merge-handoff` phase is the user's gate. The agent's role ends at "PR is ready, here is the merge command." Issue close is a downstream consequence of the user running `gh pr merge`.
 
-Mechanism per concept:
+### Subtask state vs Issue closed/open
+
+The Subtask state machine and the GH Issue closed/open dimension are **decoupled**:
+
+| Subtask state | GH Issue state (github-only) | Meaning |
+|---|---|---|
+| `in-progress` | open + `state:in-progress` label | Implementation in progress |
+| `in-review` | open + `state:in-review` label | Draft PR exists, `/review` in flight |
+| `done` (pre-merge) | open + `state:done` label | `/review` Pass verdict reached, awaiting `gh pr merge` |
+| `done` (post-merge) | closed + `state:done` label retained | The PR merged; GH auto-close fired via `Closes #N` |
+
+The `state:done` label is what `soloscrum-tracker-github-transition-state` writes at verdict time. The transition skill **never** calls `gh issue close` — that is the merge consequence. See `soloscrum-tracker-github-transition-state` for the GH mapping.
+
+For `linear+github`: Subtask state is on Linear (via `soloscrum-tracker-linear-transition-state`). Linear's "Done" status corresponds to `state = done`; Linear's native GH sync mirrors the closed state when the PR merges.
+
+### Mechanism per concept
 
 | Concept | When closed | By what |
 |---|---|---|

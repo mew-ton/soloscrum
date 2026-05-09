@@ -45,7 +45,7 @@ Place at `.claude/rules/tracker.md` to pin a repo to a specific profile regardle
 | SP (Issue level) | not registered (size-check only) | not registered (size-check only) |
 | SP (Subtask level) | GH Projects v2 — `SP` Number field | Linear estimate field |
 | Priority | GH label `priority:{urgent\|high\|medium\|low}` | GH label `priority:{urgent\|high\|medium\|low}` (canonical on GH; Linear priority field is not used) |
-| State | GH Issue state + label `state:{in-progress\|in-review}` | Linear state (Backlog/In Progress/In Review/Done) |
+| State | label `state:{in-progress\|in-review\|done}` (open until merge — GH "closed" means "merged into main" via `Closes #N` auto-close, decoupled from soloscrum's `done` state) | Linear state (Backlog/In Progress/In Review/Done) |
 | Type | GH label `type:{develop\|design-ui}` | Linear label `type:{develop\|design-ui}` |
 | Parent–child link | GH Sub-issue (native) | Linear parent field |
 | Blocking dependency | body line `Depends on: #N` (GH renders as cross-link) | Linear "Blocked by" relation |
