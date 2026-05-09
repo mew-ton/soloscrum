@@ -24,6 +24,16 @@ This command lives at `.claude/commands/audit.md`. It is **soloscrum's own repo-
 
 `/audit` is therefore **not** registered in `README.md`'s Commands table or in `soloscrum-define-agent-responsibilities`'s Lifecycle Summary — those describe the plugin surface; `/audit` is local-only.
 
+## Prerequisites
+
+`/audit` requires the following files to be present on the working tree (all repo-local):
+
+- `.claude/skills/soloscrum-audit-spec-consistency/SKILL.md` — the rule definitions
+- `.claude/skills/soloscrum-audit-spec-consistency/references/report-template.md` — the report shape
+- `.claude/agents/soloscrum-auditor.md` — the read-only subagent that emits the report
+
+If any of these is missing (e.g. on a checkout before all sub-issues of #18 have merged), `/audit` will fail at step 3 below. Confirm the three files exist before invoking; do not paper over a missing prerequisite with a runtime fallback — a missing file means the audit pipeline is genuinely incomplete and the user should resolve that first.
+
 ## Behavior
 
 1. Parse `$ARGUMENTS` for `--scope <skill|agent|command|docs|all>`. Default `all`.
