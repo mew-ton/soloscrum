@@ -111,7 +111,19 @@ Every finding from any of R1–R4 goes through the same per-item decision as `so
 
 Severity (warning / error) is **informational only** — never an auto-skip filter. A warning that is a real drift is still worth fixing; an error that is a false positive is still skipped with reason.
 
-There is no confidence pre-filter on auditor findings. The agent-finding pre-filter in `soloscrum-define-code-review-process` exists because multi-agent reviewers spawn fresh per PR and are prone to inventing constraints — that is a hallucination floor specific to that pipeline. The auditor is a single deterministic subagent applying a fixed rule set against a fixed corpus; it has no equivalent floor, so every match goes straight to the per-item decision.
+There is no confidence pre-filter on auditor findings. The agent-finding pre-filter in `soloscrum-define-code-review-process` exists because multi-agent reviewers spawn fresh per PR and are prone to inventing constraints — that is a hallucination floor specific to that pipeline. The auditor's rule set and corpus are fixed; rule **definitions** are mechanical, but rule **application** is performed by an LLM and is therefore non-deterministic across runs. Every match goes straight to the per-item decision.
+
+### Multi-pass union, no quorum filter
+
+Because rule application is LLM-driven, a single pass of `/audit` can miss findings that another pass would catch. `/audit` therefore runs **N parallel passes** (default `--passes 3`) and aggregates the per-pass reports via **union with deduplication** — the orchestration spec lives in `.claude/commands/audit.md` "Behavior". Each surfaced finding carries an `Appeared in: K/N runs` annotation so the reviewer knows how often it surfaced.
+
+The annotation is **informational only**. It does **not** drive an auto-skip filter; a finding that surfaced in 1 of 3 passes is still worth the per-item decision because:
+
+- LLM sampling can suppress a real drift on any given pass; rejecting 1/N findings would discard real signal
+- The reviewer's per-finding decision already filters false-positives at decision time
+- `severity` in `soloscrum-define-code-review-process` works the same way: informational input, never a gate
+
+**Quorum filtering (e.g. "drop findings that appeared in fewer than ⌈N/2⌉ passes") is an anti-pattern.** It conflates LLM sampling variance with finding validity. If a finding's prose looks borderline because it surfaced once in three runs, that is a per-item decision input, not a pre-filter signal.
 
 ## Report format
 

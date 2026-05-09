@@ -91,6 +91,13 @@ Write the report to stdout. Do not write to any file.
 3. **Surface, do not fix** — when a finding warrants a fix, the report writes the suggested edit; the actual edit is the user's call (typically routed through `/refine` for the follow-up Issue, then `/develop`).
 4. **De-duplicate** — when the same drift appears in N files (e.g. identical workaround prose copied to three skills), report it once with all locations listed, not N separate findings.
 5. **No state mutations** — the auditor never transitions any tracker state, never closes any Issue, never adds labels.
+6. **Single-pass output is non-deterministic** — write the report assuming this single pass is one sample of N. The `/audit` orchestrator runs `--passes N` (default 3) parallel invocations and aggregates them via union (per `.claude/commands/audit.md` "Behavior" + `soloscrum-audit-spec-consistency` "Multi-pass union"). Do **not** suppress a borderline finding because "another pass might disagree" — that is exactly the case the union aggregation is designed to surface. Conversely, do **not** fabricate findings to hedge against missing them; emit what the rules genuinely match on this pass.
+
+## Non-determinism caveat
+
+Rule **definitions** in `soloscrum-audit-spec-consistency` are mechanical, but rule **application** is performed by an LLM (this agent). Heuristic match / non-match, concept-index snippet extraction, R2 disagreement judgement, the example-phrase carve-out, and the per-finding decision are all judgement calls that vary across invocations. Single-pass runs miss findings that other passes catch. The orchestrator (`/audit`) compensates by running N passes and unioning the results.
+
+For this single pass: be honest about what the rules match, do not apply a quorum heuristic in your own head ("would two other passes agree?"), and emit each finding with concrete evidence (`> excerpt`) so the orchestrator's deduplication can cleanly merge with peers.
 
 ## External Access
 
@@ -99,7 +106,7 @@ Write the report to stdout. Do not write to any file.
 
 ## Invoked by
 
-- `.claude/commands/audit.md` (the `/audit` command, sub-issue #25)
+- `.claude/commands/audit.md` (the `/audit` command). Typically as one of N parallel passes; can also be invoked standalone with `--passes 1` for backward compat.
 
 ## Depends On
 
