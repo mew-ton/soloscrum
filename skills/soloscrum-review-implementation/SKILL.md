@@ -1,6 +1,6 @@
 ---
 name: soloscrum-review-implementation
-description: Reviews a PR or Figma file against the DoD checklist and all Acceptance Criteria. PRs are expected in draft; on Pass the review agent promotes the PR to ready, transitions the Subtask to Done via the active profile's tracker operation skill, closes the Issue when all subtasks complete, and hands the merge command off to the user. Merge itself is always user-gated.
+description: Reviews a PR or Figma file against the DoD checklist and all Acceptance Criteria. PRs are expected in draft; on Pass the review agent promotes the PR to ready, transitions the Subtask to Done via the active profile's tracker operation skill, and hands the merge command off to the user. Issue close is not part of this sequence — it happens at merge time via the PR body's Closes # keyword (see soloscrum-define-pr-lifecycle, "Issue close happens at merge"). Merge itself is always user-gated.
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
 allowed-tools:
@@ -50,8 +50,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
    - Resolve active profile, then invoke the matching `transition-state` operation skill to move the Subtask to `done`:
      - `github-only` → `soloscrum-tracker-github-transition-state`
      - `linear+github` → `soloscrum-tracker-linear-transition-state`
-   - Programmatically check whether all sibling Subtasks under the parent Issue are also `done` (query the tracker via the matching `query-state` skill; this is a tracker lookup, not a user prompt)
-   - If all complete, invoke the same `transition-state` skill on the parent Issue to close it
+   - **Do not close the parent Issue here.** Parent and Subtask Issue closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close, not as part of the post-verdict sequence. For parent Issues whose closing event was missed, the `/refine` janitor cleans them up on the next backlog touch. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
    - Promote the PR to ready (`gh pr ready`) — reversible (`gh pr ready --undo`); per `soloscrum-define-pr-lifecycle` this runs without pre-confirm
    - **Stop here.** Surface the exact `gh pr merge` command for the user to run; merge is irreversible and is the user's gate. Do not run `gh pr merge`.
    - If `transition-state` fails after `gh pr ready` has happened (rare race), surface a clear notice and prompt the user to manually transition before they merge

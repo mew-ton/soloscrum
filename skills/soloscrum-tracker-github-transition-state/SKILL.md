@@ -47,5 +47,5 @@ Transitions an Issue or Sub-issue between soloscrum lifecycle states. Active whe
 ## Notes
 
 - Only `soloscrum-review` may transition to `done` (per `soloscrum-define-agent-responsibilities`)
-- When the parent Issue's all Sub-issues reach `done`, the parent Issue itself can be closed via the same operation
+- **Subtask state transition is profile-only** — closing the underlying GitHub Issue is **not** done here. Issue closure happens at merge time via the PR body's `Closes #` keyword, or via the `/refine` janitor for parent Issues that GH auto-close did not cover. This skill operates on `state:*` labels (and `gh issue close` only as the GH representation of `state = done`); it is not invoked to close a parent Issue at verdict. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
 - If `state:*` labels do not exist in the repo, create them once: `gh label create state:in-progress --color BFD4F2` and `gh label create state:in-review --color D4C5F9`
