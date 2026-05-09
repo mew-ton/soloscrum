@@ -47,5 +47,5 @@ Implement a develop Subtask.
 ## Resources
 
 - Subagent: `soloscrum-dev`
-- Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`
+- Skills: `soloscrum-implement-task`, `soloscrum-define-branch-commit`, `soloscrum-define-dod`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`, `soloscrum-tracker-github-wait-for-pr-checks` (when confirming CI started before handoff)
 - Rules: `.claude/rules/stack.md`, `.claude/rules/branch.md`, `.claude/rules/dod-extra.md`, `.claude/rules/pr.md` (optional draft-window override)
