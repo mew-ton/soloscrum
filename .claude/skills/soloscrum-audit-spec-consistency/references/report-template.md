@@ -28,8 +28,9 @@ Scope: <skill | agent | command | docs | all>
 ### R1 — Leaked session context
 
 #### F1.1 <one-line description>
-- File: `<path>:<line-range>`
-- Snippet: > <prose excerpt>
+- Files:
+  - `<path>:<line-range>` — <prose excerpt>
+  - (additional locations when the same drift appears in N files; one bullet per location)
 - Why: <which heuristic matched>
 - Suggested fix: <concrete edit, or "track as follow-up Issue">
 

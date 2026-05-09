@@ -48,6 +48,8 @@ When invoked with `--scope <skill|agent|command|docs|all>`, narrow accordingly:
 - `docs` → `CLAUDE.md` + `README.md`
 - `all` → the full default
 
+All Glob patterns are repo-root-relative and therefore automatically exclude `.claude/**` (which has no leading `skills/` / `agents/` / `commands/` prefix at the repo root). The auditor never needs an explicit exclude rule; the path shapes do the filtering.
+
 Use `Glob` to enumerate the file set. Use `Read` to load each file's body in full.
 
 ### 2. Apply the four detection rule sets
