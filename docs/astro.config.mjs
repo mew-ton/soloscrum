@@ -14,10 +14,21 @@ export default defineConfig({
 					href: 'https://github.com/mew-ton/soloscrum',
 				},
 			],
-			// Sidebar sections (Concept / Reference / Commands / Onboarding) will be
-			// added in #47 / #48 alongside the actual content. Until then, the site
-			// only renders the hand-written stub index page.
-			sidebar: [],
+			// Concept and Reference sections were added in #47. Commands and
+			// Onboarding sections will be added in #48. Both existing sections
+			// rely on Starlight's `autogenerate` so adding a new page only
+			// requires dropping a Markdown file with `sidebar.order` frontmatter
+			// in the matching directory.
+			sidebar: [
+				{
+					label: 'Concept',
+					items: [{ autogenerate: { directory: 'concept' } }],
+				},
+				{
+					label: 'Reference',
+					items: [{ autogenerate: { directory: 'reference' } }],
+				},
+			],
 		}),
 	],
 });
