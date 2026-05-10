@@ -84,5 +84,4 @@ Two subtleties worth knowing:
 ## See also
 
 - The canonical contract — including the PR comment template, severity tables, and the full anti-pattern list — lives at [`skills/soloscrum-define-code-review-process/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-code-review-process/SKILL.md).
-- For a quick spec view, see the [code review process reference](/reference/define-code-review-process/).
 - For how the verdict drives the PR's state machine, see the [PR lifecycle concept](/concept/pr-lifecycle/).

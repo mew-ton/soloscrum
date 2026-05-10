@@ -53,4 +53,4 @@ sidebar:
 ## 関連項目
 
 - 正本の契約: [`skills/soloscrum-define-issue-format/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-format/SKILL.md)。
-- この形式の Issue を分割すべきかどうかを判断する size gate は [`define-issue-size`](/reference/define-issue-size/) にあります。
+- この形式の Issue を分割すべきかどうかを判断する size gate は [`issue-size`](/policies/issue-size/) にあります。

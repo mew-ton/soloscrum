@@ -51,5 +51,3 @@ That single frontmatter field is the whole contract.
 ## See also
 
 - The full storage matrix and the operation skill table live in the canonical contract: see [`skills/soloscrum-define-tracker-profile/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-tracker-profile/SKILL.md).
-- For a per-skill summary of every tracker operation, jump to the [tracker operations reference](/reference/tracker-operations/).
-- For a concise spec view of profile resolution, see the [tracker profile reference](/reference/define-tracker-profile/).

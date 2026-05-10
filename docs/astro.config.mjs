@@ -23,7 +23,7 @@ export default defineConfig({
 				en: { label: 'English', lang: 'en' },
 				ja: { label: '日本語', lang: 'ja' },
 			},
-			// Concept and Reference sections were added in #47. Commands and
+			// Concept and Policies sections were added in #47. Commands and
 			// Onboarding sections will be added in #48. Both existing sections
 			// rely on Starlight's `autogenerate` so adding a new page only
 			// requires dropping a Markdown file with `sidebar.order` frontmatter
@@ -34,8 +34,8 @@ export default defineConfig({
 					items: [{ autogenerate: { directory: 'concept' } }],
 				},
 				{
-					label: 'Reference',
-					items: [{ autogenerate: { directory: 'reference' } }],
+					label: 'Policies',
+					items: [{ autogenerate: { directory: 'policies' } }],
 				},
 			],
 		}),

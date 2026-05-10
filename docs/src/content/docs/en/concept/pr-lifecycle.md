@@ -110,5 +110,4 @@ If CI goes red during the wait step, the Pass retroactively downgrades to Fail: 
 ## See also
 
 - The full autonomy table, anti-patterns, and verdict-to-action mapping live in [`skills/soloscrum-define-pr-lifecycle/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-pr-lifecycle/SKILL.md).
-- The PR-side reference summary lives at [reference/define-pr-lifecycle](/reference/define-pr-lifecycle/).
 - For how findings are decided before the verdict is set, see the [code review process concept](/concept/code-review-process/).

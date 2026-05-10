@@ -67,5 +67,4 @@ Three rules tie this together and are worth keeping in mind when reading any sol
 ## See also
 
 - For the full ownership matrix, see [`skills/soloscrum-define-agent-responsibilities/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-agent-responsibilities/SKILL.md).
-- For a quick spec summary, see the [agent responsibilities reference](/reference/define-agent-responsibilities/).
 - For how PR transitions split between reversible (agent runs them) and irreversible (user gates them), see the [PR lifecycle concept](/concept/pr-lifecycle/).

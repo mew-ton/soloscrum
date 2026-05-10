@@ -30,7 +30,7 @@ Input is a candidate Issue and its size-check SP / subtask count. Output is eith
 
 ## Why days is calibration-only
 
-`max_sp: 5` operates on the scope × uncertainty SP scale defined by [`define-story-points`](/reference/define-story-points/). The split test is therefore "can this Issue fit in one PR's scope and decision-set without compounding?" If a single PR would have to span multiple subsystems **and** carry multiple unresolved design decisions, the Issue is over-budget regardless of how fast a model could draft it.
+`max_sp: 5` operates on the scope × uncertainty SP scale defined by [`story-points`](/policies/story-points/). The split test is therefore "can this Issue fit in one PR's scope and decision-set without compounding?" If a single PR would have to span multiple subsystems **and** carry multiple unresolved design decisions, the Issue is over-budget regardless of how fast a model could draft it.
 
 `max_estimated_days` is retained as a coarse calibration check during `/refine`: if the rough wall-clock feel obviously exceeds two days of solo-dev cycle time (including user review), that is a signal the scope/uncertainty estimate is probably too low. It is not the primary criterion.
 
@@ -41,4 +41,4 @@ Large-scale refactoring and tech debt reduction are exempt from these thresholds
 ## See also
 
 - Canonical contract: [`skills/soloscrum-define-issue-size/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-size/SKILL.md).
-- For the SP scale itself, see [`define-story-points`](/reference/define-story-points/).
+- For the SP scale itself, see [`story-points`](/policies/story-points/).

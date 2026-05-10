@@ -15,7 +15,7 @@ It pins the canonical DoD list:
 - [ ] Tests exist (when applicable).
 - [ ] PR body contains the Issue number (`Closes #N` / `Fixes #N` / `Resolves #N`).
 - [ ] Zero lint errors.
-- [ ] Code review pipeline executed and findings addressed (per [`define-code-review-process`](/reference/define-code-review-process/)).
+- [ ] Code review pipeline executed and findings addressed (per the [code review process concept](/concept/code-review-process/)).
 - [ ] Review has passed.
 
 For each item, the skill spells out what counts as satisfied — for example, "tests exist" applies to business logic, API endpoints, and utility functions but not to configuration changes with no logic, and "Issue number" specifically requires one of the GitHub-recognised auto-close keywords.

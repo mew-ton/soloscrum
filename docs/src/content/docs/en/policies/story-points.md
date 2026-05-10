@@ -17,7 +17,7 @@ It pins:
 
 ## The two levels
 
-**Issue SP** is a roughness check. The PO uses it during `/refine` to decide whether the Issue is small enough to enter the lifecycle, or whether [`define-issue-size`](/reference/define-issue-size/) needs to fire `suggest_split` first. It is **not** stored anywhere — it is a decision input, not a record.
+**Issue SP** is a roughness check. The PO uses it during `/refine` to decide whether the Issue is small enough to enter the lifecycle, or whether [`issue-size`](/policies/issue-size/) needs to fire `suggest_split` first. It is **not** stored anywhere — it is a decision input, not a record.
 
 **Subtask SP** is the actual recorded value. Dev calculates it during `/breakdown` from the subtask's AC and writes it to the tracker via `soloscrum-tracker-{github|linear}-set-sp`. This is the value used for backlog planning and progress tracking.
 
@@ -42,9 +42,9 @@ For both levels:
 1. Read AC / Goal to identify scope: how many subsystems / concerns are touched?
 2. Identify uncertainty: how many open design decisions remain after AC? Is anything novel?
 3. Map (scope, uncertainty) to the SP table. Both axes have to fit; pick the higher row when in doubt.
-4. If the result exceeds 5, the Issue is over-budget — split per [`define-issue-size`](/reference/define-issue-size/) and re-estimate.
+4. If the result exceeds 5, the Issue is over-budget — split per [`issue-size`](/policies/issue-size/) and re-estimate.
 
 ## See also
 
 - Canonical contract: [`skills/soloscrum-define-story-points/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-story-points/SKILL.md).
-- For where the SP value is stored per tracker profile, see the [tracker profiles concept](/concept/tracker-profile/) and the [tracker operations reference](/reference/tracker-operations/).
+- For where the SP value is stored per tracker profile, see the [tracker profiles concept](/concept/tracker-profile/).

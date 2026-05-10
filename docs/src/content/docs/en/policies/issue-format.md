@@ -53,4 +53,4 @@ The canonical language is English. Multi-language variants are out of scope.
 ## See also
 
 - Canonical contract: [`skills/soloscrum-define-issue-format/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-format/SKILL.md).
-- The size gate that decides whether an Issue in this format needs splitting lives in [`define-issue-size`](/reference/define-issue-size/).
+- The size gate that decides whether an Issue in this format needs splitting lives in [`issue-size`](/policies/issue-size/).

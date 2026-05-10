@@ -84,5 +84,4 @@ verdict 後のアクションの詳細は [PR ライフサイクル概念](/conc
 ## 関連項目
 
 - 正本の契約 — PR コメントテンプレート、severity 表、完全な anti-pattern リストを含む — は [`skills/soloscrum-define-code-review-process/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-code-review-process/SKILL.md) にあります。
-- 簡潔な spec ビューは [code review process リファレンス](/reference/define-code-review-process/) を参照。
 - verdict が PR の状態機械をどう駆動するかについては、[PR ライフサイクル概念](/concept/pr-lifecycle/) を参照。

@@ -17,7 +17,7 @@ sidebar:
 
 ## 2 つの段階
 
-**Issue SP** は粗さチェックです。PO は `/refine` 中に、Issue がライフサイクルに入れるほど小さいか、それとも先に [`define-issue-size`](/reference/define-issue-size/) が `suggest_split` を発火する必要があるかを判断するためにこれを使います。これはどこにも保存され **ません** — レコードではなく、決定への入力です。
+**Issue SP** は粗さチェックです。PO は `/refine` 中に、Issue がライフサイクルに入れるほど小さいか、それとも先に [`issue-size`](/policies/issue-size/) が `suggest_split` を発火する必要があるかを判断するためにこれを使います。これはどこにも保存され **ません** — レコードではなく、決定への入力です。
 
 **Subtask SP** が実際に記録される値です。Dev は `/breakdown` 中に subtask の AC からこれを計算し、`soloscrum-tracker-{github|linear}-set-sp` 経由で tracker に書き込みます。これが backlog planning と進捗追跡で使われる値です。
 
@@ -42,9 +42,9 @@ sidebar:
 1. AC / Goal を読んで scope を特定する: いくつのサブシステム / 関心事に触れるか?
 2. uncertainty を特定する: AC の後にいくつの未解決設計決定が残るか? 何か新規のものはあるか?
 3. (scope, uncertainty) を SP 表にマッピングする。両軸が収まらなければならない; 迷ったら高い行を選ぶ。
-4. 結果が 5 を超える場合、Issue は予算超過 — [`define-issue-size`](/reference/define-issue-size/) に従って split し再見積もりする。
+4. 結果が 5 を超える場合、Issue は予算超過 — [`issue-size`](/policies/issue-size/) に従って split し再見積もりする。
 
 ## 関連項目
 
 - 正本の契約: [`skills/soloscrum-define-story-points/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-story-points/SKILL.md)。
-- tracker profile ごとの SP 値の保存場所については、[tracker profile 概念](/concept/tracker-profile/) と [tracker operations リファレンス](/reference/tracker-operations/) を参照。
+- tracker profile ごとの SP 値の保存場所については、[tracker profile 概念](/concept/tracker-profile/) を参照。

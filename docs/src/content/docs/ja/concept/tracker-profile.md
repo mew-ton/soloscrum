@@ -51,5 +51,3 @@ profile: github-only
 ## 関連項目
 
 - 完全な storage 行列と operation skill 表は正本の契約にあります: [`skills/soloscrum-define-tracker-profile/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-tracker-profile/SKILL.md) を参照。
-- skill ごとの全 tracker operation のサマリは、[tracker operations リファレンス](/reference/tracker-operations/) へ。
-- profile 解決の簡潔な spec ビューは、[tracker profile リファレンス](/reference/define-tracker-profile/) を参照。
