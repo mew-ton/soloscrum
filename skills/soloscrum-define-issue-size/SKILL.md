@@ -36,6 +36,12 @@ Trigger `suggest_split` when any of the following is exceeded:
 2. Confirm each split Issue falls within thresholds
 3. Obtain user approval before creating split Issues
 
+## Notes
+
+`max_sp: 5` operates on the scope x uncertainty SP scale defined in `soloscrum-define-story-points` — not on a time budget. The split test is therefore "can this Issue fit in one PR's scope and decision-set without compounding?" If a single PR would have to span multiple subsystems **and** carry multiple unresolved design decisions, the Issue is over-budget regardless of how fast a model could draft it.
+
+`max_estimated_days` is retained as a coarse calibration check for the PO during `/refine`: if the rough wall-clock feel obviously exceeds two days of solo-dev cycle time (including user review), that is a signal the scope/uncertainty estimate is probably too low. It is not the primary criterion.
+
 ## Exceptions
 
 - Large-scale refactoring and tech debt reduction are exempt from these thresholds; defer to user judgment.
