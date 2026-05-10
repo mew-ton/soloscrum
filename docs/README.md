@@ -40,14 +40,26 @@ src/content/docs/
   en/
     index.md
     concept/...
-    reference/...
+    policies/...
   ja/
     index.md
     concept/...
-    reference/...
+    policies/...
 ```
 
-The sidebar `autogenerate` directive references `directory: 'concept'` and `directory: 'reference'` once; Starlight resolves these per-locale. Cross-links in Markdown should be written as `/concept/foo/` or `/reference/bar/` — Starlight rewrites them to `/ja/concept/foo/` etc. when rendering the `ja` build.
+The sidebar `autogenerate` directive references `directory: 'concept'` and `directory: 'policies'` once; Starlight resolves these per-locale. Cross-links in Markdown should be written as `/concept/foo/` or `/policies/bar/` — Starlight rewrites them to `/ja/concept/foo/` etc. when rendering the `ja` build.
+
+The site has two top-level sections, kept narrow on purpose:
+
+- **Concept** — the human-facing flow narrative (tracker profile, agent responsibilities, PR lifecycle, code review process). These pages explain *how soloscrum's lifecycle hangs together*.
+- **Policies** — the five rules a human actively uses or judges against:
+  - `issue-format` — the structural shape of an Issue body
+  - `priority` — the priority levels and when to choose each
+  - `story-points` — the SP scale (so the PO's estimate can be sanity-checked)
+  - `issue-size` — when an Issue is too big and needs splitting
+  - `dod` — Definition of Done, the bar `/review` decides against
+
+The previous "Reference" section (one page per `soloscrum-define-*` skill) was retired in #47 v3: pages that covered orchestration the **agent** owns (branch naming, Conventional Commits, tracker operation routing, agent role splits, task type, design criteria, UI standards) are not human-actionable and live only as `skills/*/SKILL.md` for the AI contract; pages that re-stated content already in Concept were merged into Concept.
 
 Translation policy:
 
@@ -72,4 +84,4 @@ pnpm run preview      # preview the built site locally
 
 ## Status
 
-This is the bare scaffold from soloscrum issue [#46](https://github.com/mew-ton/soloscrum/issues/46): the project is initialised, the build passes, and a single hand-written stub index page renders. Concept / Reference / Commands / Onboarding sections will be filled in by [#47](https://github.com/mew-ton/soloscrum/issues/47) and [#48](https://github.com/mew-ton/soloscrum/issues/48). CI deploy and a navigation entry from the repo root README are tracked in [#49](https://github.com/mew-ton/soloscrum/issues/49).
+This is the bare scaffold from soloscrum issue [#46](https://github.com/mew-ton/soloscrum/issues/46): the project is initialised, the build passes, and a single hand-written stub index page renders. Concept / Policies sections are filled in by [#47](https://github.com/mew-ton/soloscrum/issues/47); Commands / Onboarding sections will be added in [#48](https://github.com/mew-ton/soloscrum/issues/48). CI deploy and a navigation entry from the repo root README are tracked in [#49](https://github.com/mew-ton/soloscrum/issues/49).
