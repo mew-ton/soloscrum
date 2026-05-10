@@ -5,11 +5,9 @@ sidebar:
   order: 2
 ---
 
-`soloscrum-define-priority` is the four-level priority taxonomy and the decision flow for placing an Issue on it.
+When you file an Issue, you (or `/refine`) pick one of four priority levels. Priority drives ordering in the backlog and signals urgency to anyone picking up the work.
 
-## What it does
-
-It pins the priority scale and what each level means.
+## The four levels
 
 | Priority | Decision criteria | Response target |
 |---|---|---|
@@ -18,13 +16,7 @@ It pins the priority scale and what each level means.
 | **Medium** | Normal feature development and improvements | Process in backlog order |
 | **Low** | Tech debt, refactoring, nice-to-have | When capacity allows |
 
-## When it is consumed
-
-`soloscrum-create-issue` (`/refine`) calls this skill to label a fresh Issue. The label is `priority:{urgent|high|medium|low}` and lives on the GitHub Issue regardless of active tracker profile (GitHub stays canonical for parent metadata in both profiles).
-
-## Key inputs and outputs
-
-Input is the Issue's nature (problem type, who is impacted, whether anything else is blocked). Output is one of the four priority labels.
+The level is stored as a `priority:{urgent|high|medium|low}` label on the GitHub Issue. The label lives on GitHub regardless of the active tracker profile (GitHub stays canonical for parent metadata in both profiles).
 
 ## Decision flow
 
@@ -42,6 +34,10 @@ Other (tech debt, future improvements)?
   → Low
 ```
 
+## When this applies
+
+`/refine` sets the label when the Issue is created. After that the level is sticky — soloscrum never re-decides priority automatically; you change it by editing the label on the Issue.
+
 ## Notes
 
 - In solo development, Urgent and High often overlap. Reserve Urgent for genuinely time-critical situations only.
@@ -49,5 +45,5 @@ Other (tech debt, future improvements)?
 
 ## See also
 
+- Where priority sits in the lifecycle (PO assigns it at `/refine`): [Agents and responsibilities](/concept/agent-responsibilities/).
 - Canonical contract: [`skills/soloscrum-define-priority/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-priority/SKILL.md).
-- For where priority sits in the lifecycle (PO assigns at `/refine`, never re-decided automatically), see [Agents and responsibilities](/concept/agent-responsibilities/).
