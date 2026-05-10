@@ -4,6 +4,14 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	// Public canonical URL for the deployed site. The docs are published to
+	// GitHub Pages at https://mew-ton.github.io/soloscrum/ via the
+	// `.github/workflows/docs.yml` workflow. `site` is required for sitemap
+	// generation (without it Astro emits a build warning) and `base` makes
+	// internal links resolve correctly when served from the `/soloscrum/`
+	// subpath.
+	site: 'https://mew-ton.github.io/soloscrum/',
+	base: '/soloscrum/',
 	integrations: [
 		starlight({
 			title: 'soloscrum docs',
