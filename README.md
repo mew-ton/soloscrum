@@ -2,6 +2,8 @@
 
 > 一人用AI駆動開発基盤。Claude Plugin として配布する。
 
+ドキュメントサイト: <https://mew-ton.github.io/soloscrum/>
+
 GitHub Issues を中心に据え、必要に応じて Linear を併用しながら、個人開発のタスク管理・実装・レビューを自律的に回す。
 
 ---
