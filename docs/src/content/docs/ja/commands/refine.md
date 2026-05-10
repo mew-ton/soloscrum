@@ -18,8 +18,8 @@ sidebar:
 ## What happens
 
 1. **Backlog janitor.** `/refine` は open Issue を走査し、それぞれについて closing keyword (`Closes #N`, `Fixes #N`, `Resolves #N` など) で参照していて既に merge 済みの PR を探します。そのような PR を持つ Issue は reason `completed` でクローズされます。出力の最初の行は `Closed N stale Issue(s): #X, #Y` か `No stale Issues found` (`--no-janitor` を渡したときは `Janitor skipped`) です。janitor はクローズしかしません — 再オープンは決してしません。
-2. **Idea structuring.** PO agent がアイデアを読み、4 セクションの Issue 本文を抽出し、[priority](/policies/priority/) ラベルを選び、size-check [SP](/policies/story-points/) を計算します。
-3. **Size gate.** size-check SP が 5 を超えている場合、`/refine` は Issue を oversized として flag し、作成前に分割を提案します。閾値については [issue size](/policies/issue-size/) を参照。
+2. **Idea structuring.** PO agent がアイデアを読み、4 セクションの Issue 本文を抽出し、[priority](/ja/policies/priority/) ラベルを選び、size-check [SP](/ja/policies/story-points/) を計算します。
+3. **Size gate.** size-check SP が 5 を超えている場合、`/refine` は Issue を oversized として flag し、作成前に分割を提案します。閾値については [issue size](/ja/policies/issue-size/) を参照。
 4. **Confirmation.** 構造化された Issue 本文がユーザに提示され、承認を求められます。
 5. **Issue creation.** 承認後、priority ラベル付きで GitHub Issue が作成されます。
 
@@ -40,8 +40,8 @@ SP が 5 以下なら、ユーザが確認して Issue が作成されます。a
 
 ## See also
 
-- [Agents and responsibilities](/concept/agent-responsibilities/) — `/refine` は PO agent が所有。
-- [Issue format](/policies/issue-format/) — `/refine` が生成する Background / Goal / AC / Out of Scope の形。
-- [Issue size](/policies/issue-size/) — `suggest_split` を発火させる閾値。
-- ライフサイクルの次: [`/breakdown`](/commands/breakdown/)。
+- [Agents and responsibilities](/ja/concept/agent-responsibilities/) — `/refine` は PO agent が所有。
+- [Issue format](/ja/policies/issue-format/) — `/refine` が生成する Background / Goal / AC / Out of Scope の形。
+- [Issue size](/ja/policies/issue-size/) — `suggest_split` を発火させる閾値。
+- ライフサイクルの次: [`/breakdown`](/ja/commands/breakdown/)。
 - 正本の契約: [`commands/refine.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/refine.md)。

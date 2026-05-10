@@ -21,7 +21,7 @@ sidebar:
 2. **分解を計画する。** Design は Subtask のリストを提案します: title、type (コードなら `develop`、Figma 作業なら `design-ui`)、各 Subtask の AC、Subtask 間の blocking 関係 (例: *Subtask B は Subtask A に依存*) があればそれも。
 3. **Validate.** Design は提案された分割に対して size check を再実行します — どれかの Subtask がまだ大きすぎる、または分解が 5 個を超える場合、split test が再度発火し、提案が refine された slice として戻ってきます。
 4. **Confirmation.** 分解提案がユーザに提示され、tracker write の前に承認が求められます。
-5. **Registration.** 承認後、Dev agent が `soloscrum-tracker-{github|linear}-create-subtask` 経由で各 Subtask を tracker に書き込みます。subtask の SP は [story-points](/policies/story-points/) スケールから、AC を慎重に読んだうえで Subtask ごとに適用されます。Subtask 間の依存は `soloscrum-tracker-{github|linear}-add-dependency` 経由で追加されます。
+5. **Registration.** 承認後、Dev agent が `soloscrum-tracker-{github|linear}-create-subtask` 経由で各 Subtask を tracker に書き込みます。subtask の SP は [story-points](/ja/policies/story-points/) スケールから、AC を慎重に読んだうえで Subtask ごとに適用されます。Subtask 間の依存は `soloscrum-tracker-{github|linear}-add-dependency` 経由で追加されます。
 
 ## Typical flow
 
@@ -39,9 +39,9 @@ sidebar:
 
 ## See also
 
-- [Agents and responsibilities](/concept/agent-responsibilities/) — Design が分解を提案し、Dev が登録する。
-- [Issue size](/policies/issue-size/) — Issue が大きすぎて `suggest_split` が発火するとき。
-- [Story points](/policies/story-points/) — Subtask ごとに適用される SP スケール。
-- [Tracker profile](/concept/tracker-profile/) — Subtask レコードがどこに住むか。
+- [Agents and responsibilities](/ja/concept/agent-responsibilities/) — Design が分解を提案し、Dev が登録する。
+- [Issue size](/ja/policies/issue-size/) — Issue が大きすぎて `suggest_split` が発火するとき。
+- [Story points](/ja/policies/story-points/) — Subtask ごとに適用される SP スケール。
+- [Tracker profile](/ja/concept/tracker-profile/) — Subtask レコードがどこに住むか。
 - ライフサイクルの前: [`/refine`](/commands/refine/)。次: [`/develop`](/commands/develop/)。
 - 正本の契約: [`commands/breakdown.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/breakdown.md)。

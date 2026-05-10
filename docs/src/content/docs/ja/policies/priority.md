@@ -45,5 +45,5 @@ Issue を起票するとき、あなた (もしくは `/refine`) は 4 段階の
 
 ## 関連項目
 
-- priority がライフサイクルのどこに位置するか (PO が `/refine` で割り当て): [agent と責務](/concept/agent-responsibilities/)。
+- priority がライフサイクルのどこに位置するか (PO が `/refine` で割り当て): [agent と責務](/ja/concept/agent-responsibilities/)。
 - 正本の契約: [`skills/soloscrum-define-priority/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-priority/SKILL.md)。

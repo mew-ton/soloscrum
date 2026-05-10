@@ -55,5 +55,5 @@ AC のルール:
 
 ## 関連項目
 
-- この形式の本文に対するサイズ上限: [`issue-size`](/policies/issue-size/)。
+- この形式の本文に対するサイズ上限: [`issue-size`](/ja/policies/issue-size/)。
 - 正本の契約: [`skills/soloscrum-define-issue-format/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-format/SKILL.md)。

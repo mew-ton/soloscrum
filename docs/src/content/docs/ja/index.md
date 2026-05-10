@@ -5,11 +5,11 @@ description: soloscrum フレームワークの人間向けコンパニオンド
 
 このサイトは [soloscrum](https://github.com/mew-ton/soloscrum) フレームワークに対する **人間向けのコンパニオン** です。オンボーディングノート、概念解説、command のウォークスルー、人間が能動的に使う / 判断する policies といった、人間に向けた手書きの説明を集める場であり、フレームワークの機械可読な spec ファイルとは独立して書かれます。
 
-初めてなら [はじめに](/onboarding/) から開始してください — `/plugin install` から最初の Issue を `/refine` で file するまでをガイドします。そこから:
+初めてなら [はじめに](/ja/onboarding/) から開始してください — `/plugin install` から最初の Issue を `/refine` で file するまでをガイドします。そこから:
 
-- [Concept](/concept/tracker-profile/) は why を解説 (tracker profile、agent の責務、PR ライフサイクル、code review プロセス)。
-- [Policies](/policies/issue-format/) は `/refine` と `/review` が照合する 5 つの rule を扱います。
-- [Commands](/commands/refine/) は `/refine`, `/breakdown`, `/develop`, `/review` をライフサイクル順にウォークスルーします。
+- [Concept](/ja/concept/tracker-profile/) は why を解説 (tracker profile、agent の責務、PR ライフサイクル、code review プロセス)。
+- [Policies](/ja/policies/issue-format/) は `/refine` と `/review` が照合する 5 つの rule を扱います。
+- [Commands](/ja/commands/refine/) は `/refine`, `/breakdown`, `/develop`, `/review` をライフサイクル順にウォークスルーします。
 
 ## AI 契約はどこにあるか
 

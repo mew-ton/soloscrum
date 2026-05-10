@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-`/review` は品質ゲートです。`/develop` が開いた draft PR を読み、[DoD](/policies/dod/) と各 Issue AC を verify し、CodeRabbit と multi-agent review pipeline を走らせ、各 finding を個別に決定し、Pass / Pass with follow-ups / Fail verdict を投稿します。Pass なら Subtask を `done` に遷移させ、CI green を待ち、PR を ready に昇格させ、ユーザが実行する正確な `gh pr merge` command を surface します。merge そのものは **常に** ユーザのゲートです。
+`/review` は品質ゲートです。`/develop` が開いた draft PR を読み、[DoD](/ja/policies/dod/) と各 Issue AC を verify し、CodeRabbit と multi-agent review pipeline を走らせ、各 finding を個別に決定し、Pass / Pass with follow-ups / Fail verdict を投稿します。Pass なら Subtask を `done` に遷移させ、CI green を待ち、PR を ready に昇格させ、ユーザが実行する正確な `gh pr merge` command を surface します。merge そのものは **常に** ユーザのゲートです。
 
 ## Usage
 
@@ -17,7 +17,7 @@ PR review には PR URL または番号を渡します。Figma ファイル (`ty
 
 ## What happens
 
-1. **DoD verification.** [DoD](/policies/dod/) の各チェックリスト項目が check されます。PR 本文に closing keyword (`Closes #N`) が含まれること、lint が clean、該当する場合のテスト、AC が満たされていること。
+1. **DoD verification.** [DoD](/ja/policies/dod/) の各チェックリスト項目が check されます。PR 本文に closing keyword (`Closes #N`) が含まれること、lint が clean、該当する場合のテスト、AC が満たされていること。
 2. **AC verification.** 親 Issue の AC の各 checkbox が diff および動作する build に対して verify されます。
 3. **CodeRabbit run.** CodeRabbit CLI が diff に対して走ります。"No findings" 結果でも multi-agent パスは依然として要求されます — PR が小さい / docs only だからと multi-agent ステップをスキップすることは named anti-pattern です。
 4. **Multi-agent review.** 専門 agent (security, accessibility, performance など) が並列で diff を review します。confidence ≥ 80 の finding が consolidate されます。
@@ -50,13 +50,13 @@ verdict 後のシーケンス — tracker `→ done`、CI 待機、`gh pr ready`
 - Pass の場合: Subtask state が `done` に進み、PR が ready に昇格し、ユーザが実行する `gh pr merge` command が surface される。
 - Fail の場合: finding ごとのフィードバックが PR に投稿され、Subtask が `in-progress` に戻され、PR は draft のまま残る。
 
-Issue そのものは `/review` によって **クローズされません** — クローズは merge 時に PR 本文の `Closes #N` キーワードと GitHub の auto-close 経由で発火します。なぜかは [PR lifecycle](/concept/pr-lifecycle/) を参照。
+Issue そのものは `/review` によって **クローズされません** — クローズは merge 時に PR 本文の `Closes #N` キーワードと GitHub の auto-close 経由で発火します。なぜかは [PR lifecycle](/ja/concept/pr-lifecycle/) を参照。
 
 ## See also
 
-- [Agents and responsibilities](/concept/agent-responsibilities/) — Review が Pass を発行できる唯一のロール。
-- [PR lifecycle](/concept/pr-lifecycle/) — autonomy の契約、reversible vs irreversible、なぜ merge は常にユーザのゲートか。
-- [Code review process](/concept/code-review-process/) — finding ごとの決定ルールと verdict マッピング。
-- [DoD](/policies/dod/) — `/review` が照合するチェックリスト。
+- [Agents and responsibilities](/ja/concept/agent-responsibilities/) — Review が Pass を発行できる唯一のロール。
+- [PR lifecycle](/ja/concept/pr-lifecycle/) — autonomy の契約、reversible vs irreversible、なぜ merge は常にユーザのゲートか。
+- [Code review process](/ja/concept/code-review-process/) — finding ごとの決定ルールと verdict マッピング。
+- [DoD](/ja/policies/dod/) — `/review` が照合するチェックリスト。
 - ライフサイクルの前: [`/develop`](/commands/develop/)。
 - 正本の契約: [`commands/review.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/review.md)。

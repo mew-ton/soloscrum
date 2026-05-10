@@ -13,7 +13,7 @@ sidebar:
 - [ ] テストが存在する (該当する場合)。
 - [ ] PR 本文に Issue 番号が含まれる (`Closes #N` / `Fixes #N` / `Resolves #N`)。
 - [ ] lint エラーがゼロ。
-- [ ] code review pipeline が実行され finding に対処済み ([code review process](/concept/code-review-process/) に従う)。
+- [ ] code review pipeline が実行され finding に対処済み ([code review process](/ja/concept/code-review-process/) に従う)。
 - [ ] review が pass している。
 
 各項目について、何が「満たされた」とカウントされるかは具体的に定義されています — 例えば「テストが存在する」はビジネスロジック / API endpoint / ユーティリティ関数には該当しますが、ロジックなしの設定変更には該当しません。「Issue 番号」は GitHub が認識する auto-close キーワードのいずれかを具体的に要求します。
@@ -31,5 +31,5 @@ sidebar:
 
 ## 関連項目
 
-- auto-close キーワードが必須な理由: [PR ライフサイクル](/concept/pr-lifecycle/)。
+- auto-close キーワードが必須な理由: [PR ライフサイクル](/ja/concept/pr-lifecycle/)。
 - 正本の契約: [`skills/soloscrum-define-dod/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-dod/SKILL.md)。

@@ -1,0 +1,78 @@
+name: Deploy docs to GitHub Pages
+
+# Builds the Starlight docs site under `docs/` and deploys it to GitHub Pages.
+# Uses GitHub's official Pages deployment actions (configure-pages /
+# upload-pages-artifact / deploy-pages) — not third-party publishers — so the
+# deployment integrates with the repo's "Build and deployment > Source: GitHub
+# Actions" Pages setting.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Only rebuild when docs content or this workflow itself changes.
+      - 'docs/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+# Pages deployment requires id-token (OIDC) and pages write; everything else
+# stays read-only.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment can be in flight at a time. Cancel any in-progress
+# run when a newer commit arrives so we never deploy stale content.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Starlight site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: docs/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: docs
+        run: pnpm install --frozen-lockfile
+
+      - name: Build with Astro
+        working-directory: docs
+        run: pnpm run build
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
