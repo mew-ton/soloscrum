@@ -50,7 +50,7 @@ SP is a **size class anchored on scope x uncertainty** — not a time unit. The 
 | 2  | 2-3 files / single skill area | 1 minor decision | ~100K-200K tokens, agent ~10-20 min |
 | 3  | Single subsystem cross-cut | 1-2 design decisions | ~200K-500K tokens, agent ~20-45 min |
 | 5  | Multi-subsystem cross-cut | Multiple design decisions | ~500K-1M tokens, agent ~45 min-2h |
-| >5 | Do not use | → Split the Issue and re-estimate | |
+| >5 | (over-budget) | (over-budget) | Do not assign — split per `soloscrum-define-issue-size` and re-estimate |
 
 The SP table is shared by both Issue SP and subtask SP.
 

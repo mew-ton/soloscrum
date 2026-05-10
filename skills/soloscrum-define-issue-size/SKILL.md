@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-issue-size
-description: "Reference: issue size thresholds (max SP 5, max subtasks 5, max days 2). Defines the suggest_split action triggered when any threshold is exceeded."
+description: "Reference: issue size thresholds (max SP 5, max subtasks 5; max days is a coarse calibration signal only). Defines the suggest_split action triggered when SP or subtask threshold is exceeded."
 user-invocable: false
 ---
 
@@ -25,7 +25,7 @@ Trigger `suggest_split` when any of the following is exceeded:
 |---|---|---|
 | SP | > 5 | Estimates exceeding SP 5 |
 | Subtask count | > 5 | When breakdown would produce more than 5 subtasks |
-| Estimated days | > 2 days | When implementation is expected to take more than 2 days |
+| Estimated days | > 2 days (calibration only) | Coarse signal — see Notes; does not by itself force a split |
 
 ## suggest_split Action
 
