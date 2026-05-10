@@ -35,7 +35,7 @@ The site ships with two locales configured in `astro.config.mjs`:
 
 Each locale lives under its own subtree:
 
-```
+```text
 src/content/docs/
   en/
     index.md
