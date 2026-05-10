@@ -1,6 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { remarkBaseUrl } from './src/lib/remark-base-url.mjs';
+
+const BASE = '/soloscrum/';
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,7 +14,28 @@ export default defineConfig({
 	// internal links resolve correctly when served from the `/soloscrum/`
 	// subpath.
 	site: 'https://mew-ton.github.io/soloscrum/',
-	base: '/soloscrum/',
+	base: BASE,
+	// The site uses i18n with `defaultLocale: 'en'`, which means Starlight
+	// emits content under `/en/` and `/ja/` but does NOT emit a root index.
+	// Without this redirect, `https://mew-ton.github.io/soloscrum/` 404s.
+	// Astro generates a meta-redirect HTML at `dist/index.html` from this
+	// rule. The destination must include the `base` prefix because Astro
+	// does not auto-prefix redirect targets — the value is used verbatim in
+	// the emitted `<meta http-equiv="refresh">`.
+	redirects: {
+		'/': '/soloscrum/en/',
+	},
+	markdown: {
+		// Markdown-authored absolute links (`/concept/foo/`, `/policies/bar/`,
+		// etc.) are not auto-prefixed with `base` or with the i18n locale
+		// segment by Astro/Starlight. Without this plugin those links resolve
+		// to the wrong host path on Pages (e.g.
+		// `https://mew-ton.github.io/concept/foo/` instead of
+		// `https://mew-ton.github.io/soloscrum/en/concept/foo/`). The plugin
+		// rewrites them to include both the `/soloscrum/` base prefix and the
+		// source file's locale at build time.
+		remarkPlugins: [[remarkBaseUrl, { base: BASE, locales: ['en', 'ja'] }]],
+	},
 	integrations: [
 		starlight({
 			title: 'soloscrum docs',
