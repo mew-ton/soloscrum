@@ -3,9 +3,9 @@ title: soloscrum docs (work in progress)
 description: Human-facing companion documentation for the soloscrum framework.
 ---
 
-This site is the **human-facing companion** to the [soloscrum](https://github.com/mew-ton/soloscrum) framework. It is a place for hand-written explanations aimed at people — onboarding notes, conceptual overviews, command walkthroughs, and reference material — written separately from the framework's machine-readable spec files.
+This site is the **human-facing companion** to the [soloscrum](https://github.com/mew-ton/soloscrum) framework. It is a place for hand-written explanations aimed at people — onboarding notes, conceptual overviews, command walkthroughs, and the policies a human actively uses or judges against — written separately from the framework's machine-readable spec files.
 
-The site is currently a stub. Concept, Reference, Commands, and Onboarding sections will be added in subsequent subtasks (see issues [#47](https://github.com/mew-ton/soloscrum/issues/47) and [#48](https://github.com/mew-ton/soloscrum/issues/48)).
+The site is currently a stub. Concept and Policies sections are added in [#47](https://github.com/mew-ton/soloscrum/issues/47); Commands and Onboarding sections will follow in [#48](https://github.com/mew-ton/soloscrum/issues/48).
 
 ## Where the AI contract lives
 

@@ -26,6 +26,51 @@ If you are looking for the authoritative behaviour spec, read the source files a
 - TypeScript (strict, via `astro/tsconfigs/strict`)
 - Package manager: **pnpm**
 
+## Internationalisation
+
+The site ships with two locales configured in `astro.config.mjs`:
+
+- `en` (English) — the default locale
+- `ja` (日本語)
+
+Each locale lives under its own subtree:
+
+```text
+src/content/docs/
+  en/
+    index.md
+    concept/...
+    policies/...
+  ja/
+    index.md
+    concept/...
+    policies/...
+```
+
+The sidebar `autogenerate` directive references `directory: 'concept'` and `directory: 'policies'` once; Starlight resolves these per-locale. Cross-links in Markdown should be written as `/concept/foo/` or `/policies/bar/` — Starlight rewrites them to `/ja/concept/foo/` etc. when rendering the `ja` build.
+
+The site has two top-level sections, kept narrow on purpose:
+
+- **Concept** — the human-facing flow narrative (tracker profile, agent responsibilities, PR lifecycle, code review process). These pages explain *how soloscrum's lifecycle hangs together*.
+- **Policies** — the five rules a human actively uses or judges against:
+  - `issue-format` — the structural shape of an Issue body
+  - `priority` — the priority levels and when to choose each
+  - `story-points` — the SP scale (so the PO's estimate can be sanity-checked)
+  - `issue-size` — when an Issue is too big and needs splitting
+  - `dod` — Definition of Done, the bar `/review` decides against
+
+The previous "Reference" section (one page per `soloscrum-define-*` skill) was retired in #47 v3: pages that covered orchestration the **agent** owns (branch naming, Conventional Commits, tracker operation routing, agent role splits, task type, design criteria, UI standards) are not human-actionable and live only as `skills/*/SKILL.md` for the AI contract; pages that re-stated content already in Concept were merged into Concept.
+
+Translation policy:
+
+- Domain terms (`PR`, `Issue`, `Subtask`, `branch`, `merge`, `commit`, `Pass`, `Fail`, `draft`, `ready`, `lint`, `CI`, etc.) stay English.
+- Skill names (`soloscrum-define-pr-lifecycle`, etc.) stay English.
+- Code blocks, command examples, and file paths are identical across locales.
+- `sidebar.order` frontmatter is kept identical between `en` and `ja` so the navigation order matches.
+- External GitHub links to canonical `SKILL.md` files point at the English source — the spec is in English.
+
+Starlight automatically renders a locale picker in the site header when more than one locale is configured.
+
 ## Local development
 
 All commands are run from `docs/`.
@@ -39,4 +84,4 @@ pnpm run preview      # preview the built site locally
 
 ## Status
 
-This is the bare scaffold from soloscrum issue [#46](https://github.com/mew-ton/soloscrum/issues/46): the project is initialised, the build passes, and a single hand-written stub index page renders. Concept / Reference / Commands / Onboarding sections will be filled in by [#47](https://github.com/mew-ton/soloscrum/issues/47) and [#48](https://github.com/mew-ton/soloscrum/issues/48). CI deploy and a navigation entry from the repo root README are tracked in [#49](https://github.com/mew-ton/soloscrum/issues/49).
+This is the bare scaffold from soloscrum issue [#46](https://github.com/mew-ton/soloscrum/issues/46): the project is initialised, the build passes, and a single hand-written stub index page renders. Concept / Policies sections are filled in by [#47](https://github.com/mew-ton/soloscrum/issues/47); Commands / Onboarding sections will be added in [#48](https://github.com/mew-ton/soloscrum/issues/48). CI deploy and a navigation entry from the repo root README are tracked in [#49](https://github.com/mew-ton/soloscrum/issues/49).
