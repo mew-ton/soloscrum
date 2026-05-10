@@ -110,4 +110,4 @@ verdict 後のシーケンス — tracker `→ done`、CI 待機、`gh pr ready`
 ## 関連項目
 
 - 完全な autonomy 表、anti-pattern、verdict-to-action マッピングは [`skills/soloscrum-define-pr-lifecycle/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-pr-lifecycle/SKILL.md) にあります。
-- verdict が設定される前に finding がどう決定されるかについては、[code review process 概念](/concept/code-review-process/) を参照。
+- verdict が設定される前に finding がどう決定されるかについては、[code review process 概念](/ja/concept/code-review-process/) を参照。

@@ -24,7 +24,7 @@ Issue は SP > 5 のとき、もしくは `/breakdown` が 5 個より多い sub
 
 ## なぜ日数は校正のみなのか
 
-`max_sp: 5` は [`story-points`](/policies/story-points/) で定義される scope × uncertainty SP スケール上で動作します。したがって split test は「この Issue は複合せずに 1 つの PR の scope と決定セットに収まるか?」というものです。単一の PR が複数のサブシステムにまたがり、**かつ** 複数の未解決設計決定を抱えなければならないとき、Issue は大きすぎる — モデルがどれほど速くドラフトできるかに関わらず。
+`max_sp: 5` は [`story-points`](/ja/policies/story-points/) で定義される scope × uncertainty SP スケール上で動作します。したがって split test は「この Issue は複合せずに 1 つの PR の scope と決定セットに収まるか?」というものです。単一の PR が複数のサブシステムにまたがり、**かつ** 複数の未解決設計決定を抱えなければならないとき、Issue は大きすぎる — モデルがどれほど速くドラフトできるかに関わらず。
 
 `max_estimated_days` は `/refine` 中の粗い校正チェックとして保持されます: rough な wall-clock 感覚が solo-dev のサイクルタイム (ユーザレビュー含む) で 2 日を明らかに超えるなら、それは scope/uncertainty 見積もりがおそらく低すぎるシグナルです。これが主基準ではありません。
 
@@ -34,5 +34,5 @@ Issue は SP > 5 のとき、もしくは `/breakdown` が 5 個より多い sub
 
 ## 関連項目
 
-- SP スケール自体: [`story-points`](/policies/story-points/)。
+- SP スケール自体: [`story-points`](/ja/policies/story-points/)。
 - 正本の契約: [`skills/soloscrum-define-issue-size/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-size/SKILL.md)。

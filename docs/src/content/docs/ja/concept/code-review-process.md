@@ -52,7 +52,7 @@ sidebar:
 
 ## draft-window の override
 
-`code-review:code-review` command には、draft 状態の PR をスキップする eligibility check が同梱されています。soloscrum 内では、この check は **bypass** しなければなりません。`/review` が動くとき PR は意図的に draft であり、[draft window](/concept/pr-lifecycle/) こそがローカル品質ゲートが発火する場所です。upstream の skip を尊重すると、review pipeline の半分を静かに捨てることになります。
+`code-review:code-review` command には、draft 状態の PR をスキップする eligibility check が同梱されています。soloscrum 内では、この check は **bypass** しなければなりません。`/review` が動くとき PR は意図的に draft であり、[draft window](/ja/concept/pr-lifecycle/) こそがローカル品質ゲートが発火する場所です。upstream の skip を尊重すると、review pipeline の半分を静かに捨てることになります。
 
 `code-review:code-review` が明示的な override 引数を公開した場合は、それを優先してください。それまでは、soloscrum の review は draft PR を意図的に eligible として扱います。
 
@@ -68,7 +68,7 @@ sidebar:
 
 ## verdict 後の流れ
 
-verdict 後のアクションの詳細は [PR ライフサイクル概念](/concept/pr-lifecycle/) で説明されますが、短いバージョン:
+verdict 後のアクションの詳細は [PR ライフサイクル概念](/ja/concept/pr-lifecycle/) で説明されますが、短いバージョン:
 
 | Verdict | 次のアクション |
 |---|---|
@@ -84,4 +84,4 @@ verdict 後のアクションの詳細は [PR ライフサイクル概念](/conc
 ## 関連項目
 
 - 正本の契約 — PR コメントテンプレート、severity 表、完全な anti-pattern リストを含む — は [`skills/soloscrum-define-code-review-process/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-code-review-process/SKILL.md) にあります。
-- verdict が PR の状態機械をどう駆動するかについては、[PR ライフサイクル概念](/concept/pr-lifecycle/) を参照。
+- verdict が PR の状態機械をどう駆動するかについては、[PR ライフサイクル概念](/ja/concept/pr-lifecycle/) を参照。

@@ -15,26 +15,21 @@ export default defineConfig({
 	// subpath.
 	site: 'https://mew-ton.github.io/soloscrum/',
 	base: BASE,
-	// The site uses i18n with `defaultLocale: 'en'`, which means Starlight
-	// emits content under `/en/` and `/ja/` but does NOT emit a root index.
-	// Without this redirect, `https://mew-ton.github.io/soloscrum/` 404s.
-	// Astro generates a meta-redirect HTML at `dist/index.html` from this
-	// rule. The destination must include the `base` prefix because Astro
-	// does not auto-prefix redirect targets — the value is used verbatim in
-	// the emitted `<meta http-equiv="refresh">`.
-	redirects: {
-		'/': '/soloscrum/en/',
-	},
 	markdown: {
-		// Markdown-authored absolute links (`/concept/foo/`, `/policies/bar/`,
-		// etc.) are not auto-prefixed with `base` or with the i18n locale
-		// segment by Astro/Starlight. Without this plugin those links resolve
-		// to the wrong host path on Pages (e.g.
-		// `https://mew-ton.github.io/concept/foo/` instead of
-		// `https://mew-ton.github.io/soloscrum/en/concept/foo/`). The plugin
-		// rewrites them to include both the `/soloscrum/` base prefix and the
-		// source file's locale at build time.
-		remarkPlugins: [[remarkBaseUrl, { base: BASE, locales: ['en', 'ja'] }]],
+		// Astro and Starlight do not auto-prefix `/`-leading hrefs that
+		// originate inside Markdown body content with the configured `base`
+		// value. Starlight's `createPathFormatter` covers framework chrome
+		// (sidebar, header, breadcrumbs) but body content emits as authored.
+		// Without this plugin a link `[x](/concept/foo/)` resolves on Pages
+		// to `https://host/concept/foo/` instead of
+		// `https://host/soloscrum/concept/foo/`.
+		//
+		// Locale prefixing is author-managed under the canonical root-locale
+		// form: English content uses absolute slugs without a locale segment
+		// (`/concept/foo/`); Japanese content uses absolute slugs with the
+		// `/ja/` segment already in place (`/ja/concept/foo/`). The plugin
+		// only prepends `base`.
+		remarkPlugins: [[remarkBaseUrl, { base: BASE }]],
 	},
 	integrations: [
 		starlight({
@@ -46,17 +41,18 @@ export default defineConfig({
 					href: 'https://github.com/mew-ton/soloscrum',
 				},
 			],
-			// i18n was enabled in #47 (English default + Japanese). Each locale
-			// has its own subtree under `src/content/docs/{en,ja}/`; Starlight
-			// resolves the autogenerate `directory` per locale, so the sidebar
-			// definition below stays unified across languages.
-			defaultLocale: 'en',
+			// i18n uses Starlight's canonical "root locale" form: English
+			// content lives at the content root (no `/en/` prefix in URLs) and
+			// Japanese content lives under `/ja/`. With this layout, English
+			// absolute slugs (`/concept/foo/`) resolve directly under `base`,
+			// and Japanese absolute slugs are authored with the `/ja/` prefix
+			// already (`/ja/concept/foo/`). This matches Starlight's own docs
+			// site convention.
 			locales: {
-				en: { label: 'English', lang: 'en' },
+				root: { label: 'English', lang: 'en' },
 				ja: { label: '日本語', lang: 'ja' },
 			},
-			// Concept and Policies sections were added in #47. Commands and
-			// Onboarding sections will be added in #48. Both existing sections
+			// Concept and Policies sections were added in #47. Both sections
 			// rely on Starlight's `autogenerate` so adding a new page only
 			// requires dropping a Markdown file with `sidebar.order` frontmatter
 			// in the matching directory of each locale.
