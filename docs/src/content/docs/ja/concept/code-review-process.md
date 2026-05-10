@@ -1,6 +1,6 @@
 ---
 title: code review プロセス
-description: `/review` が CodeRabbit と multi-agent review pipeline をどう組み合わせるか、なぜ severity が情報的なものに留まるか、そして各 finding が 3 つの verdict のいずれにどう辿り着くか。
+description: "`/review` が CodeRabbit と multi-agent review pipeline をどう組み合わせるか、なぜ severity が情報的なものに留まるか、そして各 finding が 3 つの verdict のいずれにどう辿り着くか。"
 sidebar:
   order: 4
 ---

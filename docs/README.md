@@ -26,6 +26,39 @@ If you are looking for the authoritative behaviour spec, read the source files a
 - TypeScript (strict, via `astro/tsconfigs/strict`)
 - Package manager: **pnpm**
 
+## Internationalisation
+
+The site ships with two locales configured in `astro.config.mjs`:
+
+- `en` (English) — the default locale
+- `ja` (日本語)
+
+Each locale lives under its own subtree:
+
+```
+src/content/docs/
+  en/
+    index.md
+    concept/...
+    reference/...
+  ja/
+    index.md
+    concept/...
+    reference/...
+```
+
+The sidebar `autogenerate` directive references `directory: 'concept'` and `directory: 'reference'` once; Starlight resolves these per-locale. Cross-links in Markdown should be written as `/concept/foo/` or `/reference/bar/` — Starlight rewrites them to `/ja/concept/foo/` etc. when rendering the `ja` build.
+
+Translation policy:
+
+- Domain terms (`PR`, `Issue`, `Subtask`, `branch`, `merge`, `commit`, `Pass`, `Fail`, `draft`, `ready`, `lint`, `CI`, etc.) stay English.
+- Skill names (`soloscrum-define-pr-lifecycle`, etc.) stay English.
+- Code blocks, command examples, and file paths are identical across locales.
+- `sidebar.order` frontmatter is kept identical between `en` and `ja` so the navigation order matches.
+- External GitHub links to canonical `SKILL.md` files point at the English source — the spec is in English.
+
+Starlight automatically renders a locale picker in the site header when more than one locale is configured.
+
 ## Local development
 
 All commands are run from `docs/`.
