@@ -16,7 +16,7 @@ This repository **is** the soloscrum framework. All non-trivial work on this rep
 For every change other than the explicit exemptions below, route through:
 
 1. **`/refine`** — turn the idea into a GitHub Issue with Background / Goal / Acceptance Criteria / Out of Scope per `soloscrum-define-issue-format`. User feedback that produces a discrete unit of work counts as the trigger.
-2. **`/breakdown`** — if the Issue exceeds the size threshold in `soloscrum-define-issue-size` (SP > 5, > 5 subtasks, or > 2 days), split into Sub-issues. Issues that fit within a single develop unit can skip this step.
+2. **`/breakdown`** — if the Issue exceeds the size threshold in `soloscrum-define-issue-size` (SP > 5 or > 5 subtasks; > 2 days is a calibration signal only), split into Sub-issues. Issues that fit within a single develop unit can skip this step.
 3. **`/develop`** — branch per `soloscrum-define-branch-commit`, implement, open a **draft** PR with `Closes #<issue>` in the body. PRs always start as draft (per `soloscrum-define-pr-lifecycle`).
 4. **`/review`** — DoD + AC verification, CodeRabbit + multi-agent pipeline, per-finding decisions, verdict, post-verdict actions through to the merge handoff.
 

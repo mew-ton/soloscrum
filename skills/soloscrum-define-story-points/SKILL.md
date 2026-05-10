@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-story-points
-description: "Reference: story point scale and estimation criteria. SP 1=2h, 2=half day, 3=1 day, 5=2 days. Issues estimated over SP 5 must be split before proceeding."
+description: "Reference: story point scale and estimation criteria. SP is anchored on scope x uncertainty (size class, not a time unit); SP 5 is the upper bound and Issues estimated above it must be split before proceeding."
 user-invocable: false
 ---
 
@@ -22,8 +22,8 @@ The lightweight estimate in the PO layer serves as this **entry gate**.
 
 - **Purpose**: Determine whether the Issue is a manageable size
 - **Owner**: `soloscrum-po` (during `/refine`)
-- **Precision**: Rough is fine. Estimate from intuition without detailing every aspect
-- **Threshold**: Trigger `suggest_split` when SP > 5 or estimated days > 2
+- **Precision**: Rough is fine. Estimate scope and uncertainty from intuition without enumerating every file
+- **Threshold**: Trigger `suggest_split` when SP > 5
 - **Registered in tracker**: No — this is a size-check value only, never written to any tracker storage
 
 When Issue SP exceeds the threshold, split the Issue per `soloscrum-define-issue-size` and re-estimate.
@@ -42,13 +42,15 @@ When Issue SP exceeds the threshold, split the Issue per `soloscrum-define-issue
 
 ## SP Table
 
-| SP | Estimated effort | Complexity guide |
-|---|---|---|
-| 1 | Up to 2 hours | Clear change, 1-2 files, easy to test |
-| 2 | Half day (~4 hours) | Small feature addition, 3-5 files |
-| 3 | 1 day (~8 hours) | Medium feature addition, multiple components |
-| 5 | 2 days (~16 hours) | Large feature addition, new patterns introduced |
-| >5 | Do not use | → Split the Issue and re-estimate |
+SP is a **size class anchored on scope x uncertainty** — not a time unit. The "Calibration" column lists observed agent runtimes / token budgets so the scale can be sanity-checked, but those numbers are not the unit and must not be used as the primary input.
+
+| SP | Scope | Uncertainty | Calibration (observed, not the unit) |
+|----|-------|-------------|---|
+| 1  | 1 file / 1 concern | All decisions known (AC fully prescribes the change) | ~30K-100K tokens, agent ~5-10 min |
+| 2  | 2-3 files / single skill area | 1 minor decision | ~100K-200K tokens, agent ~10-20 min |
+| 3  | Single subsystem cross-cut | 1-2 design decisions | ~200K-500K tokens, agent ~20-45 min |
+| 5  | Multi-subsystem cross-cut | Multiple design decisions | ~500K-1M tokens, agent ~45 min-2h |
+| >5 | (over-budget) | (over-budget) | Do not assign — split per `soloscrum-define-issue-size` and re-estimate |
 
 The SP table is shared by both Issue SP and subtask SP.
 
@@ -56,19 +58,21 @@ The SP table is shared by both Issue SP and subtask SP.
 
 ### Issue SP (PO Layer)
 
-1. Survey the volume and complexity of the Issue's Goal and AC
-2. Estimate intuitively: "How many days would it take one person to implement this?"
-3. Map to the SP table
-4. If SP > 5 or estimated days > 2, split the Issue
+1. Read the Goal and AC to identify scope: how many subsystems does the change touch, and how many concerns are bundled into the Issue?
+2. Identify uncertainty: how many open design decisions remain after AC? Is any part novel (no precedent in this repo)?
+3. Map (scope, uncertainty) to the SP table — both axes must fit; pick the higher row when in doubt
+4. If SP > 5, split the Issue per `soloscrum-define-issue-size`
 
 ### Subtask SP (Dev Layer)
 
-1. Evaluate AC count, affected file count, and novelty of the subtask
-2. Increase by one step if uncertainty is high
-3. If estimate exceeds SP 5, a missed Issue split is likely — confirm with user
+1. Count affected files and concerns from the subtask AC; locate the corresponding Scope column
+2. Count remaining design decisions (anything AC does not prescribe verbatim) and judge novelty against this repo's existing patterns; locate the corresponding Uncertainty column
+3. Pick the higher row if scope and uncertainty disagree
+4. If estimate exceeds SP 5, a missed Issue split is likely — confirm with user
 
 ## Notes
 
-- SP measures **complexity and uncertainty**, not lines of code
-- Solo development — do not factor in team velocity
-- Avoid under- or over-estimation by comparing against past experience
+- **SP measures scope and uncertainty, not time.** This is the primary basis for the scale; the Calibration column is observation only, used to sanity-check the chosen row.
+- Time anchors were intentionally removed: model speed shifts release-to-release (today's "2 hours" becomes next month's "20 minutes"), agents run in parallel which warps wall-clock comparisons, and human time vs AI agent time do not map linearly — pinning SP to a clock unit made the scale unstable.
+- Past Issues with established SP can be used to triangulate: if the current Issue is "obviously bigger than #X (SP 2) and obviously smaller than #Y (SP 5)", SP 3 is the answer regardless of any timing intuition.
+- Solo development — do not factor in team velocity.
