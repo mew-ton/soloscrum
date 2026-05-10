@@ -2,7 +2,7 @@
 title: define-priority
 description: Spec summary — priority levels (Urgent / High / Medium / Low) and decision criteria.
 sidebar:
-  order: 9
+  order: 2
 ---
 
 `soloscrum-define-priority` is the four-level priority taxonomy and the decision flow for placing an Issue on it.

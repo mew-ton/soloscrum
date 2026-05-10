@@ -2,7 +2,7 @@
 title: define-issue-format
 description: spec サマリ — Issue タイトルと本文の必須形 (Background / Goal / Acceptance Criteria / Out of Scope) と コンパニオンの ISSUE_TEMPLATE ファイル。
 sidebar:
-  order: 6
+  order: 1
 ---
 
 `soloscrum-define-issue-format` は、すべての soloscrum Issue が従う構造的契約です。`/refine` はこの形で Issue を生成し、`/validate` と `/breakdown` は形が予測可能であることに依存します。

@@ -2,7 +2,7 @@
 title: define-priority
 description: spec サマリ — priority レベル (Urgent / High / Medium / Low) と決定基準。
 sidebar:
-  order: 9
+  order: 2
 ---
 
 `soloscrum-define-priority` は 4 段階の priority 分類体系と、Issue をその上に配置するための決定フローです。

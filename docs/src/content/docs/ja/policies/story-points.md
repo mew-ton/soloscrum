@@ -2,7 +2,7 @@
 title: define-story-points
 description: spec サマリ — 2 段階の SP 構造 (Issue size-check、Subtask 登録) と scope × uncertainty SP スケール。
 sidebar:
-  order: 10
+  order: 3
 ---
 
 `soloscrum-define-story-points` は SP の定義です。SP は **scope × uncertainty に錨を下ろした size class** であり — 時間単位ではありません。

@@ -2,7 +2,7 @@
 title: define-story-points
 description: Spec summary — two-level SP structure (Issue size-check, Subtask registered) and the scope × uncertainty SP scale.
 sidebar:
-  order: 10
+  order: 3
 ---
 
 `soloscrum-define-story-points` is the SP definition. SP is a **size class anchored on scope × uncertainty** — not a time unit.

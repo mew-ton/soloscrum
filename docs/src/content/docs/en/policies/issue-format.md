@@ -2,7 +2,7 @@
 title: define-issue-format
 description: Spec summary — required Issue title and body shape (Background / Goal / Acceptance Criteria / Out of Scope) plus the companion ISSUE_TEMPLATE file.
 sidebar:
-  order: 6
+  order: 1
 ---
 
 `soloscrum-define-issue-format` is the structural contract every soloscrum Issue follows. `/refine` produces Issues in this shape; `/validate` and `/breakdown` rely on the shape being predictable.

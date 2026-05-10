@@ -2,7 +2,7 @@
 title: define-issue-size
 description: Spec summary — Issue size thresholds (max SP 5, max 5 subtasks; days are a coarse calibration signal only) and the suggest_split action.
 sidebar:
-  order: 7
+  order: 4
 ---
 
 `soloscrum-define-issue-size` is the size gate. It exists because tasks can be decomposed indefinitely and the framework needs a concrete bar for "this Issue is too big to enter the lifecycle as one unit."

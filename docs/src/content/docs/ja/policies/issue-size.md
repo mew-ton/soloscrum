@@ -2,7 +2,7 @@
 title: define-issue-size
 description: spec サマリ — Issue サイズの閾値 (max SP 5、max 5 subtask; 日数は粗い校正シグナルのみ) と suggest_split アクション。
 sidebar:
-  order: 7
+  order: 4
 ---
 
 `soloscrum-define-issue-size` は size gate です。タスクは無限に分解可能であるため、フレームワークは「この Issue は単一ユニットとしてライフサイクルに入るには大きすぎる」という具体的なバーが必要です。それが存在する理由です。
