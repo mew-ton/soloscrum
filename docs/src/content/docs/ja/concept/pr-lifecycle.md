@@ -19,7 +19,7 @@ soloscrum における PR は、名前のついた 4 つのフェーズを経由
 stateDiagram-v2
     [*] --> draft: gh pr create --draft
     draft --> review: /review 開始
-    review --> ready: Verdict = Pass<br/>(または Pass with follow-ups)
+    review --> ready: Verdict = Pass<br/>(or Pass with follow-ups)
     review --> draft: Verdict = Fail
     ready --> merge_handoff: agent が merge command を提示
     merge_handoff --> [*]: ユーザが gh pr merge を実行
