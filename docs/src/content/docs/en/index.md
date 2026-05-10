@@ -1,11 +1,15 @@
 ---
-title: soloscrum docs (work in progress)
+title: soloscrum docs
 description: Human-facing companion documentation for the soloscrum framework.
 ---
 
 This site is the **human-facing companion** to the [soloscrum](https://github.com/mew-ton/soloscrum) framework. It is a place for hand-written explanations aimed at people — onboarding notes, conceptual overviews, command walkthroughs, and the policies a human actively uses or judges against — written separately from the framework's machine-readable spec files.
 
-The site is currently a stub. Concept and Policies sections are added in [#47](https://github.com/mew-ton/soloscrum/issues/47); Commands and Onboarding sections will follow in [#48](https://github.com/mew-ton/soloscrum/issues/48).
+If you are new, start at [Getting started](/onboarding/) — it walks you from `/plugin install` to filing your first Issue with `/refine`. From there:
+
+- [Concept](/concept/tracker-profile/) explains the why (tracker profiles, agent responsibilities, PR lifecycle, code review process).
+- [Policies](/policies/issue-format/) covers the five rules `/refine` and `/review` decide against.
+- [Commands](/commands/refine/) walks through `/refine`, `/breakdown`, `/develop`, and `/review` in lifecycle order.
 
 ## Where the AI contract lives
 
