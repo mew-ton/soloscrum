@@ -12,6 +12,7 @@ skills:
   - soloscrum-define-story-points
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
+  - soloscrum-tracker-github-transition-state
   - soloscrum-tracker-github-wait-for-pr-checks
 ---
 
