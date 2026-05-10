@@ -31,7 +31,7 @@ A PR is created directly in **draft** by `/develop`. It is never created as read
 |---|---|---|---|---|
 | `draft` | open, draft | dev | Implementation lands; the local quality gate runs | `/review` is launched |
 | `review` | open, draft | review | DoD + AC + CodeRabbit + multi-agent + per-finding decisions | Verdict reached |
-| `ready` | open, ready | review | Verdict was Pass; tracker subtask is `done`; CI is green | `gh pr ready` lands |
+| `ready` | open, ready | review | Verdict was Pass; tracker subtask is `done`; CI is green | merge command is surfaced |
 | `merge-handoff` | open, ready | **user** | The user's final gate — agent never runs `gh pr merge` | User runs `gh pr merge` |
 
 ## Why a draft window exists

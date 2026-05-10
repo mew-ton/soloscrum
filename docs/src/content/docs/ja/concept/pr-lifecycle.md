@@ -31,7 +31,7 @@ PR は `/develop` によって直接 **draft** で作成されます。ready と
 |---|---|---|---|---|
 | `draft` | open, draft | dev | 実装が着地; ローカル品質ゲートが動作 | `/review` が起動 |
 | `review` | open, draft | review | DoD + AC + CodeRabbit + multi-agent + finding ごとの決定 | verdict 到達 |
-| `ready` | open, ready | review | verdict が Pass; tracker subtask は `done`; CI は green | `gh pr ready` 着地 |
+| `ready` | open, ready | review | verdict が Pass; tracker subtask は `done`; CI は green | merge command が提示される |
 | `merge-handoff` | open, ready | **ユーザ** | ユーザの最終ゲート — agent は決して `gh pr merge` を実行しない | ユーザが `gh pr merge` を実行 |
 
 ## なぜ draft window が存在するのか
