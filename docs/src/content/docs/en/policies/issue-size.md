@@ -1,6 +1,6 @@
 ---
-title: define-issue-size
-description: Spec summary — Issue size thresholds (max SP 5, max 5 subtasks; days are a coarse calibration signal only) and the suggest_split action.
+title: Issue size
+description: Issue size thresholds (max SP 5, max 5 subtasks; days are a coarse calibration signal only) and the suggest_split action.
 sidebar:
   order: 4
 ---

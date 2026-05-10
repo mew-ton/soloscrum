@@ -1,6 +1,6 @@
 ---
-title: define-story-points
-description: Spec summary — two-level SP structure (Issue size-check, Subtask registered) and the scope × uncertainty SP scale.
+title: Story points
+description: The two-level SP structure (Issue size-check, Subtask registered) and the scope × uncertainty SP scale.
 sidebar:
   order: 3
 ---

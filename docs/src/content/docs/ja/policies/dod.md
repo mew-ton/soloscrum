@@ -1,6 +1,6 @@
 ---
-title: define-dod
-description: spec サマリ — soloscrum subtask の Definition of Done チェックリスト。
+title: Definition of Done
+description: soloscrum subtask の Definition of Done チェックリスト。
 sidebar:
   order: 5
 ---

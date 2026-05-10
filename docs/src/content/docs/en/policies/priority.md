@@ -1,6 +1,6 @@
 ---
-title: define-priority
-description: Spec summary — priority levels (Urgent / High / Medium / Low) and decision criteria.
+title: Priority
+description: Priority levels (Urgent / High / Medium / Low) and decision criteria.
 sidebar:
   order: 2
 ---

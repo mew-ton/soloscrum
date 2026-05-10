@@ -1,6 +1,6 @@
 ---
-title: define-issue-format
-description: Spec summary — required Issue title and body shape (Background / Goal / Acceptance Criteria / Out of Scope) plus the companion ISSUE_TEMPLATE file.
+title: Issue format
+description: The required Issue title and body shape (Background / Goal / Acceptance Criteria / Out of Scope) plus the companion ISSUE_TEMPLATE file.
 sidebar:
   order: 1
 ---

@@ -1,6 +1,6 @@
 ---
-title: define-priority
-description: spec サマリ — priority レベル (Urgent / High / Medium / Low) と決定基準。
+title: 優先度
+description: 優先度レベル (Urgent / High / Medium / Low) と決定基準。
 sidebar:
   order: 2
 ---

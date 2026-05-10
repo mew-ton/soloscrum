@@ -1,6 +1,6 @@
 ---
-title: define-dod
-description: Spec summary — Definition of Done checklist for soloscrum subtasks.
+title: Definition of Done
+description: The Definition of Done checklist for soloscrum subtasks.
 sidebar:
   order: 5
 ---

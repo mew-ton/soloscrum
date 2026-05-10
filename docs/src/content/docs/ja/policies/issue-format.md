@@ -1,6 +1,6 @@
 ---
-title: define-issue-format
-description: spec サマリ — Issue タイトルと本文の必須形 (Background / Goal / Acceptance Criteria / Out of Scope) と コンパニオンの ISSUE_TEMPLATE ファイル。
+title: Issue フォーマット
+description: Issue タイトルと本文の必須形 (Background / Goal / Acceptance Criteria / Out of Scope) と コンパニオンの ISSUE_TEMPLATE ファイル。
 sidebar:
   order: 1
 ---

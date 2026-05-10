@@ -1,6 +1,6 @@
 ---
-title: define-story-points
-description: spec サマリ — 2 段階の SP 構造 (Issue size-check、Subtask 登録) と scope × uncertainty SP スケール。
+title: Story points
+description: 2 段階の SP 構造 (Issue size-check、Subtask 登録) と scope × uncertainty SP スケール。
 sidebar:
   order: 3
 ---
