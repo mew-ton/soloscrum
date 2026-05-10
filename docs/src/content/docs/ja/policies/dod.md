@@ -5,31 +5,25 @@ sidebar:
   order: 5
 ---
 
-`soloscrum-define-dod` は Definition of Done — `/review` が Pass verdict をレンダリングする前にすべての subtask が満たさなければならない 6 項目のチェックリストです。
+すべての subtask は `/review` が Pass verdict を出せる前に 6 つの条件を満たす必要があります。DoD は verdict コメントが照合する基準そのものです。
 
-## 何をするか
-
-正本の DoD リストを固定します:
+## チェックリスト
 
 - [ ] すべての AC が満たされている。
 - [ ] テストが存在する (該当する場合)。
 - [ ] PR 本文に Issue 番号が含まれる (`Closes #N` / `Fixes #N` / `Resolves #N`)。
 - [ ] lint エラーがゼロ。
-- [ ] code review pipeline が実行され finding に対処済み ([code review process 概念](/concept/code-review-process/) に従う)。
+- [ ] code review pipeline が実行され finding に対処済み ([code review process](/concept/code-review-process/) に従う)。
 - [ ] review が pass している。
 
-各項目について、skill は何が「満たされた」とカウントされるかを綴ります — 例えば「テストが存在する」はビジネスロジック、API endpoint、ユーティリティ関数には該当しますが、ロジックなしの設定変更には該当しません。「Issue 番号」は GitHub が認識する auto-close キーワードのいずれかを具体的に要求します。
+各項目について、何が「満たされた」とカウントされるかは具体的に定義されています — 例えば「テストが存在する」はビジネスロジック / API endpoint / ユーティリティ関数には該当しますが、ロジックなしの設定変更には該当しません。「Issue 番号」は GitHub が認識する auto-close キーワードのいずれかを具体的に要求します。
 
-## いつ消費されるか
+## いつ使われるか
 
-2 つの caller:
+2 つの瞬間があります:
 
-- `soloscrum-implement-task` (`/develop`) は「review が pass している」以外のすべての項目について self-check を行います — 開発者 agent は self で review verdict を発行できません。
-- `soloscrum-review-implementation` (`/review`) は 6 項目すべて (自分自身が発行しようとしている review pass を含む) を検証します。
-
-## 主要な入力と出力
-
-入力は PR (本文、diff、commit リスト、lint 出力、テスト結果) とリンクされた Issue の AC です。出力は項目ごとの OK / Not OK と理由で、code review finding と並んで `/review` コメントに浮上します。
+- `/develop` 中、開発者 agent は「review が pass している」以外のすべての項目について self-check を行います — 開発者は自分自身に review verdict を発行できません。
+- `/review` 中、6 項目すべて (`/review` 自身が発行しようとしている review pass を含む) が検証されます。verdict コメントには項目ごとの OK / Not OK と理由が並びます。
 
 ## リポジトリ固有の追加項目
 
@@ -37,5 +31,5 @@ sidebar:
 
 ## 関連項目
 
+- auto-close キーワードが必須な理由: [PR ライフサイクル](/concept/pr-lifecycle/)。
 - 正本の契約: [`skills/soloscrum-define-dod/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-dod/SKILL.md)。
-- Issue 番号の auto-close キーワードが強制される理由は、Issue クロージャと merge の相互作用にあります — [PR ライフサイクル](/concept/pr-lifecycle/) を参照。

@@ -5,21 +5,7 @@ sidebar:
   order: 3
 ---
 
-`soloscrum-define-story-points` は SP の定義です。SP は **scope × uncertainty に錨を下ろした size class** であり — 時間単位ではありません。
-
-## 何をするか
-
-次を固定します:
-
-- 2 段階の SP 構造: Issue レベル SP (PO が `/refine` で行う entry-gate サイズチェック) と Subtask レベル SP (Dev が `/breakdown` 中に tracker に登録する値)。
-- SP スケールと各行の意味。
-- 稼働中の tracker profile ごとの値の登録方法 (`github-only` では GitHub Projects v2 `SP` Number フィールド; `linear+github` では Linear `estimate` フィールド)。
-
-## 2 つの段階
-
-**Issue SP** は粗さチェックです。PO は `/refine` 中に、Issue がライフサイクルに入れるほど小さいか、それとも先に [`issue-size`](/policies/issue-size/) が `suggest_split` を発火する必要があるかを判断するためにこれを使います。これはどこにも保存され **ません** — レコードではなく、決定への入力です。
-
-**Subtask SP** が実際に記録される値です。Dev は `/breakdown` 中に subtask の AC からこれを計算し、`soloscrum-tracker-{github|linear}-set-sp` 経由で tracker に書き込みます。これが backlog planning と進捗追跡で使われる値です。
+Story points (SP) は scope × uncertainty を測ります — 時間ではありません。soloscrum は 1/2/3/5 のスケールを使い、SP > 5 の Issue は `/develop` の前に split が必須です。
 
 ## SP スケール
 
@@ -29,7 +15,15 @@ sidebar:
 | 2  | 2-3 ファイル / 単一スキル領域 | 1 つの軽微な決定 | ~100K-200K tokens, agent ~10-20 min |
 | 3  | 単一サブシステム横断 | 1-2 個の設計決定 | ~200K-500K tokens, agent ~20-45 min |
 | 5  | 複数サブシステム横断 | 複数の設計決定 | ~500K-1M tokens, agent ~45 min-2h |
-| >5 | (予算超過) | (予算超過) | 割り当てない — `define-issue-size` に従って split |
+| >5 | (予算超過) | (予算超過) | 割り当てない — [`issue-size`](/policies/issue-size/) に従って split し再見積もり |
+
+## 2 つの段階
+
+SP はライフサイクルの 2 箇所に登場します:
+
+**Issue SP** は粗さチェックです。PO は `/refine` 中に、Issue がライフサイクルに入れるほど小さいか、それとも先に [`issue-size`](/policies/issue-size/) が `suggest_split` を発火する必要があるかを判断するためにこれを使います。これはどこにも保存され **ません** — レコードではなく、決定への入力です。
+
+**Subtask SP** が実際に記録される値です。Dev は `/breakdown` 中に subtask の AC からこれを計算し、`soloscrum-tracker-{github|linear}-set-sp` 経由で tracker に書き込みます。これが backlog planning と進捗追跡で使われる値です。
 
 ## なぜ scope × uncertainty で時間ではないのか
 
@@ -46,5 +40,5 @@ sidebar:
 
 ## 関連項目
 
+- tracker profile ごとの SP 値の保存場所: [tracker profile](/concept/tracker-profile/)。
 - 正本の契約: [`skills/soloscrum-define-story-points/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-story-points/SKILL.md)。
-- tracker profile ごとの SP 値の保存場所については、[tracker profile 概念](/concept/tracker-profile/) を参照。

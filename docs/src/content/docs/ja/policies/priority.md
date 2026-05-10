@@ -5,11 +5,9 @@ sidebar:
   order: 2
 ---
 
-`soloscrum-define-priority` は 4 段階の priority 分類体系と、Issue をその上に配置するための決定フローです。
+Issue を起票するとき、あなた (もしくは `/refine`) は 4 段階の priority のうち 1 つを選びます。priority は backlog の順序を決め、Issue を pickup する人に緊急度を伝えます。
 
-## 何をするか
-
-priority スケールと各レベルの意味を固定します。
+## 4 つのレベル
 
 | Priority | 決定基準 | 対応目安 |
 |---|---|---|
@@ -18,13 +16,7 @@ priority スケールと各レベルの意味を固定します。
 | **Medium** | 通常の機能開発と改善 | backlog 順に処理 |
 | **Low** | 技術的負債、リファクタリング、nice-to-have | 余力あるとき |
 
-## いつ消費されるか
-
-`soloscrum-create-issue` (`/refine`) は新しい Issue にラベルを付けるためにこの skill を呼びます。ラベルは `priority:{urgent|high|medium|low}` で、稼働中の tracker profile に関わらず GitHub Issue 上にあります (両 profile で親メタデータについては GitHub が正本のままです)。
-
-## 主要な入力と出力
-
-入力は Issue の性質 (problem type、誰が影響を受けるか、他に何かが blocked されているか) です。出力は 4 つの priority ラベルのうちの 1 つです。
+レベルは GitHub Issue 上の `priority:{urgent|high|medium|low}` ラベルとして保存されます。ラベルは稼働中の tracker profile に関わらず GitHub 上にあります (両 profile で親メタデータについては GitHub が正本のままです)。
 
 ## 決定フロー
 
@@ -42,6 +34,10 @@ priority スケールと各レベルの意味を固定します。
   → Low
 ```
 
+## いつ使われるか
+
+`/refine` が Issue 作成時にラベルを付けます。その後レベルは sticky です — soloscrum が priority を自動的に再決定することはありません。変更したい場合は Issue のラベルを直接編集します。
+
 ## 注記
 
 - solo development では Urgent と High はしばしば重なります。Urgent は本当に時間的に切迫した状況のみに予約してください。
@@ -49,5 +45,5 @@ priority スケールと各レベルの意味を固定します。
 
 ## 関連項目
 
+- priority がライフサイクルのどこに位置するか (PO が `/refine` で割り当て): [agent と責務](/concept/agent-responsibilities/)。
 - 正本の契約: [`skills/soloscrum-define-priority/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-priority/SKILL.md)。
-- priority がライフサイクルのどこに位置するか (PO が `/refine` で割り当て、自動的に再決定されることはない) については、[agent と責務](/concept/agent-responsibilities/) を参照。

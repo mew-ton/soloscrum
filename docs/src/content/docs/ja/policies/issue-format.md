@@ -5,24 +5,11 @@ sidebar:
   order: 1
 ---
 
-`soloscrum-define-issue-format` は、すべての soloscrum Issue が従う構造的契約です。`/refine` はこの形で Issue を生成し、`/validate` と `/breakdown` は形が予測可能であることに依存します。
+soloscrum の Issue 本文は常に同じ 4 セクション構造を取ります: Background / Goal / Acceptance Criteria / Out of Scope。`/refine` がこの形で Issue を生成し、あなたは承認前に本文を読み・編集します。後段の `/validate` と `/breakdown` は形が予測可能であることに依存します。
 
-## 何をするか
+## 4 つのセクション
 
-次を固定します:
-
-- title ルール: 動詞で始まる、50 文字以下、How ではなく What を記述する。
-- 本文セクション、順序通り: `## Background`, `## Goal`, `## Acceptance Criteria` (チェックボックス), `## Out of Scope`, オプションで `## Notes`。
-- AC 記述ルール — 検証可能でユーザ向けの言い回し (「user can …」/「… is displayed」)、実装の言い回しではない (「Issue JWT token」/「Implement validation」)。
-- soloscrum 形式 Issue の self-marker: 先頭の `<!-- soloscrum-issue-format -->` HTML コメントと最下部の小さなイタリック footer。
-
-## いつ消費されるか
-
-`soloscrum-create-issue` (`/refine`) は、この spec から直接 Issue 本文を生成します。`soloscrum-validate-feature` (`/validate`) は同じ形に対して生成された Issue をチェックします。コンパニオンの `templates/ISSUE_TEMPLATE.md` は、人間が GitHub UI 経由で使うために skill の隣に置かれています — `/refine` 自体はこれを **読みません**; 2 つの面は手動で同期されます。
-
-## 主要な入力と出力
-
-`/refine` への入力は自由形式のアイデアです。出力は上記構造に従う GitHub Issue 本文です:
+本文は常にこの順序で書かれます:
 
 ```markdown
 ## Background
@@ -41,6 +28,22 @@ sidebar:
 [Supplementary info, references, design links.]
 ```
 
+タイトルのルール:
+
+- 動詞で始まる、50 文字以下
+- How ではなく What を記述する
+
+AC のルール:
+
+- 各項目が独立して検証可能
+- ユーザ視点の言い回し (「user can …」「… is displayed」) ― 実装の言い回し (「Issue JWT token」「Implement validation」) は使わない
+
+先頭の `<!-- soloscrum-issue-format -->` HTML コメントと最下部の小さなイタリック footer は、本文が soloscrum 形式であることを示すマーカーで、janitor や `/validate` が安価に検出できるようにします。
+
+## いつ使われるか
+
+`/refine` がこの形で Issue を書き、`/breakdown` の前に `/validate` が既存 Issue を同じ形に対してチェックします。triage / 見積もり / pickup のたびに、あなたもこの本文を読みます。
+
 ## コンパニオンテンプレート
 
 コンパニオンファイル `templates/ISSUE_TEMPLATE.md` は本文構造をミラーし、次のいずれかが可能です:
@@ -52,5 +55,5 @@ sidebar:
 
 ## 関連項目
 
+- この形式の本文に対するサイズ上限: [`issue-size`](/policies/issue-size/)。
 - 正本の契約: [`skills/soloscrum-define-issue-format/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-format/SKILL.md)。
-- この形式の Issue を分割すべきかどうかを判断する size gate は [`issue-size`](/policies/issue-size/) にあります。
