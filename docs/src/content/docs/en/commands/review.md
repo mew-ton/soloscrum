@@ -10,7 +10,7 @@ sidebar:
 ## Usage
 
 ```bash
-/review <pr-url or figma-url>
+/review <pr-url|pr-number or figma-url>
 ```
 
 For PR review, pass the PR URL or number. For design-fidelity review of a Figma file (`type:design-ui` Subtasks), pass the Figma URL.

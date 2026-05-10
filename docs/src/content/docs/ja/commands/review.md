@@ -10,7 +10,7 @@ sidebar:
 ## Usage
 
 ```bash
-/review <pr-url or figma-url>
+/review <pr-url|pr-number or figma-url>
 ```
 
 PR review には PR URL または番号を渡します。Figma ファイル (`type:design-ui` Subtask) の design-fidelity review には Figma URL を渡します。
