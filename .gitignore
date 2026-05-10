@@ -5,3 +5,10 @@
 .DS_Store
 *.swp
 *~
+
+# docs/ (Astro + Starlight) — build output, deps, generated types
+# (also covered locally by docs/.gitignore; duplicated here as a safety net
+# so accidental top-level globs from tooling can't sneak these into commits)
+docs/node_modules/
+docs/dist/
+docs/.astro/
