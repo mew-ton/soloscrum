@@ -1,17 +1,17 @@
 ---
 title: PR ライフサイクル
-description: PR が経るフェーズ (draft, review, ready, merge handoff)、reversible と irreversible の境界、ユーザのゲートがどこにあるか。
+description: PR が辿る 4 つのフェーズ (draft / review / ready / merge handoff)、reversible と irreversible の境界、そしてユーザのゲートがどこに置かれているか。
 sidebar:
   order: 3
 ---
 
-soloscrum における PR は、名前のついた 4 つのフェーズを経由します。「agent が自律的に実行する」と「ユーザが確認しなければならない」の境界が、この設計が答える中心的な問いです。契約は短いです:
+soloscrum における PR は、名前のついた 4 つのフェーズを順に辿る。「agent が自律的に実行する」と「ユーザの確認が要る」の境界をどこで切るか — それがこの設計が答える中心的な問いだ。契約はシンプルに 3 行で書ける:
 
-- **reversible な遷移は自律的。** agent が実行し、報告します。
-- **irreversible な遷移はユーザゲート。** agent は正確な command を提示して停止します。
-- **verdict が決定点。** `/review` が Pass に到達したら、verdict 後のアクション群はそれ以上のプロンプトなしに end-to-end で実行されます — agent は reversible な各ステップごとに second-guess して止まりません。
+- **reversible な遷移は自律的に実行する。** agent が実行し、結果を報告する。
+- **irreversible な遷移はユーザゲート。** agent は正確な command を提示して停止する。
+- **verdict が決定点。** `/review` が Pass に到達したら、verdict 後のアクションは確認を挟まずに end-to-end で走り抜ける。reversible な各ステップで agent が立ち止まることはない。
 
-この契約が存在する理由は、この設計の動機となった failure mode が、Pass verdict の後に「`gh pr ready` を実行してもよいですか?」と尋ねる過剰に慎重な agent だからです。verdict はすでに決まっており、アクションは reversible で、許可を求めて停止することは soloscrum がまさに避けるために作られたものです。
+この契約が必要になった理由は、まさに失敗モードがそこにあるからだ — Pass verdict の後に「`gh pr ready` を実行してもよいですか?」と尋ねてくる過剰に慎重な agent。verdict はもう決まっていて、アクションは reversible で、確認を求めて止まること自体が soloscrum が避けたい挙動そのものだ。
 
 ## フェーズ
 
@@ -25,27 +25,27 @@ stateDiagram-v2
     merge_handoff --> [*]: ユーザが gh pr merge を実行
 ```
 
-PR は `/develop` によって直接 **draft** で作成されます。ready として作成されてから降格されることはありません; agent は ready PR を独自の判断で draft に戻すことはしません。
+PR は `/develop` が直接 **draft** で作成する。ready で作ってから draft に戻す経路は存在せず、agent が ready PR を独自判断で draft に戻すこともない。
 
 | フェーズ | GitHub state | Owner | 目的 | Exit |
 |---|---|---|---|---|
-| `draft` | open, draft | dev | 実装が着地; ローカル品質ゲートが動作 | `/review` が起動 |
+| `draft` | open, draft | dev | 実装の着地、ローカル品質ゲートの実行 | `/review` 起動 |
 | `review` | open, draft | review | DoD + AC + CodeRabbit + multi-agent + finding ごとの決定 | verdict 到達 |
-| `ready` | open, ready | review | verdict が Pass; tracker subtask は `done`; CI は green | merge command が提示される |
-| `merge-handoff` | open, ready | **ユーザ** | ユーザの最終ゲート — agent は決して `gh pr merge` を実行しない | ユーザが `gh pr merge` を実行 |
+| `ready` | open, ready | review | verdict が Pass、tracker subtask は `done`、CI green | merge command 提示 |
+| `merge-handoff` | open, ready | **ユーザ** | ユーザの最終ゲート。agent が `gh pr merge` を実行することはない | ユーザが `gh pr merge` を実行 |
 
 ## なぜ draft window が存在するのか
 
-draft フェーズは飾りではありません。2 つの独立した理由が存在し続けさせており、どちらか一方だけでもコストを正当化します:
+draft フェーズは飾りではない。独立した 2 つの理由が支えており、どちらか片方だけでもコストを正当化する:
 
-1. **auto-reviewer の抑制。** GitHub 側の reviewer (CodeRabbit、組織の bot など) は通常 draft PR では動作しません。ローカル pipeline が各 finding を決定するまで PR を draft に保つことで、冗長または衝突する review を回避し、ローカル pipeline がどうせ修正を要求する PR に有料 review クレジットを焼くことを回避します。
-2. **self-quality ゲート。** GitHub 側の reviewer が存在しない場合でも、draft フェーズは PR が「ready として提示される」前にローカル CodeRabbit CLI および multi-agent pipeline が走るための明示的な window です。これにより [`soloscrum-define-code-review-process`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-code-review-process/SKILL.md) の verdict セマンティクスが具体的な state にひもづきます。
+1. **auto-reviewer の抑止。** CodeRabbit や組織の bot など、GitHub 側の reviewer は通常 draft PR では動かない。ローカル pipeline が各 finding を決定し終わるまで draft のままにしておけば、冗長または衝突する review が発生せず、ローカル pipeline がどうせ修正を要求する PR に有料 review クレジットを使わずに済む。
+2. **self-quality ゲート。** GitHub 側の reviewer が存在しない場合でも、draft フェーズは「ready として提示する」前にローカル CodeRabbit CLI + multi-agent pipeline を走らせる明示的な window として機能する。これにより [`soloscrum-define-code-review-process`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-code-review-process/SKILL.md) の verdict セマンティクスが、具体的な state に紐付く。
 
-リポジトリは `.claude/rules/pr.md` にルールを書くことで always-draft デフォルトを override できますが、そのファイルが存在するまでは、すべての `/develop` は draft PR を開きます。
+`.claude/rules/pr.md` にルールを書けば always-draft デフォルトを override できるが、そのファイルがないかぎりすべての `/develop` は draft PR を開く。
 
 ## reversible な遷移 — agent が実行
 
-ある遷移は、それを取り消すのに 1 つの追加 command で済み、同じセッション内で取り消せない外部から見える副作用を残さないとき、reversible です。このリストのすべての遷移は確認なしに実行されます:
+ある遷移が reversible だと言えるのは、取り消しに必要なのが 1 つの追加 command だけで、同セッション内で取り消せない外部副作用を残さないときだ。次の表の遷移はすべて、確認なしで実行される:
 
 | 遷移 | command | 取り消し方 |
 |---|---|---|
@@ -53,61 +53,61 @@ draft フェーズは飾りではありません。2 つの独立した理由が
 | ready に昇格 | `gh pr ready` | `gh pr ready --undo` |
 | review を承認 | `gh pr review --approve` | review を dismiss |
 | PR にコメント | `gh pr comment` | コメントを削除 |
-| ラベル追加 / 削除 | `gh issue edit --add-label / --remove-label` | edit を逆操作 |
-| tracker state 遷移 | (tracker operation skill に委譲) | 前 state で再度呼ぶ |
+| ラベル追加 / 削除 | `gh issue edit --add-label / --remove-label` | 同じ edit を逆方向に |
+| tracker state 遷移 | (tracker operation skill に委譲) | 前 state を指定して再実行 |
 
-「`gh pr ready` を今実行すべきか先に確認すべきか?」と議論しているなら、答えは実行する、です。verdict はすでに決まっています。
+「`gh pr ready` を今実行すべきか、念のため確認すべきか」と迷ったら、答えは実行するだ。verdict はもう決まっている。
 
 ## irreversible な遷移 — ユーザのゲート
 
-ある遷移は、取り消しが不可能、admin の介入を要する、または外部から見える副作用 (notification、下流自動化、コスト) をきれいに取り消せない形で発火するとき、irreversible です。agent は command を提示して停止します:
+逆に irreversible なのは、取り消しが不可能、あるいは admin の介入が必要、または外部から見える副作用 (通知、下流の自動化、コスト) を取り消せない形で発火する遷移だ。agent は command を提示してそこで止まる:
 
 | 遷移 | なぜ irreversible か |
 |---|---|
-| `gh pr merge` | commit が base branch に着地; 下流の CI / deploy / notification が発火 |
-| 共有 branch への `git push --force` | 他者の history を上書き |
-| `gh pr close --delete-branch` (他のバックアップなし) | branch が消える |
-| 有料の外部自動化を発火させるもの | コストが発生 |
+| `gh pr merge` | commit が base branch に着地し、下流の CI / deploy / 通知が発火する |
+| 共有 branch への `git push --force` | 他者の history を上書きしてしまう |
+| `gh pr close --delete-branch` (他にバックアップがない場合) | branch が失われる |
+| 有料の外部自動化を発火させる操作 | コストが発生する |
 
-`gh pr merge` は **常に** ユーザゲートです — verdict がどれほどクリーンだったか、ユーザが直前に何を承認したか、diff がどれほど小さく見えるかに関わらず。
+`gh pr merge` は **常に** ユーザゲートだ。verdict がどれほどクリーンでも、ユーザが直前に何かを承認していても、diff がいかに小さく見えても、扱いは変わらない。
 
 ## solo-dev での self-approve refusal
 
-GitHub は PR の作者が自分の PR を承認することを許可しません。solo-dev のセットアップ — soloscrum の `/review` が中心に据える設計点 — では、`gh pr review --approve` は次のように失敗します:
+GitHub は PR の作者が自分の PR を承認することを許さない。soloscrum の `/review` はそもそも solo-dev を中心に設計されているので、`gh pr review --approve` は次のように失敗する:
 
 ```text
 failed to create review: GraphQL: Review Can not approve your own pull request
 ```
 
-これは Fail では **ありません**。PR に投稿された verdict コメントが正式な Pass の記録であり、API 側の承認は solo-dev が構造的に生成できない重複シグナルです。実装は try-and-fall-through です:
+これは Fail では **ない**。PR に投稿された verdict コメントが正式な Pass の記録であり、API 側の承認は solo-dev では構造的に作れない重複シグナルにすぎない。実装は try-and-fall-through でよい:
 
 ```bash
 gh pr review --approve "$PR_URL" \
   || echo "approve skipped (likely self-approve refusal); verdict comment is the formal Pass record"
 ```
 
-verdict 後のシーケンス — tracker `→ done`、CI 待機、`gh pr ready`、merge command の提示 — はそのまま実行されます。
+verdict 後のシーケンス — tracker `→ done`、CI 待機、`gh pr ready`、merge command の提示 — はそのまま走り抜ける。
 
-## Issue クローズは merge 時に発生する
+## Issue クローズは merge 時に起きる
 
-微妙なポイント: `/review` が Pass に到達しても Issue は **クローズされません**。subtask の state が `done` にフリップするだけです。Issue は PR が merge されたときに、GitHub が認識する `Closes #N` キーワード経由でクローズされます — そして DoD はすべての PR 本文にそのキーワードを要求します。
+少し細かい点だが、`/review` が Pass に到達しても Issue はクローズされ **ない**。フリップするのは subtask の state が `done` になるところだけだ。Issue 自体は、PR が merge されたときに本文の `Closes #N` キーワードを GitHub が拾って閉じる — そして DoD はそのキーワードを全 PR 本文に要求している。
 
-なぜ verdict 時ではなく merge 時なのか? GitHub における「closed」は慣例的に「変更が base branch に着地した」を意味するからです。verdict 時 (merge 前) にクローズすると、その慣例が崩れます: Pass に続いてユーザが merge しないと決めた場合、作業が着地していないのに Issue がクローズされた状態になります。ユーザの merge ゲートはクロージャゲートでもあるのです。
+なぜ verdict 時ではなく merge 時なのか。GitHub での「closed」は慣例的に「変更が base branch に着地した」を意味するからだ。verdict 時にクローズしてしまうと、Pass が出た後にユーザが merge しないと決めたケースで、作業が着地していないのに Issue だけが閉じた状態になり、慣例から外れる。ユーザの merge ゲートが、同時にクローズのゲートでもある。
 
-クロージング PR が親ではなく sub-issue を参照した親 Issue については、次の refine command 開始時の `/refine` janitor sweep が拾い上げてクローズします。
+なお、クロージング PR が親ではなく sub-issue を参照していた親 Issue については、次回の `/refine` 冒頭の janitor sweep が拾って閉じる。
 
 ## verdict から次アクションへのマップ
 
-| Verdict | シーケンス | ユーザの事前確認? |
+| Verdict | シーケンス | ユーザの事前確認 |
 |---|---|---|
 | **Pass** | `gh pr review --approve` → subtask `→ done` → CI green を待つ → `gh pr ready` → merge command を提示 | 不要 (すべて reversible) |
-| **Pass with follow-ups** | 各 out-of-scope skip に follow-up Issue があることを確認 → Pass と同じ | 不要 |
-| **Fail** | finding ごとのフィードバックを投稿 → subtask `→ in-progress` → PR を draft のまま | 不要 (すべて reversible) |
-| (任意の verdict) → merge | ユーザが `gh pr merge` を実行 | **要 (ユーザゲート)** |
+| **Pass with follow-ups** | 各 out-of-scope skip に follow-up Issue があるか確認 → Pass と同じ | 不要 |
+| **Fail** | finding ごとのフィードバックを投稿 → subtask `→ in-progress` → PR は draft のまま | 不要 (すべて reversible) |
+| (任意の verdict) → merge | ユーザが `gh pr merge` を実行 | **必要 (ユーザゲート)** |
 
-待機ステップ中に CI が red になると、Pass は遡及的に Fail に降格されます: agent が失敗した conclusion を投稿し、subtask を `in-progress` に戻し、残りの Pass アクションをスキップします。CI green は Pass 契約の一部です。
+待機ステップ中に CI が red になった場合、Pass は遡及的に Fail に降格する: agent は失敗した conclusion を投稿し、subtask を `in-progress` に戻し、残りの Pass アクションをスキップする。CI green は Pass 契約に含まれている。
 
 ## 関連項目
 
-- 完全な autonomy 表、anti-pattern、verdict-to-action マッピングは [`skills/soloscrum-define-pr-lifecycle/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-pr-lifecycle/SKILL.md) にあります。
-- verdict が設定される前に finding がどう決定されるかについては、[code review process 概念](/ja/concept/code-review-process/) を参照。
+- autonomy 表の全文、anti-pattern、verdict-to-action マッピングは [`skills/soloscrum-define-pr-lifecycle/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-pr-lifecycle/SKILL.md) を参照。
+- verdict が確定する前に finding をどう決定するかは、[code review process 概念](/ja/concept/code-review-process/) を参照。
