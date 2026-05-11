@@ -5,31 +5,31 @@ sidebar:
   order: 5
 ---
 
-すべての subtask は `/review` が Pass verdict を出せる前に 6 つの条件を満たす必要があります。DoD は verdict コメントが照合する基準そのものです。
+`/review` が Pass verdict を出せる状態になるには、subtask が 6 つの条件をすべて満たしている必要がある。DoD は verdict コメントが照合する基準そのものだ。
 
 ## チェックリスト
 
 - [ ] すべての AC が満たされている。
 - [ ] テストが存在する (該当する場合)。
-- [ ] PR 本文に Issue 番号が含まれる (`Closes #N` / `Fixes #N` / `Resolves #N`)。
-- [ ] lint エラーがゼロ。
-- [ ] code review pipeline が実行され finding に対処済み ([code review process](/ja/concept/code-review-process/) に従う)。
+- [ ] PR 本文に Issue 番号が含まれる (`Closes #N` / `Fixes #N` / `Resolves #N` のいずれか)。
+- [ ] lint エラーが 0。
+- [ ] code review pipeline が実行され、finding に対処済み ([code review process](/ja/concept/code-review-process/) に従う)。
 - [ ] review が pass している。
 
-各項目について、何が「満たされた」とカウントされるかは具体的に定義されています — 例えば「テストが存在する」はビジネスロジック / API endpoint / ユーティリティ関数には該当しますが、ロジックなしの設定変更には該当しません。「Issue 番号」は GitHub が認識する auto-close キーワードのいずれかを具体的に要求します。
+各項目について、「満たされた」とみなされる具体的な条件は別途決まっている。例えば「テストが存在する」はビジネスロジック、API endpoint、ユーティリティ関数には該当するが、ロジックを伴わない設定変更には該当しない。「Issue 番号」については、GitHub が auto-close キーワードとして認識する形式のいずれかが要求される。
 
-## いつ使われるか
+## いつ適用されるか
 
-2 つの瞬間があります:
+タイミングは 2 つある:
 
-- `/develop` 中、開発者 agent は「review が pass している」以外のすべての項目について self-check を行います — 開発者は自分自身に review verdict を発行できません。
-- `/review` 中、6 項目すべて (`/review` 自身が発行しようとしている review pass を含む) が検証されます。verdict コメントには項目ごとの OK / Not OK と理由が並びます。
+- `/develop` 中、開発者 agent は「review が pass している」を除く全項目を self-check する。開発者が自分自身に review verdict を出すことはできない。
+- `/review` 中、`/review` 自身が出そうとしている review pass を含む 6 項目すべてを検証する。verdict コメントには項目ごとに OK / Not OK とその理由が並ぶ。
 
 ## リポジトリ固有の追加項目
 
-リポジトリは `.claude/rules/dod-extra.md` に独自の DoD 要件を追加できます。それらのエントリは core リストに **追加** されるもので、置き換えるものではありません。
+リポジトリは `.claude/rules/dod-extra.md` に独自の DoD 要件を追記できる。これらのエントリは core リストに **追加** されるもので、置き換えるものではない。
 
 ## 関連項目
 
-- auto-close キーワードが必須な理由: [PR ライフサイクル](/ja/concept/pr-lifecycle/)。
+- なぜ auto-close キーワードが必須なのか: [PR ライフサイクル](/ja/concept/pr-lifecycle/)。
 - 正本の契約: [`skills/soloscrum-define-dod/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-dod/SKILL.md)。
