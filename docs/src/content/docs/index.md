@@ -22,7 +22,7 @@ soloscrum is composed of four moving parts:
 
 ## The flow
 
-```
+```text
 /refine     → idea becomes a GitHub Issue with Background / Goal / AC / Out of Scope
 /breakdown  → Issue is split into Sub-issues when it exceeds the size threshold
 /develop    → branch, implement, open a draft PR with `Closes #N`

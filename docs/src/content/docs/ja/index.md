@@ -22,7 +22,7 @@ soloscrum は 4 つの構成要素からなります:
 
 ## ワークフロー
 
-```
+```text
 /refine     → アイデアを Background / Goal / AC / Out of Scope を備えた GitHub Issue にする
 /breakdown  → サイズ閾値を超えた Issue を Sub-issue に分割する
 /develop    → branch を切り、実装し、`Closes #N` を含む draft PR を開く
