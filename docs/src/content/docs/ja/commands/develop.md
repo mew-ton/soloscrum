@@ -17,7 +17,7 @@ sidebar:
 
 ## 何が起きるか
 
-1. **Subtask を読む.** Dev agent が Subtask AC と親 Issue、加えて stack / branch 戦略 / DoD extras に対する `.claude/rules/*.md` の override を読む。
+1. **Subtask を読む.** Dev agent が Subtask AC・親 Issue・`.claude/rules/*.md` の override (stack / branch 戦略 / DoD extras) を読む。
 2. **branch を切る.** [branch naming](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md) 規約に従って新しい branch を作る: `<type>/<issue-id>-<slug>` (例: `feat/123-password-reset`)。
 3. **実装する.** Conventional Commits (`feat: …`、`fix: …`、`refactor: …`) の形でコードを着地させる。
 4. **DoD self-check.** Dev が自分の所有する DoD 項目をすべて検証する: AC が満たされていること、該当する場合のテスト、lint clean、PR 本文に Issue の closing keyword が含まれること。「Review has passed」だけは Dev が self-grant できない項目で、これは `/review` の担当だ。
@@ -31,7 +31,7 @@ sidebar:
 
 Dev agent は Subtask AC を読み、`feat/50-email-form-integration` のような branch を開き、関連ファイルにまたがって実装を書く。進めながら commit を切る (`feat(auth): add password reset form`、`test(auth): cover form validation cases` といった具合だ)。AC を満たしてローカル self-check が pass したら、`Closes #50` を含む本文を付けて `gh pr create --draft` を実行する (closing keyword は、merge 時に GitHub が Issue を自動でクローズするように DoD で求めている)。続いて `skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr> 15 300` を走らせ、CI が clean に立ち上がったかを確認する。最後に Subtask を `in-review` に動かす。
 
-ユーザへの handoff は、draft PR の URL と「次に `/review <pr-url>` を実行する」という推奨だ。ready への昇格は `/develop` の役割では **ない** — それは Pass verdict が出た後の `/review` の担当だ。draft PR で停止するのはライフサイクルの設計点であって、ユーザからの追加指示を待つための場所ではない。
+ユーザへの handoff は、draft PR の URL と「次に `/review <pr-url>` を実行する」という推奨だ。ready への昇格は `/develop` の役割では **ない** — それは Pass verdict が出た後の `/review` の担当だ。draft で止まるのはライフサイクルの設計上の意図であって、ユーザの追加指示を待つためではない。
 
 ## Output
 
