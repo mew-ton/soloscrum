@@ -43,5 +43,5 @@ sidebar:
 - [Issue サイズ](/ja/policies/issue-size/) — Issue が大きすぎて `suggest_split` が発火する条件。
 - [Story points](/ja/policies/story-points/) — Subtask ごとに適用する SP スケール。
 - [tracker profile](/ja/concept/tracker-profile/) — Subtask レコードの保存先。
-- ライフサイクルの前のステップ: [`/refine`](/commands/refine/)。次のステップ: [`/develop`](/commands/develop/)。
+- ライフサイクルの前のステップ: [`/refine`](/ja/commands/refine/)。次のステップ: [`/develop`](/ja/commands/develop/)。
 - 正本の契約: [`commands/breakdown.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/breakdown.md)。
