@@ -11,7 +11,7 @@ A PR moves through four phases. soloscrum's contract draws the line between tran
 - **Irreversible transitions are user-gated.** The agent surfaces the exact command and stops.
 - **The verdict is the decision point.** Once `/review` reaches Pass, the post-verdict actions run end-to-end. The agent does not pause to re-confirm each reversible step.
 
-Pausing on a reversible step after a Pass verdict (for example, asking "may I run `gh pr ready`?") is the named anti-pattern this contract prevents.
+Pausing on a reversible step after a Pass verdict — for example, asking "may I run `gh pr ready`?" — violates this contract.
 
 ## Phases
 
@@ -56,7 +56,7 @@ A transition is reversible when undoing it takes one further command and leaves 
 | Add / remove labels | `gh issue edit --add-label / --remove-label` | reverse the edit |
 | Tracker state transition | (delegated to a tracker operation skill) | call again with previous state |
 
-If the question is "should I run `gh pr ready` now or check first?", the answer is run it. The verdict already decided.
+Once the verdict is Pass, run `gh pr ready` without checking again. The verdict is the decision point.
 
 ## Irreversible transitions — the user's gate
 
@@ -69,7 +69,7 @@ A transition is irreversible when undoing it is impossible, requires admin inter
 | `gh pr close --delete-branch` (with no other backup) | Branch is gone |
 | Anything that triggers paid external automation | Cost is incurred |
 
-`gh pr merge` is **always** user-gated, regardless of how clean the verdict was, how recently the user authorised something else, or how small the diff looks.
+`gh pr merge` is **always** user-gated. No exception applies for clean verdicts, recent authorisations, or small diffs.
 
 ## Self-approve refusal in solo-dev
 

@@ -29,7 +29,7 @@ The argument is a Subtask URL or ID (`#N` under `github-only`, `PRJ-N` under `li
 
 You start with a Subtask in `in-progress` — usually from a recent `/breakdown` or a previous `/develop` invocation that set the state. You invoke `/develop #50` (or just `/develop` and let it auto-pick).
 
-The Dev agent reads the Subtask AC, opens a branch like `feat/50-email-form-integration`, writes the implementation, and commits as it goes (`feat(auth): add password reset form`, `test(auth): cover form validation cases`). Once AC is satisfied and the local self-checks pass, it runs `gh pr create --draft` with a body that includes `Closes #50` — the closing keyword is required by the DoD so GitHub auto-closes the Issue at merge time. It then runs `skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr> 15 300` to confirm CI started cleanly. The Subtask moves to `in-review`.
+The Dev agent reads the Subtask AC, opens a branch like `feat/50-email-form-integration`, writes the implementation, and commits as it goes (`feat(auth): add password reset form`, `test(auth): cover form validation cases`). Once AC is satisfied and the local self-checks pass, it runs `gh pr create --draft` with a body that includes `Closes #50`. The closing keyword is required by the DoD; GitHub auto-closes the Issue at merge time. It then runs `skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr> 15 300` to confirm CI started cleanly. The Subtask moves to `in-review`.
 
 The handoff to you is a draft PR URL and a recommendation to run `/review <pr-url>`. Promotion to ready is **not** part of `/develop` — that belongs to `/review` after a Pass verdict.
 

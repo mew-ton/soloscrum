@@ -7,9 +7,9 @@ description: A Claude Code plugin that runs a scrum-style loop (refine → break
 
 ## The problem
 
-A solo developer plays every role: shape the idea, file the Issue, break it down, implement it, review it, decide when it ships. Context switching between roles burns focus, and the quality gates — review, DoD, "is this Issue well-formed?" — are the first to be skipped.
+A solo developer plays every role: shape the idea, file the Issue, break it down, implement it, review it, decide when it ships. Context switching between roles is costly, and the quality gates — review, DoD, "is this Issue well-formed?" — tend to be the first to be skipped.
 
-soloscrum lets a Claude agent hold each role on your behalf. The contract for each role keeps the loop honest when nobody else is watching.
+soloscrum lets a Claude agent hold each role on your behalf. A per-role contract enforces the loop without requiring a second human reviewer.
 
 ## What you get
 
@@ -43,7 +43,7 @@ Use soloscrum when:
 soloscrum is not a fit when:
 
 - Multiple human reviewers are required before merge.
-- You need portability across AI agents. soloscrum is a Claude Code plugin and bakes that in.
+- You need portability across AI agents. soloscrum is built specifically for Claude Code.
 - You want a framework that organises people rather than codifies a contract for an agent.
 
 ## Next steps
@@ -55,4 +55,4 @@ soloscrum is not a fit when:
 
 ## Where the AI contract lives
 
-The authoritative source of soloscrum's behaviour lives in the [repository](https://github.com/mew-ton/soloscrum) — `skills/`, `agents/`, `commands/`, and `CLAUDE.md`. This site is the human-readable companion. Spec files are tuned for AI consumption; these pages are written for humans to read top-to-bottom.
+The authoritative source of soloscrum's behaviour lives in the [repository](https://github.com/mew-ton/soloscrum) — `skills/`, `agents/`, `commands/`, and `CLAUDE.md`. This site is the human-readable companion. Spec files are structured for AI parsing; these pages are structured for human readers.

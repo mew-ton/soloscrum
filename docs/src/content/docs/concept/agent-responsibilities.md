@@ -63,7 +63,7 @@ user           user     → runs `gh pr merge` (irreversible, user-gated)
 
 1. **Single creator per concept.** Two roles never create the same kind of record. PO creates Issues. Dev creates subtask records. Dev or UI creates the PR / Figma artifact. There is no path where two agents file duplicate subtasks for the same AC.
 2. **State transitions are role-gated.** Only Review may transition any record to a terminal state. Dev and UI can move their own subtask to `in-review`, but only Review can move it to `done`.
-3. **The verifier is always Review** — except for the entry-gate SP (PO) and the type label (Dev / UI), which are decisions, not verifications.
+3. **Review is the verifier** for every record state. Entry-gate SP is decided by PO; type labels are set by Dev or UI.
 
 ## See also
 
