@@ -1,44 +1,68 @@
 ---
 title: Tracker profiles
-description: How soloscrum decides where Issues, subtasks, SP, state, and dependencies are stored — and how each command picks the right tracker without baking the choice in.
+description: Where Issues, subtasks, SP, state, and dependencies are stored, and how each command picks the right tracker.
 sidebar:
   order: 1
 ---
 
-soloscrum runs on top of an issue tracker. Different teams use different trackers, and a framework that hard-codes "everything lives on GitHub" or "everything lives in Linear" has to be forked the moment that assumption breaks. soloscrum sidesteps the fork by treating the tracker as a pluggable layer and resolving the active **tracker profile** at the start of every command.
+A **tracker profile** selects the issue tracker each command reads and writes. soloscrum resolves the profile at the start of every command and keeps the rest of the framework profile-agnostic.
 
-A tracker profile is a small bundle of decisions: where the parent Issue lives, where subtasks live, what an issue ID looks like, where SP is recorded, how the state machine maps onto the tracker's native states, and which API the agent uses to read and write all of that. Two profiles ship today, and the rest of the framework is profile-agnostic on purpose.
+A profile bundles these decisions:
+
+- Where the parent Issue lives
+- Where subtasks live
+- What an issue ID looks like
+- Where SP is recorded
+- How the state machine maps onto the tracker's native states
+- Which API the agent uses
+
+Two profiles ship today.
 
 ## The two profiles
 
-**`github-only`** is the conservative default. Issues are GitHub Issues, subtasks are native GH Sub-issues, SP lives in a GitHub Projects v2 Number field, state is encoded as `state:in-progress` / `state:in-review` / `state:done` labels, and dependencies are written as `Depends on: #N` lines in the Issue body so GitHub can render them as cross-links. It works in repos where Linear is unavailable — public OSS projects, organisations with a GitHub-only constraint, or anyone who simply does not want a second tool in the loop.
+### `github-only` (default)
 
-**`linear+github`** is the choice for teams that already run Linear. The parent Issue is still on GitHub (it stays canonical so commits, PRs, and `Closes #` keywords keep working), but subtasks, SP, state, and dependency relations all live on Linear and get there through Linear's native GitHub sync. Subtask IDs in this profile look like `PRJ-42`, not `#123`. Priority labels remain on GitHub because GitHub is canonical for the parent.
+- Issues are GitHub Issues
+- Subtasks are native GH Sub-issues
+- SP lives in a GitHub Projects v2 Number field
+- State is encoded as `state:in-progress` / `state:in-review` / `state:done` labels
+- Dependencies are written as `Depends on: #N` lines in the Issue body (GitHub renders cross-links)
 
-## How the profile gets resolved
+Use this profile when Linear is unavailable — public OSS, GitHub-only organisations, or any single-tool workflow.
 
-Every command and agent that needs to touch the tracker goes through the same resolution order:
+### `linear+github`
 
-1. A repo-level override at `.claude/rules/tracker.md` — if the file exists with a `profile:` frontmatter, that wins.
-2. A user-level config from the plugin install prompt (`tracker_profile` in `.claude/settings.json`).
-3. The built-in default, `github-only`.
+- Parent Issue stays on GitHub (so commits, PRs, and `Closes #` keep working)
+- Subtasks, SP, state, and dependency relations live on Linear, synced via Linear's native GitHub integration
+- Subtask IDs look like `PRJ-42`, not `#123`
+- Priority labels stay on GitHub (GitHub remains canonical for parent metadata)
 
-Resolution stops at the first match. Pinning a single repo to one profile while keeping the user-level default for everything else is the reason the override exists; without it, two repos that share a Claude install would have to share a tracker, which is rarely what anyone wants.
+Use this profile when the team already runs Linear.
+
+## Resolution order
+
+Every command and agent that touches the tracker resolves the profile in this order:
+
+1. Repo-level override at `.claude/rules/tracker.md` (`profile:` frontmatter).
+2. User-level config from the plugin install prompt (`tracker_profile` in `.claude/settings.json`).
+3. Built-in default: `github-only`.
+
+Resolution stops at the first match. The repo-level override lets a single repo pin to a profile without changing the user-level default for every other repo.
 
 ## Why the framework stays profile-agnostic
 
-The lifecycle, the state machine, the DoD, and the review pipeline never mention "Linear" or "GitHub" by name. Instead, anything that needs to talk to the tracker delegates to a profile-namespaced **operation skill**: `soloscrum-tracker-{github|linear}-{operation}`. Resolving the profile is the same as picking a prefix; from then on, the agent invokes the matching `create-subtask`, `transition-state`, `set-sp`, `query-state`, `query-backlog`, or `add-dependency` skill, and the operation works the same way regardless of where the data is stored.
+The lifecycle, state machine, DoD, and review pipeline never name "Linear" or "GitHub" directly. Anything that touches the tracker delegates to a profile-namespaced **operation skill**: `soloscrum-tracker-{github|linear}-{operation}`. The profile selects the prefix; from there, the agent invokes the matching `create-subtask`, `transition-state`, `set-sp`, `query-state`, `query-backlog`, or `add-dependency` skill.
 
-This is what lets a `/develop` flow look identical on a GitHub-only OSS repo and on a Linear-using product team: the verbs are the same, only the storage backend differs.
+A `/develop` flow runs identically on a GitHub-only OSS repo and on a Linear-using product team. The verbs are the same; only the storage backend differs.
 
 ## When to set `.claude/rules/tracker.md`
 
-Reach for the override when the user-level default is wrong for this repo specifically. The two common cases are:
+Use the override when the user-level default does not match this repo. Two common cases:
 
-- A user with `linear+github` set globally clones a public OSS repo that has no Linear workspace. Pin that repo to `github-only` so commands do not try to reach a Linear team that does not exist for them.
-- A user with `github-only` as the default joins a Linear-using project. Pin that repo to `linear+github` so subtasks land on the team's Linear board instead of staying invisible on GitHub.
+- A user with `linear+github` set globally clones a public OSS repo with no Linear workspace. Pin the repo to `github-only`.
+- A user with `github-only` as the default joins a Linear-using project. Pin the repo to `linear+github` so subtasks land on the team's Linear board.
 
-The override file is intentionally minimal:
+The override file is minimal:
 
 ```markdown
 ---
@@ -50,4 +74,4 @@ That single frontmatter field is the whole contract.
 
 ## See also
 
-- The full storage matrix and the operation skill table live in the canonical contract: see [`skills/soloscrum-define-tracker-profile/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-tracker-profile/SKILL.md).
+- The full storage matrix and the operation skill table live in [`skills/soloscrum-define-tracker-profile/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-tracker-profile/SKILL.md).
