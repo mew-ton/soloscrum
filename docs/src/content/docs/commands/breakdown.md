@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-`/breakdown` is the second step. It takes an Issue that is too big to land in a single PR — either because its size-check SP exceeded 5 or because the work obviously spans multiple subsystems — and turns it into a list of Subtasks, each typed (`develop` or `design-ui`) and sized so a single PR can satisfy it. The Subtasks are then written to the active tracker.
+`/breakdown` splits an Issue that is too big for a single PR — either because its size-check SP exceeded 5, or because the work spans multiple subsystems — into a list of Subtasks. Each Subtask is typed (`develop` or `design-ui`) and sized so a single PR can satisfy it. The Subtasks are then written to the active tracker.
 
 ## Usage
 
@@ -18,18 +18,25 @@ The argument is the parent Issue. URL form (`https://github.com/<owner>/<repo>/i
 ## What happens
 
 1. **Read the Issue.** The Design agent reads the parent Issue's Background, Goal, AC, and Out of Scope.
-2. **Plan the decomposition.** Design proposes a list of Subtasks: title, type (`develop` for code, `design-ui` for Figma work), AC for each one, and any cross-Subtask blocking relations (e.g. *Subtask B depends on Subtask A*).
-3. **Validate.** Design re-runs the size check on the proposed split — if any Subtask is still too big or the breakdown would exceed five Subtasks, the split test fires again and the proposal comes back with a refined slice.
+2. **Plan the decomposition.** Design proposes a list of Subtasks: title, type (`develop` for code, `design-ui` for Figma work), AC for each, and any cross-Subtask blocking relations (e.g. *Subtask B depends on Subtask A*).
+3. **Validate.** Design re-runs the size check on the proposed split. If any Subtask is still too big, or the breakdown would exceed five Subtasks, the split test fires again and the proposal comes back refined.
 4. **Confirmation.** The breakdown proposal is shown to you for approval before any tracker writes.
-5. **Registration.** On approval, the Dev agent writes each Subtask to the tracker via `soloscrum-tracker-{github|linear}-create-subtask`. The subtask SP comes from the [story-points](/policies/story-points/) scale, applied per-Subtask after carefully reading its AC. Cross-Subtask dependencies are added via `soloscrum-tracker-{github|linear}-add-dependency`.
+5. **Registration.** On approval, the Dev agent writes each Subtask via `soloscrum-tracker-{github|linear}-create-subtask`. SP is applied per-Subtask after reading its AC, using the [story-points](/policies/story-points/) scale. Cross-Subtask dependencies are added via `soloscrum-tracker-{github|linear}-add-dependency`.
 
 ## Typical flow
 
-You filed an Issue *"add password reset flow"* during `/refine`, and `/refine` told you the size-check SP is 8 — too big. You re-run with `/breakdown 48` against the parent Issue. Design comes back with a four-Subtask proposal: a `design-ui` subtask for the password reset form mockup, a `develop` subtask for the email-sending backend, a `develop` subtask for the form integration, and a `develop` subtask for the rate-limit / abuse protection. The two `develop` subtasks that touch the form depend on the `design-ui` one being reviewed first.
+You filed *"add password reset flow"* during `/refine`, and `/refine` reported size-check SP 8 — too big. You re-run with `/breakdown 48` against the parent Issue. Design returns a four-Subtask proposal:
 
-You approve. Dev writes the four Subtasks under the parent: GH Sub-issues (under `github-only`) or Linear subtasks (under `linear+github`). Each carries its own SP, type label, AC, and parent link. The dependency between the form-integration subtask and the design-ui subtask is recorded — under `github-only` as a `Depends on: #N` line in the body, under `linear+github` as a Linear "Blocked by" relation.
+- A `design-ui` subtask for the password reset form mockup.
+- A `develop` subtask for the email-sending backend.
+- A `develop` subtask for the form integration.
+- A `develop` subtask for rate-limit / abuse protection.
 
-When the breakdown produces only one Subtask whose work fits cleanly into a single PR, `/breakdown` is unnecessary — you can go straight from `/refine` to `/develop`. The split exists so the PR-and-review unit stays small enough to verdict cleanly; running it on an already-PR-sized Issue is not a step the framework forces.
+The two `develop` subtasks that touch the form depend on the `design-ui` one being reviewed first.
+
+You approve. Dev writes the four Subtasks under the parent — GH Sub-issues under `github-only`, Linear subtasks under `linear+github`. Each carries its own SP, type label, AC, and parent link. The form-integration → design-ui dependency is recorded: a `Depends on: #N` line under `github-only`, a Linear "Blocked by" relation under `linear+github`.
+
+When the breakdown produces only one Subtask whose work fits cleanly into a single PR, skip `/breakdown` — go straight from `/refine` to `/develop`. The split exists so the PR-and-review unit stays small enough to verdict cleanly.
 
 ## Output
 
@@ -43,5 +50,5 @@ When the breakdown produces only one Subtask whose work fits cleanly into a sing
 - [Issue size](/policies/issue-size/) — when an Issue is too big and `suggest_split` fires.
 - [Story points](/policies/story-points/) — the SP scale applied per-Subtask.
 - [Tracker profile](/concept/tracker-profile/) — where Subtask records live.
-- Previous in the lifecycle: [`/refine`](/commands/refine/). Next: [`/develop`](/commands/develop/).
+- Previous: [`/refine`](/commands/refine/). Next: [`/develop`](/commands/develop/).
 - Canonical contract: [`commands/breakdown.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/breakdown.md).
