@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-When you file an Issue, you (or `/refine`) pick one of four priority levels. Priority drives ordering in the backlog and signals urgency to anyone picking up the work.
+Each Issue carries one of four priority levels. Priority drives backlog ordering and signals urgency to whoever picks up the work.
 
 ## The four levels
 
@@ -16,7 +16,7 @@ When you file an Issue, you (or `/refine`) pick one of four priority levels. Pri
 | **Medium** | Normal feature development and improvements | Process in backlog order |
 | **Low** | Tech debt, refactoring, nice-to-have | When capacity allows |
 
-The level is stored as a `priority:{urgent|high|medium|low}` label on the GitHub Issue. The label lives on GitHub regardless of the active tracker profile (GitHub stays canonical for parent metadata in both profiles).
+The level is stored as a `priority:{urgent|high|medium|low}` label on the GitHub Issue. The label lives on GitHub regardless of the active tracker profile — GitHub stays canonical for parent metadata in both profiles.
 
 ## Decision flow
 
@@ -36,12 +36,12 @@ Other (tech debt, future improvements)?
 
 ## When this applies
 
-`/refine` sets the label when the Issue is created. After that the level is sticky — soloscrum never re-decides priority automatically; you change it by editing the label on the Issue.
+`/refine` sets the label at Issue creation. After that the level is sticky — soloscrum does not re-decide priority automatically. Change it by editing the label on the Issue.
 
 ## Notes
 
-- In solo development, Urgent and High often overlap. Reserve Urgent for genuinely time-critical situations only.
-- If Medium items accumulate too much, consider downgrading some to Low and deferring them.
+- In solo development, Urgent and High often overlap. Reserve Urgent for genuinely time-critical situations.
+- If Medium items accumulate, downgrade some to Low and defer them.
 
 ## See also
 
