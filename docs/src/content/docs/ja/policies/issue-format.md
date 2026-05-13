@@ -51,7 +51,7 @@ AC のルール:
 
 `templates/ISSUE_TEMPLATE.md` は本文構造をそのまま写したテンプレートです。使い方は 2 通りあります。
 
-- `.github/ISSUE_TEMPLATE/` 配下にコピーすれば、GitHub の「New Issue」UI でチューザーに表示されます
+- `.github/ISSUE_TEMPLATE/` 配下にコピーすれば、GitHub の「New Issue」UI でテンプレートの選択肢として表示されます
 - GitHub web UI で新規 Issue を開き、本文に手動でペーストします
 
 canonical な言語は英語です。多言語版は対象外です。
