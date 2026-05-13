@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-Every subtask must satisfy six criteria before `/review` can issue a Pass verdict. The DoD is what verdict comments check against.
+Every subtask must satisfy six criteria before `/review` can issue a Pass verdict. The verdict comment checks against this list.
 
 ## The checklist
 
@@ -16,18 +16,21 @@ Every subtask must satisfy six criteria before `/review` can issue a Pass verdic
 - [ ] Code review pipeline executed and findings addressed (per the [code review process](/concept/code-review-process/)).
 - [ ] Review has passed.
 
-For each item, the rule spells out what counts as satisfied — for example, "tests exist" applies to business logic, API endpoints, and utility functions but not to configuration changes with no logic, and "Issue number" specifically requires one of the GitHub-recognised auto-close keywords.
+Each item has a precise rule:
+
+- "Tests exist" applies to business logic, API endpoints, and utility functions — not to configuration changes with no logic.
+- "Issue number" specifically requires one of the GitHub-recognised auto-close keywords.
 
 ## When this applies
 
 Two moments:
 
 - During `/develop`, the developer agent self-checks every item except "Review has passed" — the developer cannot self-grant the review verdict.
-- During `/review`, all six items are verified, including the review pass which `/review` itself is about to issue. The verdict comment lists per-item OK / Not OK with rationale.
+- During `/review`, all six items are verified, including the review pass `/review` is about to issue. The verdict comment lists per-item OK / Not OK with rationale.
 
 ## Repo-specific extras
 
-Repositories can add their own DoD requirements in `.claude/rules/dod-extra.md`. Those entries are appended to the core list, not replacing it.
+Repositories can add DoD requirements in `.claude/rules/dod-extra.md`. Entries are appended to the core list, not replaced.
 
 ## See also
 
