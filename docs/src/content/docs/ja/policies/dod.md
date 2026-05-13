@@ -14,7 +14,7 @@ sidebar:
 - [ ] PR 本文に Issue 番号が含まれている (`Closes #N` / `Fixes #N` / `Resolves #N` のいずれか)
 - [ ] lint エラーがゼロ
 - [ ] code review pipeline を実行し、finding を処理している ([code review プロセス](/ja/concept/code-review-process/) を参照)
-- [ ] review が pass している
+- [ ] review が Pass している
 
 各項目には個別のルールがあります。
 
@@ -25,7 +25,7 @@ sidebar:
 
 DoD を確認する場面は 2 つあります。
 
-- `/develop` 中、Dev agent が「review が pass している」以外の全項目を自己チェックします。review の verdict だけは Dev が自分で出せません。
+- `/develop` 中、Dev agent が「review が Pass している」以外の全項目を自己チェックします。review の verdict だけは Dev が自分で出せません。
 - `/review` 中、6 項目すべてを検証します。verdict コメントは項目ごとに OK / Not OK と理由を並べます。
 
 ## リポジトリ固有の追加項目

@@ -1,6 +1,6 @@
 ---
 title: PR ライフサイクル
-description: PR が辿る 4 つのフェーズ (draft / review / ready / merge handoff)、reversible と irreversible の境界、ユーザがゲートする位置を説明します。
+description: PR が辿る 4 つのフェーズ (draft / review / ready / merge-handoff)、reversible と irreversible の境界、ユーザがゲートする位置を説明します。
 sidebar:
   order: 3
 ---
