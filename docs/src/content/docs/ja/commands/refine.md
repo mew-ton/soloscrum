@@ -1,47 +1,47 @@
 ---
 title: /refine
-description: 自由形式のアイデアを GitHub Issue に構造化する。事前に backlog janitor sweep を走らせ、すでに closing PR が merge された open Issue をクローズする。
+description: 自由形式のアイデアを GitHub Issue に整形します。事前に janitor sweep を走らせ、closing PR がすでに merge 済みの open Issue を閉じます。
 sidebar:
   order: 1
 ---
 
-`/refine` は入口だ。1 文、1 段落、あるいは形になりきっていない bug report — どんなアイデアを渡しても、soloscrum の他の command が読み解ける Background / Goal / Acceptance Criteria / Out of Scope の構造に整った GitHub Issue が出てくる。Issue を作る前に、closing PR がすでに merge された stale-open な Issue を backlog から一掃する。
+`/refine` は、ふわっとしたアイデア — 1 文のメモ、段落単位の文章、書きかけのバグ報告 — を、Background / Goal / Acceptance Criteria / Out of Scope の 4 セクションを持つ GitHub Issue に整形します。後続の command はこの形を前提に動きます。Issue を作る前に、まずバックログを sweep して、closing PR が merge 済みなのに open のまま残っている Issue を閉じます。
 
-## Usage
+## 使い方
 
 ```bash
 /refine <idea or feature description> [--no-janitor]
 ```
 
-引数は自由テキストでよい。`--no-janitor` を付けると backlog sweep をスキップする。GitHub API が不安定なとき、または command 開始時の出力をすっきりさせたいときに便利だ。
+引数は自由なテキストです。`--no-janitor` を付けるとバックログ sweep をスキップします。GitHub API の挙動が不安定なとき、または command 冒頭の出力を静かにしたいときに使ってください。
 
-## 何が起きるか
+## 処理の流れ
 
-1. **Backlog janitor.** `/refine` は open Issue を走査し、closing keyword (`Closes #N`、`Fixes #N`、`Resolves #N` など) で参照していてすでに merge 済みの PR がないかを各 Issue について確認する。該当する PR を持つ Issue は reason `completed` でクローズされる。出力の 1 行目は `Closed N stale Issue(s): #X, #Y`、または `No stale Issues found`、`--no-janitor` を渡したときは `Janitor skipped` のいずれかになる。janitor はクローズしかしない — 再オープンは絶対にしない。
-2. **アイデアの構造化.** PO agent がアイデアを読み、4 セクションの Issue 本文を組み立て、[priority](/ja/policies/priority/) ラベルを選び、size-check の [SP](/ja/policies/story-points/) を計算する。
-3. **Size gate.** size-check SP が 5 を超えると、`/refine` は Issue を oversized として flag し、作成前に分割を提案する。閾値の詳細は [issue size](/ja/policies/issue-size/) を参照。
-4. **承認待ち.** 構造化された Issue 本文をユーザに見せて、承認を待つ。
-5. **Issue 作成.** 承認されると、priority ラベル付きで GitHub Issue を作成する。
+1. **バックログ janitor。** open Issue を順に確認し、closing keyword (`Closes #N` / `Fixes #N` / `Resolves #N` など) を持つ PR が merge 済みかをチェックします。該当する Issue は `completed` の理由で close します。出力の 1 行目は `Closed N stale Issue(s): #X, #Y` か `No stale Issues found`、`--no-janitor` 指定時は `Janitor skipped` です。janitor は close するのみで、reopen することはありません。
+2. **アイデアの構造化。** PO agent がアイデアを読み、4 セクション構成の Issue 本文を組み立て、[priority](/ja/policies/priority/) ラベルを選び、size-check [SP](/ja/policies/story-points/) を算出します。
+3. **サイズゲート。** size-check SP が 5 を超えると、Issue を作成する前に「大きすぎる」と判定して分割を提案します。[issue size](/ja/policies/issue-size/) を参照してください。
+4. **承認。** 整形した Issue 本文をユーザに提示します。
+5. **Issue 作成。** 承認後、priority ラベルを付けた状態で GitHub Issue を作成します。
 
 ## 典型的な流れ
 
-セッションは「*users should be able to reset their password by email*」のようなアイデアから始まる、というのが典型例だ。`/refine "users should be able to reset their password by email"` を実行する。1 行目の出力は janitor の結果で、クリーンな repo ならふつう `No stale Issues found` になる。続いて PO agent が構造化済みの Issue 本文を提示する: ユーザのニーズを説明する Background 段落、1 文の Goal、3〜5 個の AC チェックボックス、そしてその Issue が意図的にカバーしないものを書き出した明示的な Out of Scope。priority (初日からユーザが触れる feature なら `high` あたり) と size-check SP も併せて surface される。
+`/refine "users should be able to reset their password by email"` を実行すると、最初の行に janitor の結果が出ます。掃除済みのリポジトリでは通常 `No stale Issues found` です。続いて PO agent が、ユーザニーズを説明する Background 段落、1 文の Goal、3-5 個の AC チェックボックス、明示的な Out of Scope を組み合わせた Issue 本文を提示します。priority (ユーザが初日から触る機能なら `high` など) と size-check SP も提示します。
 
-SP が 5 以下ならユーザが承認し、Issue が作成される。authentication / email インフラ / password form UI をまたぐ変更で SP が 8 と返ってきたら、command は Issue が大きすぎることを伝え、feature 軸での分割を提案する。ここでユーザは、分割した各ピースについて `/refine` を再実行するか、単一 Issue の scope を維持する意味があるなら `/breakdown` に進んで subtask に分けるか、どちらかを選ぶことになる。
+SP が 5 以下なら承認して Issue を作成します。authentication / email infrastructure / form UI に跨って SP が 8 になるような場合、command は Issue を「大きすぎる」と判定し、機能軸で分割するよう提案します。それぞれに `/refine` を再実行するか、`/breakdown` で subtask に切ります。
 
-新しい Issue を追加していないセッションでも、`/refine` は出発点として自然な場所だ。janitor sweep が backlog を最新に保つので、次に取りかかるものが「open に偽装されたすでに ship 済みの作業」ではないと保証される。
+新規 Issue を起票しないセッションでも、`/refine` を最初に走らせるのは自然です。janitor sweep がバックログを正確に保ってくれます。
 
-## Output
+## 出力
 
-- 1 行目: janitor の summary。
-- 作成された GitHub Issue の URL。
-- 適用された priority ラベル。
-- size-check SP (informational。tracker storage には登録されない — 登録される SP は `/breakdown` が書き込む subtask の側に属する)。
+- 1 行目: janitor の結果
+- 作成した GitHub Issue の URL
+- 適用された priority ラベル
+- size-check SP (情報用。tracker には保存されません — tracker に保存される SP は `/breakdown` が書き込む subtask 側の値です)
 
-## 関連項目
+## 参考
 
-- [agent と責務](/ja/concept/agent-responsibilities/) — `/refine` は PO agent が所有する。
-- [Issue フォーマット](/ja/policies/issue-format/) — `/refine` が生成する Background / Goal / AC / Out of Scope の形。
-- [Issue サイズ](/ja/policies/issue-size/) — `suggest_split` を発火させる閾値。
-- ライフサイクルの次のステップ: [`/breakdown`](/ja/commands/breakdown/)。
-- 正本の契約: [`commands/refine.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/refine.md)。
+- [agent と責務](/ja/concept/agent-responsibilities/) — `/refine` は PO agent が担当します
+- [Issue フォーマット](/ja/policies/issue-format/) — `/refine` が生成する本文の形
+- [Issue サイズ](/ja/policies/issue-size/) — `suggest_split` を発火させる閾値
+- ライフサイクル上の次のステップ: [`/breakdown`](/ja/commands/breakdown/)
+- canonical な契約: [`commands/refine.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/refine.md)

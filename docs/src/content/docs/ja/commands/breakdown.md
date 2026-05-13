@@ -1,47 +1,54 @@
 ---
 title: /breakdown
-description: size 閾値を超える Issue を、type と SP を付けた Subtask に分割し、active tracker に登録する。
+description: サイズ閾値を超えた Issue を、type と SP を持つ Subtask に分割し、active tracker に登録します。
 sidebar:
   order: 2
 ---
 
-`/breakdown` はライフサイクルの 2 番目のステップだ。size-check SP が 5 を超えていたり、作業が明らかに複数の subsystem にまたがっていたりする Issue は、1 つの PR で着地させるには大きすぎる。`/breakdown` はそうした Issue を受け取り、各 Subtask に type (`develop` または `design-ui`) を付け、1 つの PR が満たせるサイズに調整した Subtask 一覧に変換する。出来上がった Subtask は active tracker に書き込まれる。
+`/breakdown` は、単一の PR で扱うには大きすぎる Issue — size-check SP が 5 を超えるか、複数のサブシステムに跨るような Issue — を Subtask のリストに切り分けます。各 Subtask には type (`develop` か `design-ui`) を付け、1 つの PR で満たせるサイズに収めます。最後に active tracker に書き込みます。
 
-## Usage
+## 使い方
 
 ```bash
 /breakdown <issue-url or issue-number>
 ```
 
-引数は親 Issue だ。URL 形式 (`https://github.com/<owner>/<repo>/issues/<n>`) でも、`#48` や `48` のような生の番号でも動く。
+引数は親 Issue です。URL 形式 (`https://github.com/<owner>/<repo>/issues/<n>`)、番号のみ (`#48` / `48`) のどちらも使えます。
 
-## 何が起きるか
+## 処理の流れ
 
-1. **Issue を読む.** Design agent が親 Issue の Background、Goal、AC、Out of Scope を読む。
-2. **分解を計画する.** Design は Subtask のリストを提案する: title、type (コードなら `develop`、Figma 作業なら `design-ui`)、Subtask ごとの AC、そして Subtask 間に blocking 関係 (例: *Subtask B は Subtask A に依存*) があればそれも含めて提示する。
-3. **検証.** Design は提案した分割に対して size check を再実行する。どれかの Subtask がまだ大きすぎたり、分解が 5 個を超えたりすると、split test が再度発火し、提案が refine された slice として戻ってくる。
-4. **承認待ち.** 分解提案をユーザに見せ、tracker への書き込み前に承認を待つ。
-5. **登録.** 承認されると、Dev agent が `soloscrum-tracker-{github|linear}-create-subtask` 経由で各 Subtask を tracker に書き込む。Subtask の SP は [story-points](/ja/policies/story-points/) スケールから、AC を読んだうえで Subtask ごとに適用する。Subtask 間の依存は `soloscrum-tracker-{github|linear}-add-dependency` で記録する。
+1. **Issue を読む。** Design agent が親 Issue の Background / Goal / AC / Out of Scope を読みます。
+2. **分割案を作る。** Design が Subtask のリストを提案します。各項目に title / type (`develop` はコード、`design-ui` は Figma 作業) / AC、必要なら Subtask 間の blocking 関係 (例: *Subtask B は Subtask A に依存*) を付けます。
+3. **検証。** Design が分割案に対してサイズチェックを再実行します。まだ大きい Subtask が残っていたり、Subtask の総数が 5 を超えるなら、分割テストが再発火し、提案を作り直します。
+4. **承認。** 分割案を提示し、tracker に書き込む前にユーザの承認を取ります。
+5. **登録。** 承認後、Dev agent が `soloscrum-tracker-{github|linear}-create-subtask` で各 Subtask を書き込みます。SP は各 Subtask の AC を読んでから [story points](/ja/policies/story-points/) のスケールで付けます。Subtask 間の依存関係は `soloscrum-tracker-{github|linear}-add-dependency` で登録します。
 
 ## 典型的な流れ
 
-`/refine` で「*add password reset flow*」という Issue を file し、size-check SP が 8 — 大きすぎる — と返ってきたとする。親 Issue に対して `/breakdown 48` を実行する。Design は 4 つの Subtask 案を返してくる: password reset form の mockup を扱う `design-ui` subtask、email 送信 backend を扱う `develop` subtask、form 統合の `develop` subtask、rate-limit / abuse 対策の `develop` subtask、の 4 つだ。form に触れる 2 つの `develop` subtask は、`design-ui` subtask の review 完了を依存先に持つ。
+`/refine` で *"add password reset flow"* を起票したところ、size-check SP が 8 と返ってきて分割が必要になりました。親 Issue に対して `/breakdown 48` を走らせます。Design は 4 つの Subtask に分割した提案を返してきます。
 
-ユーザが承認すると、Dev は親 Issue の下に 4 つの Subtask を書き込む: `github-only` なら GH Sub-issue、`linear+github` なら Linear subtask の形だ。各 Subtask は SP、type label、AC、parent link を持つ。form-integration subtask と design-ui subtask の依存は、`github-only` では body の `Depends on: #N` 行として、`linear+github` では Linear の "Blocked by" relation として記録される。
+- パスワード reset フォームの mockup を作る `design-ui` subtask
+- メール送信 backend の `develop` subtask
+- フォーム統合の `develop` subtask
+- rate-limit / abuse 対策の `develop` subtask
 
-分解の結果が Subtask 1 つだけで、その作業が 1 つの PR にきれいに収まる場合、`/breakdown` は不要だ — `/refine` から直接 `/develop` に進める。分割が存在する理由は、PR-and-review の単位を verdict しやすいサイズに保つことにある。すでに PR サイズに収まる Issue でわざわざ実行する必要はなく、framework もそれを強制しない。
+フォームに触れる 2 つの `develop` subtask は、`design-ui` 側の review が完了するのを待ちます。
 
-## Output
+承認すると、Dev が親 Issue 配下に 4 つの Subtask を書き込みます。`github-only` なら GH の Sub-issue、`linear+github` なら Linear の subtask です。各 Subtask は SP / type ラベル / AC / 親リンクを持ちます。フォーム統合 → design-ui の依存関係も記録され、`github-only` なら `Depends on: #N` 行、`linear+github` なら Linear の "Blocked by" 関係として表現されます。
 
-- 提案された Subtask リスト (title、type、SP、dependencies) — 承認待ちで提示。
-- 承認後: 作成された Subtask の ID (`github-only` なら `#N`、`linear+github` なら `PRJ-N`)。
-- 各 Subtask は type label (`type:develop` / `type:design-ui`) と parent-child link を持つ。
+分割した結果、Subtask が 1 つだけで、しかも 1 つの PR にきれいに収まる場合は、`/breakdown` をスキップして `/refine` から直接 `/develop` に進めます。`/breakdown` は PR と review のサイズを verdict を出しやすい単位に保つために存在します。
 
-## 関連項目
+## 出力
 
-- [agent と責務](/ja/concept/agent-responsibilities/) — Design が分解を提案し、Dev が登録する。
-- [Issue サイズ](/ja/policies/issue-size/) — Issue が大きすぎて `suggest_split` が発火する条件。
-- [Story points](/ja/policies/story-points/) — Subtask ごとに適用する SP スケール。
-- [tracker profile](/ja/concept/tracker-profile/) — Subtask レコードの保存先。
-- ライフサイクルの前のステップ: [`/refine`](/ja/commands/refine/)。次のステップ: [`/develop`](/ja/commands/develop/)。
-- 正本の契約: [`commands/breakdown.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/breakdown.md)。
+- 提案された Subtask リスト (title / type / SP / 依存関係) — 承認用に表示します
+- 承認後: 作成した Subtask の ID (`github-only` なら `#N`、`linear+github` なら `PRJ-N`)
+- 各 Subtask には type ラベル (`type:develop` / `type:design-ui`) と親子リンクが付きます
+
+## 参考
+
+- [agent と責務](/ja/concept/agent-responsibilities/) — Design が分割案を作り、Dev が登録します
+- [Issue サイズ](/ja/policies/issue-size/) — Issue が大きすぎると判定され `suggest_split` が走る条件
+- [Story points](/ja/policies/story-points/) — Subtask ごとに付ける SP スケール
+- [tracker profile](/ja/concept/tracker-profile/) — Subtask レコードの保存先
+- 前: [`/refine`](/ja/commands/refine/) / 次: [`/develop`](/ja/commands/develop/)
+- canonical な契約: [`commands/breakdown.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/breakdown.md)
