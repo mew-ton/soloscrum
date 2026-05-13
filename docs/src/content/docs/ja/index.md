@@ -3,11 +3,11 @@ title: soloscrum — Claude agent と一緒に回す solo dev のスクラムル
 description: refine → breakdown → develop → review のスクラム的ループを AI agent と一緒に最後まで回すための Claude Code plugin です。
 ---
 
-**soloscrum は、solo dev のスクラム的な開発ループを最後まで回すための Claude Code plugin です。** 各ステージを担当する AI agent が、厳格な契約のもとで動作します。
+**soloscrum は、solo dev のスクラム的な開発ループを最後まで回すための Claude Code plugin です。** 各ステージには、動作範囲が明確に定義された AI agent が割り当てられています。
 
 ## 解こうとしている問題
 
-solo dev は結局すべての役割を兼任します。アイデアを整理し、Issue を起票し、分解し、実装し、review し、いつ ship するかを決める、という具合です。役割を切り替えるたびに集中力が削られ、review / DoD / 「この Issue は形が整っているか」といった quality gate が真っ先にスキップされがちです。
+solo dev は結局すべての役割を兼任します。アイデアを整理し、Issue を起票し、分解し、実装し、review し、いつ ship するかを決める、という具合です。役割を切り替えるたびに集中力が分散し、review / DoD / 「この Issue は形が整っているか」といった quality gate が真っ先にスキップされがちです。
 
 soloscrum は、各役割を Claude agent に肩代わりさせます。役割ごとの契約があれば、2 人目の人間 reviewer に頼らずともループを回し続けられます。
 
@@ -29,7 +29,7 @@ soloscrum は 4 つのパーツでできています。
 /review     → DoD + AC + CodeRabbit + multi-agent review; verdict; ready handoff
 ```
 
-最後の `gh pr merge` だけはユーザが実行します。irreversible なので、人間側に唯一残してあるステップです。それ以前 — PR の作成、verdict の投稿、draft → ready の昇格、state の遷移 — はすべて reversible で、command の中で自律的に走ります。
+最後の `gh pr merge` だけはユーザが実行します。irreversible なので、人間側に唯一残してあるステップです。それ以前のステップ (PR の作成・verdict の投稿・draft → ready の昇格・state の遷移) はすべて reversible で、command の中で自律的に走ります。
 
 ## Fit / not-fit
 
@@ -43,7 +43,7 @@ soloscrum が合うのは、次のような状況です。
 soloscrum が合わないのは、次のような状況です。
 
 - merge 前に **複数の人間 reviewer による approve** が必須である
-- **複数の AI agent 間での移植性** が必要 — soloscrum は Claude Code 専用に設計されています
+- Claude Code 以外の AI agent への移植が必要 — soloscrum は Claude Code 専用です
 - 主目的が人を組織化するためのフレームワーク — soloscrum は agent 向けの契約をコード化したものです
 
 ## 次のステップ

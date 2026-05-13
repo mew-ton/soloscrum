@@ -13,7 +13,7 @@ sidebar:
 - [ ] テストが存在する (該当する場合)
 - [ ] PR 本文に Issue 番号が含まれている (`Closes #N` / `Fixes #N` / `Resolves #N` のいずれか)
 - [ ] lint エラーがゼロ
-- [ ] code review pipeline を実行し、finding を処理済み ([code review プロセス](/ja/concept/code-review-process/) を参照)
+- [ ] code review pipeline を実行し、finding を処理している ([code review プロセス](/ja/concept/code-review-process/) を参照)
 - [ ] review が pass している
 
 各項目には個別のルールがあります。

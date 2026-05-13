@@ -31,7 +31,7 @@ sidebar:
 
 Dev agent は Subtask の AC を読み、`feat/50-email-form-integration` のようなブランチを切り、実装を書きます。途中で `feat(auth): add password reset form` / `test(auth): cover form validation cases` のような commit を重ねます。AC が満たされ、local の self-check が通ったら、`gh pr create --draft` を走らせ、本文に `Closes #50` を入れます。closing keyword は DoD で必須であり、merge 時に GitHub が Issue を自動 close します。続いて `skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr> 15 300` を走らせ、CI が無事に起動したことを確認します。最後に Subtask を `in-review` に進めます。
 
-ユーザに渡すのは draft PR の URL と、「次は `/review <pr-url>` を走らせてください」という案内です。ready への昇格は `/develop` の責務ではなく、Pass の verdict が出た後に `/review` が行います。
+コマンドの完了時には、draft PR の URL と「次は `/review <pr-url>` を実行してください」という案内が表示されます。ready への昇格は `/develop` の責務ではなく、Pass の verdict が出た後に `/review` が行います。
 
 ## 出力
 
