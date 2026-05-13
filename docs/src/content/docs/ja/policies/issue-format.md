@@ -1,15 +1,15 @@
 ---
 title: Issue フォーマット
-description: Issue のタイトルと本文に求められる構造 (Background / Goal / Acceptance Criteria / Out of Scope)、および付属の ISSUE_TEMPLATE ファイル。
+description: Issue のタイトルと本文に求める形 (Background / Goal / Acceptance Criteria / Out of Scope)、および付属の ISSUE_TEMPLATE ファイルについて説明します。
 sidebar:
   order: 1
 ---
 
-soloscrum の Issue 本文は、常に 4 セクションの同じ並びを取る: Background、Goal、Acceptance Criteria、Out of Scope。`/refine` がこの形で本文を生成し、ユーザは承認前にそれを読んだり編集したりする。後段の `/validate` と `/breakdown` は、本文の構造が予測可能であることに依存している。
+soloscrum の Issue は、本文がすべて Background / Goal / Acceptance Criteria / Out of Scope の 4 セクション構成です。この形を書き出すのが `/refine`、形が揃っていることを前提に動くのが `/validate` と `/breakdown` です。
 
 ## 4 つのセクション
 
-本文は常にこの順番で書く:
+本文は常に次の順序で書きます。
 
 ```markdown
 ## Background
@@ -30,30 +30,33 @@ soloscrum の Issue 本文は、常に 4 セクションの同じ並びを取る
 
 タイトルのルール:
 
-- 動詞で始め、50 文字以内に収める
-- How ではなく What を書く
+- 動詞から始める
+- 50 文字以内
+- What を書く (How は書かない)
 
 AC のルール:
 
-- 各項目は独立して検証可能であること
-- 表現はユーザ視点 (「user can …」「… is displayed」) を採る。実装視点 (「Issue JWT token」「Implement validation」) は使わない
+- 1 項目ずつ独立して検証できる
+- ユーザ視点の表現にする (`user can …` / `… is displayed` など)。実装視点の表現 (`Issue JWT token` / `Implement validation` など) は使わない
 
-本文冒頭の `<!-- soloscrum-issue-format -->` HTML コメントと、末尾の小さなイタリック footer が、その本文を soloscrum フォーマットと見分けるためのマーカーだ。janitor や `/validate` はこれを使って安価に判定できる。
+本文の先頭には `<!-- soloscrum-issue-format -->` の HTML コメントと、小さなイタリック体のフッタが付きます。これにより janitor や `/validate` は、その Issue が soloscrum フォーマットで書かれているかどうかを軽く判定できます。
 
-## いつ適用されるか
+## 適用される場面
 
-`/refine` はこの形で Issue を書く。`/breakdown` の前に `/validate` が既存 Issue を同じ形に照らしてチェックする。triage、見積もり、pickup の場面でもこの本文を読むことになる。
+- `/refine` がこの形で Issue を作成します
+- `/breakdown` を走らせる前に、`/validate` が既存 Issue がこの形になっているかを確認します
+- Issue を triage、見積もり、ピックアップする際の読み手側の前提でもあります
 
-## コンパニオンテンプレート
+## 付属テンプレート
 
-付属の `templates/ISSUE_TEMPLATE.md` は同じ本文構造をミラーしており、次のどちらの使い方もできる:
+`templates/ISSUE_TEMPLATE.md` は本文構造をそのまま写したテンプレートです。使い方は 2 通りあります。
 
-- `.github/ISSUE_TEMPLATE/` にコピーする。これで GitHub の「New Issue」UI に chooser エントリとして表示される。**または**
-- GitHub Web UI 上の新規 Issue 本文に手で貼り付ける。
+- `.github/ISSUE_TEMPLATE/` 配下にコピーすれば、GitHub の「New Issue」UI でチューザーに表示されます
+- GitHub web UI で新規 Issue を開き、本文に手動でペーストします
 
-正本の言語は英語だ。多言語版は out of scope。
+canonical な言語は英語です。多言語版は対象外です。
 
-## 関連項目
+## 参考
 
-- この形式の本文に適用されるサイズ上限: [`issue-size`](/ja/policies/issue-size/)。
-- 正本の契約: [`skills/soloscrum-define-issue-format/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-format/SKILL.md)。
+- この形式で書かれた本文に対するサイズ上限: [`issue-size`](/ja/policies/issue-size/)
+- canonical な契約: [`skills/soloscrum-define-issue-format/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-format/SKILL.md)
