@@ -1,44 +1,68 @@
 ---
 title: tracker profile
-description: Issue / subtask / SP / state / 依存関係をどこに保存するか。soloscrum が tracker の選択をハードコードせず、command ごとに解決する仕組み。
+description: Issue / subtask / SP / state / dependency をどこに保存し、各 command がどのトラッカーを使うかを決める仕組みを説明します。
 sidebar:
   order: 1
 ---
 
-soloscrum は issue tracker の上で動く。チームによって使う tracker は異なるため、「すべて GitHub に置く」や「すべて Linear に置く」と決め打ちしたフレームワークは、前提が崩れた瞬間に fork するしかなくなる。それを避けるため、soloscrum は tracker を差し替え可能なレイヤーとして扱い、command の冒頭で **tracker profile** を解決する。
+**tracker profile** は、各 command が読み書きする issue tracker を選択する仕組みです。soloscrum はすべての command の冒頭で profile を解決し、フレームワーク本体は profile に依存しない形に保たれています。
 
-tracker profile は小さな決定の束だ。親 Issue の保管場所、subtask の保管場所、issue ID の形、SP の記録先、state machine と tracker ネイティブ state のマッピング、そして読み書きに使う API。今のところ profile は 2 つで、その外側のフレームワークは意図的に profile 非依存に保ってある。
+profile は次の項目をまとめて決めます。
+
+- 親 Issue をどこに置くか
+- subtask をどこに置くか
+- issue ID のフォーマット
+- SP をどこに記録するか
+- state machine をトラッカーのネイティブ state にどう対応させるか
+- agent が使う API
+
+現時点で 2 種類の profile が用意されています。
 
 ## 2 つの profile
 
-**`github-only`** は保守的なデフォルトだ。Issue は GitHub Issue、subtask はネイティブの GH Sub-issue、SP は GitHub Projects v2 の Number フィールド、state は `state:in-progress` / `state:in-review` / `state:done` ラベルで表現し、依存関係は Issue 本文に `Depends on: #N` の行として書く（GitHub がクロスリンクとしてレンダリングしてくれる）。Linear を使えないリポジトリ — 公開 OSS プロジェクト、GitHub-only 制約のある組織、単に二つ目のツールを増やしたくない人 — はこの profile で完結する。
+### `github-only` (default)
 
-**`linear+github`** は、すでに Linear を運用しているチーム向けだ。親 Issue は GitHub に残す（commit / PR / `Closes #` キーワードを機能させ続けるため、ここが正本）。一方で subtask、SP、state、依存関係は Linear 側に置き、Linear ネイティブの GitHub 同期で繋ぐ。この profile での subtask ID は `#123` ではなく `PRJ-42` の形になる。priority ラベルだけは引き続き GitHub に置く — 親については GitHub が正本だからだ。
+- Issue は GitHub Issue
+- subtask は GH ネイティブの Sub-issue
+- SP は GitHub Projects v2 の Number field に保存
+- state は `state:in-progress` / `state:in-review` / `state:done` のラベルで表現
+- 依存関係は Issue 本文の `Depends on: #N` 行 (GitHub が自動的に相互リンクをレンダリング)
 
-## profile の解決順序
+Linear が利用できない環境 — 公開 OSS、GitHub のみを許可する組織、単一ツールで完結したいワークフローなど — で使います。
 
-tracker に触れる command や agent は、毎回この順序で解決する:
+### `linear+github`
 
-1. `.claude/rules/tracker.md` のリポジトリ override — `profile:` frontmatter を持つファイルが存在すれば最優先
-2. plugin インストール時のプロンプトで決めたユーザレベル設定（`.claude/settings.json` の `tracker_profile`）
-3. ビルトインデフォルトの `github-only`
+- 親 Issue は GitHub に残します (commit / PR / `Closes #` の挙動を維持するため)
+- subtask / SP / state / 依存関係は Linear 側に置き、Linear のネイティブな GitHub 連携で同期します
+- subtask ID は `#123` ではなく `PRJ-42` のような形式
+- priority ラベルは GitHub 側に残ります (親 Issue のメタデータは GitHub を canonical とする方針のため)
 
-最初にマッチしたものを採用し、そこで打ち切る。1 リポジトリだけを特定の profile に固定しつつ、他のリポジトリではユーザレベルのデフォルトを残したい — override が存在するのはこのケースのためで、これがないと Claude のインストールを共有する複数リポジトリが同じ tracker を共有してしまう。
+すでに Linear を運用しているチームで使います。
 
-## なぜフレームワーク本体は profile 非依存なのか
+## 解決順序
 
-ライフサイクル、state machine、DoD、review pipeline — どこにも「Linear」や「GitHub」という名前は出てこない。代わりに、tracker と話す処理はすべて profile 名前空間付きの **operation skill** に委譲する: `soloscrum-tracker-{github|linear}-{operation}` の形だ。profile を解決することは prefix を選ぶことと等価で、あとは `create-subtask` / `transition-state` / `set-sp` / `query-state` / `query-backlog` / `add-dependency` といった skill を呼ぶだけで、データの保管場所に関わらず同じ operation が動く。
+tracker を扱う command や agent は、次の順で profile を探し、最初にマッチしたものを採用します。
 
-おかげで `/develop` の流れは、GitHub-only な OSS リポジトリでも Linear を使うプロダクトチームでも同じ見た目になる。動詞は共通で、変わるのは backend だけだ。
+1. リポジトリレベルのオーバーライド: `.claude/rules/tracker.md` の frontmatter `profile:`
+2. ユーザレベルの設定: plugin のインストール時に保存された `.claude/settings.json` の `tracker_profile`
+3. 組み込みデフォルト: `github-only`
 
-## `.claude/rules/tracker.md` をいつ書くか
+リポジトリレベルのオーバーライドにより、ユーザ全体のデフォルトを変えずに 1 つのリポジトリだけを別 profile に固定できます。
 
-ユーザレベルのデフォルトがこのリポジトリには合わないとき、override に手を伸ばす。よくあるのは次の 2 ケースだ:
+## フレームワーク本体が profile に依存しない理由
 
-- ユーザがグローバルに `linear+github` を設定していて、Linear ワークスペースを持たない公開 OSS リポジトリを clone した。command が存在しない Linear team に接続しようとしないよう、そのリポジトリを `github-only` に固定する。
-- 逆にデフォルトが `github-only` のユーザが、Linear を使うプロジェクトに参加した。subtask が GitHub 上で見えないままにならず、チームの Linear ボードに着地するように、そのリポジトリを `linear+github` に固定する。
+ライフサイクル / state machine / DoD / review pipeline のいずれにも「Linear」や「GitHub」という固有名は登場しません。tracker に触れる処理はすべて、profile ごとに用意された **operation skill** に委譲します。命名は `soloscrum-tracker-{github|linear}-{operation}` という形式で、profile が prefix を決め、`create-subtask` / `transition-state` / `set-sp` / `query-state` / `query-backlog` / `add-dependency` のいずれかを呼び出します。
 
-override ファイルはミニマルだ:
+この設計により、GitHub のみの OSS リポジトリと Linear を併用するプロダクトチームで、`/develop` の動作は完全に同じです。動詞は共通で、ストレージだけが切り替わります。
+
+## `.claude/rules/tracker.md` を置くべき場面
+
+ユーザレベルのデフォルトがそのリポジトリに合わない場合に使います。典型例は次の 2 つです。
+
+- グローバルで `linear+github` を使っているが、Linear workspace が存在しない公開 OSS リポジトリに参加する → `github-only` に固定
+- グローバルでは `github-only` を使っているが、Linear で管理されているプロジェクトに参加する → `linear+github` に固定し、subtask がチームの Linear ボードに作成されるようにする
+
+オーバーライドファイルは frontmatter 1 行だけで完結します。
 
 ```markdown
 ---
@@ -46,8 +70,6 @@ profile: github-only
 ---
 ```
 
-この frontmatter 1 行が契約のすべてだ。
+## 参考
 
-## 関連項目
-
-- ストレージの完全な対応表と operation skill の一覧は、正本の契約を参照: [`skills/soloscrum-define-tracker-profile/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-tracker-profile/SKILL.md)。
+- 詳細なストレージ対応表と operation skill 一覧: [`skills/soloscrum-define-tracker-profile/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-tracker-profile/SKILL.md)
