@@ -1,47 +1,45 @@
 ---
 title: はじめに
-description: 新しいリポジトリに soloscrum を導入する流れ。plugin の install、tracker profile の選択、リポジトリ rule の設定、そして `/refine` で最初の Issue を file するところまで案内します。
+description: 新しいリポジトリに soloscrum を導入する流れを 4 ステップで案内します。plugin インストール、tracker profile 選択、リポジトリルール設定、そして `/refine` で最初の Issue を起票するまでをカバーします。
 sidebar:
   order: 1
 ---
 
-このページは、新しいリポジトリに soloscrum を導入したい開発者向けです。
-
-読み終わる頃には次の状態になっています: plugin が install 済み、tracker profile が選択済み、必要に応じてリポジトリレベルの rule が設定済み、`/refine` で最初の Issue が file 済み。
+新しいリポジトリに soloscrum を導入する流れを 4 ステップで案内します。このページを読み終えるころには、plugin がインストールされ、tracker profile が選ばれ、必要なリポジトリルールが置かれ、`/refine` で最初の Issue が起票された状態になります。
 
 ## 前提条件
 
-- **Claude Code** がインストール済みで、認証も済んでいること。
-- **GitHub CLI (`gh`)** がインストール済みで、対象 repo を所有する GitHub アカウントで認証されていて、対象 repo の Issue / PR を読む・作成する・編集する権限があること。
-- **GitHub 上のリポジトリ** があること。soloscrum は tracker profile に関わらず GitHub を canonical な Issue ストアとして扱います。
-- (任意) **CodeRabbit CLI** が認証済みであること。`/review` は multi-agent pipeline の一部として CodeRabbit を実行します。なくても動きますが、ローカルの品質ゲートが弱くなります。
-- (任意) **Linear MCP** が接続されていて、GitHub→Linear の native sync が設定済みであること。`linear+github` の tracker profile を使う場合にのみ必要です。
+- **Claude Code** をインストールし、認証を済ませてください
+- **GitHub CLI (`gh`)** をインストールし、対象リポジトリを所有する GitHub アカウントで認証し、Issue と PR の読み書きができる状態にしてください
+- **GitHub 上のリポジトリ** が必要です。soloscrum は tracker profile に関係なく、Issue の canonical なストアとして GitHub を使います
+- (任意) **CodeRabbit CLI** の認証。`/review` は multi-agent pipeline の一部として CodeRabbit を実行します。なくても local quality gate は動きますが、強度は下がります
+- (任意) **Linear MCP** の接続と GitHub→Linear のネイティブ同期設定。`linear+github` profile を使う場合だけ必要です
 
-## Step 1 — plugin を install する
+## Step 1 — plugin をインストールする
 
-soloscrum は marketplace 経由で配布される Claude Code plugin です。Claude Code の中で次を実行します:
+soloscrum は marketplace 経由で配布される Claude Code plugin です。Claude Code 内で次を実行してください。
 
 ```bash
 /plugin marketplace add mew-ton/soloscrum
 /plugin install soloscrum
 ```
 
-別の repo で過去に install したことがある場合は、最新版を取り込むために `/plugin marketplace update soloscrum` を実行してください。
+別のリポジトリで以前インストール済みなら、`/plugin marketplace update soloscrum` で最新版を取り込んでください。
 
-install が終われば、soloscrum の command (`/refine`、`/breakdown`、`/develop`、`/review`) が、その repo に対する任意の Claude Code セッションで使えるようになります。
+インストール後、`/refine` / `/breakdown` / `/develop` / `/review` の各 command が、そのリポジトリ上の Claude Code セッションで使えるようになります。
 
 ## Step 2 — tracker profile を選ぶ
 
-soloscrum には、Subtask / SP / 依存関係 / state の保存先を切り替える **tracker profile** が 2 種類あります:
+**tracker profile** は、Subtask / SP / 依存関係 / state をどこに保存するかを決めます。
 
 | Profile | 使う場面 |
 |---|---|
-| `github-only` | デフォルト。GitHub Issue だけを使う repo (組織の制約、public OSS など) 向け。Subtask は GitHub の native Sub-issue を使い、SP は GitHub Projects v2 の number field に保存されます。 |
-| `linear+github` | Linear MCP が使えて、GitHub→Linear の native sync が設定済みの repo 向け。Issue は GitHub 上が canonical のまま、Subtask と SP は Linear に置かれて GitHub に戻し sync されます。 |
+| `github-only` | デフォルト。GitHub Issue のみが許可されている環境 (組織方針、公開 OSS など)。Subtask は GH ネイティブの Sub-issue、SP は GitHub Projects v2 の Number field に保存されます |
+| `linear+github` | Linear MCP が利用でき、GitHub→Linear のネイティブ同期が設定済みのリポジトリ。Issue は GitHub に canonical を残し、Subtask と SP は Linear 側に置いて同期します |
 
-概念の詳細は [tracker profile](/ja/concept/tracker-profile/) で扱っています。
+詳細は [tracker profile](/ja/concept/tracker-profile/) を参照してください。
 
-plugin のユーザ設定には install 時に決めた `tracker_profile` が記録されます。特定の repo だけ別の profile にしたい (例: グローバルでは `linear+github` を使っているが、ある OSS repo では GitHub しか使えない) ときは、その repo の root に次のような `.claude/rules/tracker.md` を置きます:
+plugin のユーザ設定にはインストール時に取得する `tracker_profile` があります。特定のリポジトリでこれをオーバーライドしたい場合 (例: 普段は `linear+github` を使っているが、特定の OSS リポジトリでは GitHub だけ使いたい) は、リポジトリ直下に `.claude/rules/tracker.md` を置きます。
 
 ```markdown
 ---
@@ -49,42 +47,42 @@ profile: github-only
 ---
 ```
 
-repo-local の override はユーザレベルのデフォルトより優先されます。どちらもない場合は、ビルトインフォールバックの `github-only` が使われます。
+リポジトリローカルのオーバーライドはユーザ設定より優先されます。どちらも未設定なら、組み込みデフォルトの `github-only` が使われます。
 
-## Step 3 — repo rule を設定する (任意)
+## Step 3 — リポジトリルールを設定する (任意)
 
-soloscrum は `.claude/rules/` の中のリポジトリ固有 rule を、あれば読み込みます。flow を動かすために必須なものはありませんが、各ファイルを置くとその repo での agent の振る舞いを引き締められます。
+soloscrum は `.claude/rules/` 配下から任意のリポジトリ固有ルールを読み込みます。どれも必須ではありません。それぞれのファイルは、そのリポジトリでの agent の振る舞いを調整します。
 
-| ファイル | 制御するもの |
+| ファイル | 用途 |
 |---|---|
-| `.claude/rules/tracker.md` | tracker profile の override (Step 2 を参照)。 |
-| `.claude/rules/stack.md` | 技術スタック、ディレクトリ配置、命名規約。Dev が `/develop` 中に参照します。 |
-| `.claude/rules/branch.md` | この repo 固有の branch 戦略 (例: trunk-based / gitflow)。soloscrum のデフォルト `<type>/<issue-id>-<slug>` から変える場合に置きます。 |
-| `.claude/rules/dod-extra.md` | [core checklist](/ja/policies/dod/) に追加する DoD 項目。例:「新規コンポーネントには Storybook story を用意する」「i18n 文字列を両 locale に登録する」など。 |
-| `.claude/rules/pr.md` | always-draft PR デフォルトの override (ほとんど不要。[PR ライフサイクル](/ja/concept/pr-lifecycle/) を参照)。 |
-| `.claude/rules/agent-overrides.md` | agent ownership matrix への repo 固有の調整。ほぼ不要です。 |
+| `.claude/rules/tracker.md` | tracker profile のオーバーライド (Step 2 参照) |
+| `.claude/rules/stack.md` | `/develop` 時に Dev が参照する技術スタック、ディレクトリ構成、命名規約 |
+| `.claude/rules/branch.md` | リポジトリ固有のブランチ戦略 (trunk-based / gitflow など、デフォルトの `<type>/<issue-id>-<slug>` から外れる場合) |
+| `.claude/rules/dod-extra.md` | [coreチェックリスト](/ja/policies/dod/) に追記する DoD 項目 (例: 「新規 component には Storybook story を用意」「i18n の文字列を両ロケールに登録」) |
+| `.claude/rules/pr.md` | always-draft PR のデフォルトを上書きする場合 (滅多に使いません。[PR ライフサイクル](/ja/concept/pr-lifecycle/) を参照) |
+| `.claude/rules/agent-overrides.md` | agent 責務マトリクスのリポジトリ固有調整 (ほぼ不要) |
 
-各ファイルは plain Markdown です。上書きしたい部分だけ書けば十分で、ファイルが存在しない場合は単に soloscrum のデフォルトが適用されます。
+いずれもプレーンな Markdown です。必要なオーバーライドだけ書いてください。ファイルがなければ soloscrum のデフォルトが適用されます。
 
-## Step 4 — `/refine` で最初の Issue を file する
+## Step 4 — `/refine` で最初の Issue を起票する
 
-これでライフサイクルを end-to-end で回す準備が整いました。repo で Claude Code のセッションを開き、次を実行します:
+リポジトリで Claude Code セッションを開き、次を実行してください。
 
 ```bash
 /refine "<your idea here>"
 ```
 
-出力の 1 行目は janitor sweep の結果で、できたばかりの repo では `No stale Issues found` になります。続いて PO agent が、アイデアを 4 セクションの Issue 本文 (Background / Goal / AC / Out of Scope) に構造化し、priority ラベルを割り当てて、size-check SP を計算したドラフトを提示します。確認すると、Issue が作成されます。
+最初の行に janitor sweep の結果が表示されます。新規リポジトリでは `No stale Issues found` のはずです。続いて PO agent がアイデアを Background / Goal / AC / Out of Scope の 4 セクションに整形し、priority ラベルと size-check SP を提示します。確認して承認すると Issue が作成されます。
 
-そこから先のライフサイクルは次のようになります:
+その後のライフサイクルは次の流れになります。
 
-- size-check SP が 5 以下で、作業が 1 つの PR に収まりそうなら、その Issue に対して直接 [`/develop`](/ja/commands/develop/) を実行します。
-- SP が 5 を超えていたり、変更が明らかに複数の subsystem にまたがっていたりする場合は、先に [`/breakdown`](/ja/commands/breakdown/) を実行して Issue を Subtask に分割し、その後で各 Subtask に対して `/develop` を実行します。
-- `/develop` が draft PR を開いたら、その PR に [`/review`](/ja/commands/review/) を実行します。Pass であれば `/review` が PR を ready に昇格させ、`gh pr merge` の command を提示します。最後の merge は agent ではなくユーザのゲートです。
+- size-check SP が 5 以下で 1 つの PR に収まるなら、Issue に対してそのまま [`/develop`](/ja/commands/develop/) を実行してください
+- SP が 5 を超える、または複数サブシステムに跨る場合は、まず [`/breakdown`](/ja/commands/breakdown/) で Subtask に切ってから、各 Subtask に `/develop` を実行してください
+- `/develop` が draft PR を開いたら、[`/review`](/ja/commands/review/) を実行してください。Pass の verdict が出ると `/review` は PR を ready に昇格させ、`gh pr merge` のコマンドを提示します。merge を実行するのはユーザの仕事で、agent の仕事ではありません
 
-## 次に読む場所
+## 次に読むもの
 
-- [Concept セクション](/ja/concept/tracker-profile/) — tracker profile の意図、agent ownership ルール、PR ライフサイクル、code review プロセスの背景。
-- [Policies セクション](/ja/policies/issue-format/) — `/refine` と `/review` が照合するルール (Issue format、priority、story points、issue size、DoD)。
-- [Commands セクション](/ja/commands/refine/) — `/refine` / `/breakdown` / `/develop` / `/review` の command ごとのウォークスルー。
-- 正本の spec はリポジトリ内: [`skills/`](https://github.com/mew-ton/soloscrum/tree/main/skills)、[`agents/`](https://github.com/mew-ton/soloscrum/tree/main/agents)、[`commands/`](https://github.com/mew-ton/soloscrum/tree/main/commands)。
+- [Concept セクション](/ja/concept/tracker-profile/) — tracker profile、agent 責務、PR ライフサイクル、code review プロセス
+- [Policies セクション](/ja/policies/issue-format/) — `/refine` と `/review` が照らすルール (Issue フォーマット、優先度、story points、Issue サイズ、DoD)
+- [Commands セクション](/ja/commands/refine/) — `/refine` / `/breakdown` / `/develop` / `/review` の使い方
+- canonical な spec: [`skills/`](https://github.com/mew-ton/soloscrum/tree/main/skills) / [`agents/`](https://github.com/mew-ton/soloscrum/tree/main/agents) / [`commands/`](https://github.com/mew-ton/soloscrum/tree/main/commands)

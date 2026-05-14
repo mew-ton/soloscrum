@@ -1,70 +1,71 @@
 ---
 title: agent と責務
-description: 5 つの soloscrum agent (PO / Design / Dev / UI / Review) が何を作り何を変更できるか、ライフサイクルでどう引き継がれるか。
+description: 5 つの soloscrum agent (PO / Design / Dev / UI / Review) の役割と、何を作れて何を変更できるか、どのようにライフサイクルで引き継がれるかを説明します。
 sidebar:
   order: 2
 ---
 
-soloscrum は 1 つの機能の作業を 5 つのロールに分け、それぞれを Claude Code agent が担当する。この分割は意図的なものだ。ボード上のすべての概念（Issue、subtask、PR、verdict）には creator が 1 ロールだけ存在し、ライフサイクル中に変更できる mutator も 1 ロールに限定されている。この single-creator ルールがあるからこそ、2 つの agent が同じ subtask を競って作ったり、ある agent が他の agent の所有する Issue を勝手に閉じたりといった事故が起きない。
+soloscrum は機能の実装作業を 5 つの役割に分割し、それぞれを Claude Code agent が担当します。ボード上のすべての概念 — Issue / subtask / PR / verdict — について、作成できる役割は 1 つ、ライフサイクル中に変更できる役割も 1 つに限定されています。このルールにより、2 つの agent が同じ subtask を並行して作成したり、他の agent が所有する Issue を閉じたりする経路を排除しています。
 
-このページは各 agent への人間向け導入だ。正本のオーナーシップ行列は [`skills/soloscrum-define-agent-responsibilities/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-agent-responsibilities/SKILL.md) を参照のこと。
+責務マトリクスの canonical な定義は [`skills/soloscrum-define-agent-responsibilities/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-agent-responsibilities/SKILL.md) にあります。
 
 ## 5 つの agent
 
 ### `soloscrum-po` — Product Owner
 
-PO はエントリポイントだ。`/refine` の中で動き、自由形式のアイデアを構造化された GitHub Issue に変換する: 動詞で始まるタイトル、Background、Goal、Acceptance Criteria、そして明示的な Out of Scope。Issue レベルの priority と size-check SP — Issue がそのままライフサイクルに乗せられるサイズか、先に分割すべきかを判断するためのざっくり見積もり — を割り当てるのも PO だ。
+PO はライフサイクルの入口です。`/refine` で動作し、形のないアイデアを GitHub Issue に整形します。動詞から始まるタイトル、Background、Goal、Acceptance Criteria、Out of Scope の 4 セクションで構成された Issue を作成し、priority と size-check 用の SP もここで付与します。size-check SP は、その Issue がライフサイクルに進めるサイズか、先に分割すべきかを判定するための概算値です。
 
-親 Issue のメタデータを作成後に変更できるのも PO だけだ。さらに `/refine` の janitor sweep も担当する。これは、クロージング PR が親ではなく sub-issue を参照したことで GitHub が auto-close しなかった親 Issue を、後追いで閉じるクリーンアップパスだ。
+親 Issue のメタデータを後から変更できるのは PO だけです。`/refine` の janitor sweep — closing PR が sub-issue 側を参照していたために GitHub が自動 close できなかった親 Issue を回収する処理 — も PO の担当です。
 
 ### `soloscrum-design` — Designer
 
-Design agent は `/validate` と `/breakdown` のプランニング段階で動く。validate 済みの Issue を実装可能なプランに落とすのが仕事だ: scope、依存関係、技術的なフィージビリティを確認し、type と AC を揃えた subtask 案を提案する。tracker への subtask 登録は **行わない** — そこは Dev の仕事だ。
+Design は `/validate` と `/breakdown` の計画段階で動作します。validate 済みの Issue を、実装可能な計画に落とし込みます。スコープ、依存関係、技術的な実現性を確認し、type と AC を持つ subtask のリストを作って登録に渡します。
 
-「breakdown を設計した」ことと「subtask を登録した」ことを分けてあるおかげで、design のパスは tracker 書き込みを伴わない冪等な思考ステップとして扱える。tracker への書き込みは最後にまとめて発生する。
+Design は **subtask レコードをトラッカーに書き込みません**。書き込みは Dev の仕事です。Design パスを冪等な思考ステップに保ち、トラッカーへの書き込みは最後にまとめて行う、という分業になっています。
 
 ### `soloscrum-dev` — Developer
 
-Dev は実装そのものを担当する。動く場所は 2 か所だ。1 つは `/breakdown` の登録段階で、Design が提案した subtask を SP / type ラベル / 親リンクとともに tracker に書き込む。もう 1 つは `/develop` で、branch を切り、コードを書き、Conventional Commits で commit し、draft PR を開く。
+Dev は実装を担当します。動作する場面は 2 つです。
 
-subtask を idle から `in-progress` へ、そして draft PR を開いた後に `in-progress` から `in-review` へ遷移させるのも Dev の役割だ。
+- **`/breakdown` の registration ステージ** — Design が提案した subtask をトラッカーに書き込みます (SP / type ラベル / 親リンク)。
+- **`/develop`** — ブランチを切り、コードを書き、Conventional Commits で commit し、draft PR を開きます。
+
+subtask の state を idle から `in-progress` に進めるのも、draft PR を開いた後に `in-progress` から `in-review` に進めるのも Dev です。
 
 ### `soloscrum-ui` — UI Designer
 
-UI agent は Dev の design-ui 版に当たる。`/design-ui` の中で動き、`type:design-ui` がタグ付けされた subtask に対して Figma 成果物 — コンポーネント、design token、状態バリアント、accessibility チェック — を作る。Dev と同様、Figma ファイルが揃った時点で自分の subtask を `in-review` に遷移させる。
+UI は design-ui 領域における Dev の対になる役割です。`/design-ui` で動作し、`type:design-ui` がついた subtask に対して Figma 上の成果物 — component、design token、state variant、accessibility check — を作ります。Dev と同様に、Figma ファイルが完成した時点で自分の subtask を `in-review` に進めます。
 
-UI を伴う機能は `design-ui` subtask と後続の `develop` subtask に分割される。`develop` 側の作業は、design subtask の review が通るまで待機する。
+UI 関連の機能は通常、`design-ui` subtask と、その後に続く `develop` subtask に分けて扱います。`develop` 側は design 側の review が終わるまで待機します。
 
 ### `soloscrum-review` — Reviewer
 
-何かを done としてマークできるのは Review だけだ。`/review` の中で動き、DoD と AC を検証し、CodeRabbit + multi-agent review pipeline を走らせ、各 finding を個別に決定し、verdict コメントを投稿する。Pass なら subtask を `done` に遷移させ、CI が green になるのを待ち、PR を draft から ready に昇格させる。最後の `gh pr merge` は常にユーザのゲートで、agent は「これが merge command です」と提示して止まる。
+Review は唯一、何かを done にできる役割です。`/review` で動作し、DoD と AC を検証し、CodeRabbit + multi-agent の review pipeline を走らせ、見つかった finding を 1 件ずつ判断し、verdict コメントを投稿します。Pass の場合は subtask を `done` に進め、CI green を待ち、PR を draft から ready に昇格させます。`gh pr merge` だけは常にユーザのゲートで、agent は merge コマンドを提示した時点で停止します。
 
-ボード上の他の概念の verifier も Review だ。state を terminal な状態に切り替える必要がある場面では、切り替えるのは必ず Review になる。
+ボード上の他の概念についても、verifier は常に Review です。terminal な状態へ進められるのは Review だけです。
 
-## ライフサイクルの全体像
+## ライフサイクル概観
 
 ```text
 /refine        po       → Issue (size-check SP, priority, AC, dependencies)
-/validate      design   → Issue を読み、無効なら refine を要求
-/breakdown     design   → subtask を提案 (type, AC)
-               dev      → subtask を登録 (SP, type label)
+/validate      design   → reads Issue, asks for refinement if invalid
+/breakdown     design   → proposes subtasks (type, AC)
+               dev      → registers subtasks (SP, type label)
 /develop       dev      → branch + code + draft PR; subtask → in-review
-/design-ui     ui       → Figma + token + state; subtask → in-review
-/review        review   → DoD + AC + コード; PR を ready に昇格;
-                          subtask → done; merge command をユーザに提示
-user           user     → `gh pr merge` を実行 (irreversible, ユーザゲート)
-/refine        po       → janitor が GH の取りこぼした親 Issue をクローズ
+/design-ui     ui       → Figma + tokens + states; subtask → in-review
+/review        review   → DoD + AC + code; promote PR to ready;
+                          subtask → done; surface merge command to user
+user           user     → runs `gh pr merge` (irreversible, user-gated)
+/refine        po       → janitor closes any parent Issues GH missed
 ```
 
-## single-creator ルール
+## 全体を支える 3 つのルール
 
-全体を貫く 3 つのルールがある。どの soloscrum command を読むときも頭に置いておく価値がある:
+1. **概念ごとに作成できる役割は 1 つだけ。** 同じ種類のレコードを 2 つの役割が作ることはありません。Issue を作るのは PO。subtask レコードを作るのは Dev。PR や Figma 成果物を作るのは Dev または UI。同じ AC に対して別々の agent が重複した subtask を起票する経路は存在しません。
+2. **state 遷移は役割でゲートされる。** terminal な状態に遷移させられるのは Review だけです。Dev と UI は自分の subtask を `in-review` まで動かせますが、`done` に進められるのは Review に限られます。
+3. **Review が verifier を担います。** ただし入口の size-check SP は PO の判断、type ラベルは Dev または UI の判断です。
 
-1. **概念ごとに creator は 1 ロール。** 同じ種類のレコードを 2 つのロールが作ることはない。Issue は PO、subtask レコードは Dev、PR / Figma 成果物は Dev または UI。同じ AC に対して 2 つの agent が重複 subtask を file する経路は存在しない。
-2. **state 遷移はロールゲート。** 任意のレコードを terminal state に遷移させられるのは Review だけだ。Dev と UI は自分の subtask を `in-review` まで動かせるが、`done` に動かせるのは Review しかいない。
-3. **verifier は常に Review。** 例外は entry-gate の SP（PO）と type ラベル（Dev / UI）だが、これらは検証ではなく決定にあたる。
+## 参考
 
-## 関連項目
-
-- 完全なオーナーシップ行列は [`skills/soloscrum-define-agent-responsibilities/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-agent-responsibilities/SKILL.md) を参照。
-- PR の遷移が reversible (agent 実行) と irreversible (ユーザゲート) にどう分かれるかは、[PR ライフサイクル概念](/ja/concept/pr-lifecycle/) を参照。
+- 完全な責務マトリクス: [`skills/soloscrum-define-agent-responsibilities/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-agent-responsibilities/SKILL.md)
+- PR 遷移のうち agent が自律実行するものとユーザがゲートするものの線引き: [PR lifecycle](/ja/concept/pr-lifecycle/)
