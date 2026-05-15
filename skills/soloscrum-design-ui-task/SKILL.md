@@ -27,11 +27,11 @@ Produce Figma design with tokens and patterns for a Subtask of type `design-ui`.
 
 ## Overview
 
-Produces design in Figma for a Subtask (type: design-ui) based on its AC. Follows `soloscrum-define-ui-standards` conventions. Subtask state transitions delegate to the active profile's tracker operation skill.
+Produces design in Figma for a Subtask (type: design-ui) based on its Checklist / "what" slice scope and the **parent Issue's AC** (per `soloscrum-define-issue-format`'s Subtask Body section — Subtasks themselves do not carry AC). Follows `soloscrum-define-ui-standards` conventions. Subtask state transitions delegate to the active profile's tracker operation skill.
 
 ## Steps
 
-1. Read target Subtask AC, description, and related Issue: $ARGUMENTS
+1. Read target Subtask's "what" + Checklist (its slice scope per `soloscrum-define-issue-format`'s Subtask Body section) and the **parent Issue's AC** (which is what the slice must move closer to satisfying without regression): $ARGUMENTS
 2. Check design token and pattern conventions with `soloscrum-define-ui-standards`
 3. Produce design in Figma MCP:
    - Check and reuse existing components

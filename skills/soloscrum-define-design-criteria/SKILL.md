@@ -15,7 +15,7 @@ Feature design validation criteria.
 | Check | Criteria |
 |---|---|
 | Is the Goal stated clearly in 1-2 sentences? | OK: single purpose. NG: multiple purposes mixed |
-| Is the AC in verifiable format? | OK: "user can ..." format. NG: "implement ..." format |
+| Is the AC in verifiable format? | OK: Shape A (`user can ...`, user-facing) or Shape B (`<contract or capability> exists / produces ...`, structural) per `soloscrum-define-issue-format`'s AC Writing Guide. NG: `implement ...` / `refactor ...` (procedure, not outcome) |
 | Is Out of Scope explicitly stated? | OK: stated. NG: blank |
 | Does scope fit within a single feature? | OK: one feature. NG: multiple features mixed |
 

@@ -19,7 +19,7 @@ PO is the only role that mutates the parent Issue's metadata after creation. PO 
 
 ### `soloscrum-design` — Designer
 
-Design runs during `/validate` and the planning stage of `/breakdown`. It converts a validated Issue into an implementable plan: scope, dependencies, technical feasibility, and a list of subtasks with type and AC ready for registration.
+Design runs during `/validate` and the planning stage of `/breakdown`. It converts a validated Issue into an implementable plan: scope, dependencies, technical feasibility, and a list of subtasks with type and Checklist / slice scope ready for registration. (Subtasks do not carry their own AC — the parent Issue owns the AC and the Subtask slices its delivery; see [issue format](/policies/issue-format/).)
 
 Design does **not** create subtask records on the tracker — that step belongs to Dev. This keeps the design pass as an idempotent thinking step, with tracker writes batched at the end.
 
@@ -49,7 +49,7 @@ Review is also the verifier for every other concept on the board. Any flip to a 
 ```text
 /refine        po       → Issue (size-check SP, priority, AC, dependencies)
 /validate      design   → reads Issue, asks for refinement if invalid
-/breakdown     design   → proposes subtasks (type, AC)
+/breakdown     design   → proposes subtasks (type, Checklist / slice scope — Subtasks have no AC)
                dev      → registers subtasks (SP, type label)
 /develop       dev      → branch + code + draft PR; subtask → in-review
 /design-ui     ui       → Figma + tokens + states; subtask → in-review

@@ -10,18 +10,22 @@ Definition of Done (generic).
 
 ## DoD Checklist
 
-- [ ] All AC are satisfied
+- [ ] AC verified at the appropriate layer (see "AC verification (Issue-level vs Subtask-level)" below — Subtask PRs check slice delivery + no regressions; Issues without Subtasks check full Issue AC; the parent Issue's intent-level AC sign-off happens when all its Subtasks close, not at any single Subtask PR)
 - [ ] Tests exist (when applicable)
-- [ ] PR body contains Issue number (`Closes #N` or `Fixes #N` format)
+- [ ] PR body contains Issue number (`Closes #N` or `Fixes #N` format — `<subtask>` for Subtask PRs, `<issue>` for Issues without Subtasks; per `soloscrum-define-branch-commit`, per-Subtask PRs do **not** reference the parent Issue via `Closes #`)
 - [ ] Zero lint errors
 - [ ] Code review pipeline executed and findings addressed (per `soloscrum-define-code-review-process`)
 - [ ] Review has passed
 
 ## Criteria for Each Item
 
-### All AC are satisfied
-- All AC checkboxes in the Issue are met
-- Behavior has been verified with evidence (screenshots, test results, etc.)
+### AC verification (Issue-level vs Subtask-level)
+
+soloscrum's AC verification operates at two layers because Subtasks slice work, not intent (per `soloscrum-define-issue-format`'s Subtask Body section). Where to verify depends on the PR's relation to the parent Issue:
+
+- **Subtask PR.** Verify the slice was delivered (its "what" + Checklist items, if any) and that there is no regression — no parent AC item that was previously satisfied is now broken. The parent Issue's AC is **not** required to be fully satisfied at this PR; only the slice's own delivery + no-regression.
+- **Issue without Subtasks** (a single-`/develop`-unit Issue per `soloscrum-define-issue-size`). Verify **all** of the Issue's AC are met, with evidence (screenshots, test results, etc.). The PR closes the Issue directly via `Closes #<issue>`.
+- **Parent Issue (with Subtasks) — intent-level AC sign-off.** The parent's full AC is verified when **all of its Subtasks are closed** (per `soloscrum-define-issue-format`), not at any individual Subtask PR. The last Subtask PR's merge triggers the parent's close via the `/refine` janitor; at that point the parent's AC must be satisfiable from the union of the Subtasks' deliveries. `soloscrum-review` does this sign-off on the parent Issue, not as part of any individual Subtask PR review.
 
 ### Tests exist (when applicable)
 - Not applicable: configuration changes with no logic, documentation updates, etc.

@@ -18,8 +18,8 @@ sidebar:
 
 ## 処理の流れ
 
-1. **DoD 検証。** [DoD](/ja/policies/dod/) の全項目を確認します。PR 本文に closing keyword (`Closes #N`) が入っていること、lint がクリーン、必要なテストが揃っている、AC が満たされている、をそれぞれ確認します。
-2. **AC 検証。** 親 Issue の AC チェックボックスを、diff とビルドの動作に照らして 1 件ずつ確認します。
+1. **DoD 検証。** [DoD](/ja/policies/dod/) の全項目を確認します。PR 本文に closing keyword（Subtask PR なら `Closes #<subtask>`、Subtask を持たない Issue なら `Closes #<issue>`）が入っていること、lint がクリーン、必要なテストが揃っていること、を確認します。AC 検証は次の項目で扱います（PR の種類によってレイヤーが変わるため）。
+2. **AC 検証（適切なレイヤーで）。** Subtask PR では、スライスが配信されたこと + 親 AC への退行がないこと、を確認します。Subtask を持たない Issue の PR では、Issue の全 AC を diff と動作中のビルドに照らして検証します。親 Issue の intent 単位 AC サインオフは、すべての Subtask が close した時点で行われ、個別 Subtask PR では行われません — [DoD](/ja/policies/dod/) の *AC 検証* セクションを参照してください。
 3. **CodeRabbit 実行。** CodeRabbit CLI を diff に対して走らせます。「No findings」が返ってきても multi-agent パスはスキップしません — PR が小さい / docs だけ、という理由で multi-agent を飛ばすのは anti-pattern です。
 4. **multi-agent review。** 専門観点を持つ複数の agent (security / accessibility / performance など) が diff を並列で review します。confidence 80 以上の finding を集約します。
 5. **finding ごとの判断。** プレフィルタを通った各 finding に対し、fix するか、理由を明記して skip するかを 1 件ずつ決めます。severity は情報用であり、skip 理由にはなりません。

@@ -118,7 +118,7 @@ Parent: #<parent-issue-number>
 
 A Subtask's done condition is concrete: the slice **lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions**. A pure spike or research Subtask whose output does not feed back into the parent's AC is not done at the parent's level even if its own PR lands cleanly — promote such work into its own Issue, or restate its outcome as an artefact the parent AC depends on.
 
-The intent-level AC sign-off itself happens at the **parent Issue** when **all of its Subtasks are closed** — which is not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier. See `soloscrum-define-dod` and `commands/review.md` for how that split is enforced in review (those files are aligned to this contract by sibling Subtask #75; until #75 lands, this cross-reference describes the target state).
+The intent-level AC sign-off itself happens at the **parent Issue** when **all of its Subtasks are closed** — which is not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier. See `soloscrum-define-dod` (the "AC verification" section) and `commands/review.md` for how that split is enforced in review.
 
 ## Companion files
 

@@ -30,9 +30,8 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
 
 1. Receive target PR or Figma file (`$ARGUMENTS`)
 2. Launch `soloscrum-review` to:
-   - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
+   - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`. AC verification operates at two layers per the DoD's "AC verification" section: a **Subtask PR** verifies slice-level delivery + no-regression on parent AC; an **Issue-without-Subtasks PR** verifies the full Issue AC; the **parent Issue's intent-level AC sign-off** happens once all its Subtasks close, not at any single Subtask PR.
    - Check code quality (for PRs)
-   - Verify all Issue AC (Acceptance Criteria)
    - Flag issues and post review comments
 3. Optional: `soloscrum-design` checks for feature scope deviation
 4. Optional: `soloscrum-ui` checks design fidelity

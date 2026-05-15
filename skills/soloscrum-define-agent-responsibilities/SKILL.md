@@ -28,11 +28,11 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 | Issue SP (size-check) | po | po | po (entry gate) |
 | Issue Priority | po | po | — |
 | Issue dependencies | po | design (refine plan) | review |
-| Issue AC | po | design (refine into subtask AC) | review |
+| Issue AC | po | po (refinement only — design does **not** derive Subtask AC since Subtasks have no AC per `soloscrum-define-issue-format`) | review (intent-level sign-off when all Subtasks of the parent close, OR full-AC verification on Issues without Subtasks) |
 | Subtask record | dev (during `/breakdown`) | dev/ui (own state), review (Done) | review |
 | Subtask Type | design (proposes) → dev (applies) | — | dev/ui (consumes for routing) |
 | Subtask SP | dev | — | review |
-| Subtask AC | design (during breakdown) | — | review |
+| Subtask Checklist | design (during `/breakdown` — slice scope: "what" + concrete steps; not AC) | dev/ui (during implementation) | review (per-Subtask correctness + no regression; intent-level AC sign-off is at the parent Issue, not here) |
 | Subtask State | dev (develop type) / ui (design-ui type) — to In Review | review — to Done | review |
 | Branch | dev | — | review (PR check) |
 | Commit | dev | — | review |
@@ -47,7 +47,7 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 ```
 /refine        po       → Issue (with size-check SP, priority, AC, dependencies)
 /validate      design   → reads Issue, asks for refinement if invalid
-/breakdown     design   → proposes subtasks (with type, AC)
+/breakdown     design   → proposes subtasks (with type, Checklist / slice scope — Subtasks have no AC per soloscrum-define-issue-format)
                dev      → registers subtasks (with SP, type label)
 /develop       dev      → branch + code + draft PR; transitions Subtask to In Review
 /design-ui     ui       → Figma + tokens + states; transitions Subtask to In Review
