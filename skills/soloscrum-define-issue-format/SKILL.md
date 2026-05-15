@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-issue-format
-description: "Reference: required format for GitHub Issue titles and bodies. Title starts with a verb. Body uses Background, Goal, Acceptance Criteria, and Out of Scope sections."
+description: "Reference: Issue and Subtask format. An Issue records intent (Background / Goal / Acceptance Criteria / Out of Scope); a Subtask slices work (Parent / What / Checklist / Notes). Includes the Issue-vs-Subtask discriminator and the two AC shapes (user-facing / structural)."
 user-invocable: false
 ---
 
@@ -28,6 +28,8 @@ A candidate is an **Issue** (intent) when **both** hold:
 2. **Not merely a delivery slice of an existing intent.** No larger intent (existing or currently being refined) already owns the "why" that this candidate just slices. If such a parent intent exists and the candidate only makes sense as part of delivering it, the candidate is a **Subtask**, not a sibling Issue.
 
 If either condition fails → the candidate is a Subtask of the parent intent.
+
+**Tie-breaker for condition 2:** when a plausibly-parent open Issue already exists, default to **Subtask** unless that parent's "why" clearly does not subsume the candidate. The default biases toward smaller, intent-coherent units; promote to a sibling Issue only when the candidate carries its own independent "why."
 
 The boundary is **relational, not a fixed property of the work**. The same piece of work can be an Issue in one context (e.g. pre-release foundational work with no parent intent yet) and a Subtask in another (post-release, where it slices a user-facing feature). Release state, project maturity, and the surrounding intent landscape all shift what passes condition 2.
 
@@ -77,6 +79,9 @@ For product features and changes a user can observe.
 | User can log in with email address | Issue JWT token |
 | Error message is shown on invalid input | Implement validation |
 | Dashboard is inaccessible after logout | Delete session |
+| Login no longer crashes on empty input | Fix null pointer in login handler |
+
+The last row covers an absence / no-regression outcome — Shape A handles "X no longer happens" by stating the user-observable post-condition, not the implementation step that achieves it.
 
 ### Shape B — structural / contract / capability
 
@@ -87,6 +92,9 @@ For foundational, infrastructure, or pre-release work where no user-facing surfa
 | Auth module exposes `verify(token)` returning `{valid, expiry}` | Refactor auth module |
 | Build pipeline produces a signed release artefact | Update build script |
 | Migration `0042_user_schema` runs to completion on staging data | Write migration |
+| Legacy `/v1/login` endpoint no longer registered (route returns 404) | Remove old login route |
+
+The last row covers a removal / deprecation outcome — Shape B can describe the absence of a contract just as it describes its presence.
 
 Both shapes describe a verifiable state, not a procedure. Mixing them within one Issue is allowed when the Issue legitimately spans both surfaces.
 
@@ -108,7 +116,9 @@ Parent: #<parent-issue-number>
 [Optional: design points, dependencies on other Subtasks, references.]
 ```
 
-A Subtask's done condition is "the parent's intent moves closer to being satisfied because this slice landed, without regressions." The intent-level AC sign-off itself happens at the **parent Issue** when the last Subtask's PR merges — see `soloscrum-define-dod` and `commands/review.md` for how that split is enforced in review.
+A Subtask's done condition is concrete: the slice **lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions**. A pure spike or research Subtask whose output does not feed back into the parent's AC is not done at the parent's level even if its own PR lands cleanly — promote such work into its own Issue, or restate its outcome as an artefact the parent AC depends on.
+
+The intent-level AC sign-off itself happens at the **parent Issue** when **all of its Sub-issues are closed** — which is not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier. See `soloscrum-define-dod` and `commands/review.md` for how that split is enforced in review.
 
 ## Companion files
 

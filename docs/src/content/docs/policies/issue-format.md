@@ -20,6 +20,8 @@ A candidate is its own Issue when **both** hold:
 
 If either fails → the candidate is a Subtask of the parent intent.
 
+**Tie-breaker for condition 2:** when a plausibly-parent open Issue already exists, default to Subtask unless its "why" clearly does not subsume the candidate. The default biases toward smaller, intent-coherent units; promote to a sibling Issue only when the candidate carries its own independent "why."
+
 The boundary is **relational**, not fixed. The same piece of work can be an Issue in one context (pre-release foundational work with no parent intent yet) and a Subtask in another (post-release, where it slices a user-facing feature). Release state, project maturity, and the surrounding intent landscape all shift what passes condition 2.
 
 ## The four sections (Issue body)
@@ -53,8 +55,8 @@ The same title rules apply to Subtasks — still verb-first, still What not How.
 
 AC takes one of two shapes, picked per Issue:
 
-- **Shape A — user-facing behavior.** `user can log in with email`, `error message is shown on invalid input`. Use for product features and observable changes.
-- **Shape B — structural / contract / capability.** `auth module exposes verify(token) returning {valid, expiry}`, `build pipeline produces a signed release artefact`. Use for foundational, infrastructure, or pre-release work where no user surface exists yet, or where the outcome is best expressed as a contract.
+- **Shape A — user-facing behavior.** `user can log in with email`, `error message is shown on invalid input`, `login no longer crashes on empty input`. Use for product features and observable changes — including absence / no-regression outcomes phrased as "X no longer happens."
+- **Shape B — structural / contract / capability.** `auth module exposes verify(token) returning {valid, expiry}`, `build pipeline produces a signed release artefact`, `legacy /v1/login endpoint no longer registered (returns 404)`. Use for foundational, infrastructure, or pre-release work where no user surface exists yet, where the outcome is best expressed as a contract, or for removal / deprecation outcomes (absence of a contract).
 
 Both shapes describe a verifiable state, not a procedure. Mixing both within one Issue is allowed when the Issue legitimately spans both surfaces.
 
@@ -78,7 +80,7 @@ Parent: #<parent-issue-number>
 [Optional: design points, dependencies on other Subtasks, references.]
 ```
 
-A Subtask's done condition is "the parent's intent moves closer to being satisfied because this slice landed, without regressions." The intent-level AC sign-off itself happens at the parent Issue when the last Subtask's PR merges.
+A Subtask's done condition is concrete: the slice lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions. A pure spike that does not feed back into the parent's AC is not done at the parent's level even when its own PR lands cleanly. The intent-level AC sign-off itself happens at the parent Issue when **all of its Sub-issues are closed** — not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier.
 
 ## When this applies
 

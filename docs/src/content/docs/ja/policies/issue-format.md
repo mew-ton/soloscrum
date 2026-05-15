@@ -20,6 +20,8 @@ soloscrum の Issue は **intent（目的・成功条件・スコープ境界）
 
 どちらかが満たされなければ、その候補は親 intent の Subtask です。
 
+**条件 2 の tie-breaker**: 親候補となり得る open Issue が既に存在する場合、その「why」が候補を明確に包含しないと言える場合を除いて、default で **Subtask** 扱いにします。default を小さく一貫した intent 単位側に寄せる方針で、候補が独立した「why」を持つ場合だけ sibling Issue に昇格させます。
+
 この境界は**固定された属性ではなく、関係**で決まります。同じ作業でも、文脈が違えば Issue にも Subtask にもなります。リリース前で上位 intent が存在しなければ基盤的な作業もそれ自体が Issue になり、リリース後にユーザー向け機能という上位 intent が登場すれば同じ作業はその Subtask に降ります。リリース状態・プロジェクトの成熟度・周囲の intent ランドスケープが、条件 2 の通過可否を動かします。
 
 ## 4 つのセクション（Issue 本文）
@@ -53,8 +55,8 @@ soloscrum の Issue は **intent（目的・成功条件・スコープ境界）
 
 AC は次の 2 つの shape のいずれかを使います（Issue ごとに選ぶ）。
 
-- **Shape A — ユーザー視点の挙動。** `user can log in with email` / `error message is shown on invalid input` のような形。プロダクト機能や、ユーザーが観測できる変化向け。
-- **Shape B — 構造的・契約的・能力的な outcome。** `auth module exposes verify(token) returning {valid, expiry}` / `build pipeline produces a signed release artefact` のような形。基盤的・インフラ・リリース前の作業で、ユーザー surface がまだ存在しない場合や、outcome を契約や能力として表現する方が自然な場合に使います。
+- **Shape A — ユーザー視点の挙動。** `user can log in with email` / `error message is shown on invalid input` / `login no longer crashes on empty input` のような形。プロダクト機能、ユーザーが観測できる変化、そして「X が起きなくなった」という不在 / 退行なしの outcome を含めて使えます。
+- **Shape B — 構造的・契約的・能力的な outcome。** `auth module exposes verify(token) returning {valid, expiry}` / `build pipeline produces a signed release artefact` / `legacy /v1/login endpoint no longer registered (returns 404)` のような形。基盤的・インフラ・リリース前の作業で、ユーザー surface がまだ存在しない場合、outcome を契約や能力として表現する方が自然な場合、または削除・廃止（契約の不在）を表現する場合に使います。
 
 どちらの shape も「検証可能な状態」を書きます。「手順」ではありません。1 つの Issue が両方の surface にまたがる場合は、両形を混在させて構いません。
 
@@ -78,7 +80,7 @@ Parent: #<parent-issue-number>
 [Optional: design points, dependencies on other Subtasks, references.]
 ```
 
-Subtask の done 条件は「このスライスが着地したことで親 intent が満たされる方向に進み、かつ退行がない」です。intent 単位の AC サインオフ自体は、最後の Subtask の PR がマージされたタイミングで**親 Issue 側で**行います。
+Subtask の done 条件は具体的に定義されています — そのスライスが**親の AC が検証可能な形で依存する artefact を残す**か、あるいは**親の AC チェックリストの達成数を厳密に進める**こと（かつ退行がないこと）。親の AC に何もフィードバックしない純粋な spike / 調査 Subtask は、自身の PR が綺麗に着地しても親レベルでは done になりません。intent 単位の AC サインオフ自体は、**親 Issue の Sub-issue がすべて close した時点で**親 Issue 側で行います（時系列で最後にマージされた Subtask PR とは限りません — 依存順序で論理的に最後の作業がもっと早くマージされることがあります）。
 
 ## 適用される場面
 
