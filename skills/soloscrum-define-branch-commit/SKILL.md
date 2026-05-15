@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-branch-commit
-description: "Reference: branch naming pattern {type}/{issue-id}-{slug} and Conventional Commits format for all soloscrum development work. Repo-specific strategy in .claude/rules/branch.md takes precedence."
+description: "Reference: branch naming ({type}/{issue-id}-{slug}, where issue-id is the Subtask or no-Subtask Issue), Conventional Commits, and parent Issue close convention (per-Subtask PRs close only the Subtask; parent closes via /refine janitor). Repo-specific strategy in .claude/rules/branch.md takes precedence."
 user-invocable: false
 ---
 
@@ -46,8 +46,9 @@ Format depends on the active tracker profile (per `soloscrum-define-tracker-prof
 ### Examples
 
 ```
-feat/123-user-password-reset
-fix/PRJ-42-auth-token-expiry
+feat/123-user-password-reset        # parent Issue with Subtasks; 123 is the Subtask
+fix/PRJ-42-auth-token-expiry        # Linear subtask ID
+refactor/456-cleanup-legacy-router  # Issue with no Subtasks; 456 is the Issue itself
 ```
 
 ## Commit Conventions
@@ -85,7 +86,7 @@ GitHub's `Closes #` keyword in a PR body auto-closes only the **directly-referen
 - The parent Issue stays open while at least one of its Subtasks is open.
 - The parent Issue is closed by the next `/refine` backlog janitor sweep once all its Subtasks are closed (intent-level AC sign-off having happened at that point per `soloscrum-define-issue-format`'s Subtask Body section).
 
-See `commands/refine.md` (backlog janitor step) and `soloscrum-define-pr-lifecycle` ("Issue close happens at merge") for the janitor's mechanism.
+See `commands/refine.md` for the janitor step details. `soloscrum-define-pr-lifecycle` ("Issue close happens at merge") documents why the parent stays open until the janitor fires.
 
 For Issues without Subtasks, the standard `Closes #<issue>` keyword in the PR body closes the Issue directly at merge — no janitor step needed.
 
