@@ -76,8 +76,9 @@ The first line of output is the janitor sweep — on a brand-new repo this is `N
 
 From there, the lifecycle is:
 
-- If the size-check SP is 5 or below and the work fits a single PR, run [`/develop`](/commands/develop/) on the Issue directly.
-- If the SP exceeds 5 or the change spans multiple subsystems, run [`/breakdown`](/commands/breakdown/) first to slice the Issue into Subtasks, then `/develop` each one.
+- If `/refine` flagged the Issue as a mis-scope smell (SP > 5 or > 5 Subtasks expected per [issue size](/policies/issue-size/)), the Issue likely bundles multiple intents — split it into separate Issues via `/refine` first.
+- If the Issue's intent is coherent and the work fits a single reviewable PR, run [`/develop`](/commands/develop/) on the Issue directly.
+- If the intent is coherent but a single PR would be unreviewable, run [`/breakdown`](/commands/breakdown/) to slice the delivery into Subtask PRs, then `/develop` each one. (`/breakdown` slices delivery, not intent.)
 - After `/develop` opens the draft PR, run [`/review`](/commands/review/) on it. On Pass, `/review` promotes the PR to ready and surfaces the `gh pr merge` command — that final merge is your gate, not the agent's.
 
 ## Where to go next

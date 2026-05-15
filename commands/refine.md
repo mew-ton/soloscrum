@@ -34,8 +34,8 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 2. Receive idea or request from user (`$ARGUMENTS`)
 3. Launch `soloscrum-po` to:
    - Structure the idea into GitHub Issue format
-   - Check size against `soloscrum-define-issue-size` criteria
-   - Suggest splitting if size exceeds threshold
+   - Check size against `soloscrum-define-issue-size` criteria. SP > 5 and `/breakdown` would produce > 5 Subtasks both read as **mis-scope smells** (likely multiple intents bundled), not hard work-volume limits.
+   - When a size signal indicates likely intent bundling, propose Issue split via `suggest_split` along the feature / phase axes per `soloscrum-define-issue-size`. This is Issue split (multiple intents → multiple Issues), distinct from `/breakdown`'s delivery slicing (one coherent intent → multiple Subtask PRs).
    - Determine priority using `soloscrum-define-priority` criteria
    - Calculate Issue-level SP using `soloscrum-define-story-points` criteria (size-check only — not registered)
 4. Present structured result to user for confirmation

@@ -24,7 +24,7 @@ soloscrum は 4 つのパーツでできています。
 
 ```text
 /refine     → idea becomes a GitHub Issue with Background / Goal / AC / Out of Scope
-/breakdown  → Issue splits into Sub-issues when it exceeds the size threshold
+/breakdown  → Issue's delivery slices into reviewable Subtask PRs when one PR would be unreviewable
 /develop    → branch, implement, open a draft PR with `Closes #N`
 /review     → DoD + AC + CodeRabbit + multi-agent review; verdict; ready handoff
 ```

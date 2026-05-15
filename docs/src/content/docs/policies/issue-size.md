@@ -1,38 +1,54 @@
 ---
 title: Issue size
-description: Issue size thresholds (max SP 5, max 5 subtasks; days are a calibration signal) and the suggest_split action.
+description: Issue and Subtask split criteria operate on intent coherence, not raw work volume. SP > 5 and subtask count > 5 are mis-scope smells. /breakdown fires when one PR would be unreviewable.
 sidebar:
   order: 4
 ---
 
-An Issue is too big when SP > 5, or when `/breakdown` would produce more than 5 subtasks. Either threshold triggers `suggest_split`, and you decide how to slice the work.
+soloscrum's split criteria operate on **intent coherence**, not raw work volume. The numeric thresholds below are signals that an Issue is *probably* bundling multiple intents — not hard limits on how much work a single intent may carry.
+
+A large but coherent single intent is not split. Its delivery is sliced by `/breakdown` into multiple reviewable PRs (Subtasks).
 
 ## The thresholds
 
-| Metric | Threshold | What it means |
+| Metric | Threshold | What it signals |
 |---|---|---|
-| SP | > 5 | Estimate exceeds the SP scale's maximum row |
-| Subtask count | > 5 | Breakdown would produce more than 5 subtasks |
-| Estimated days | > 2 days | Calibration signal only — does not by itself force a split |
+| SP | > 5 | The (scope × uncertainty) estimate is so high that the Issue likely holds more than one independent "why + done". Re-read the AC: are there multiple "what makes this satisfied" answers that do not share a unifying intent? |
+| Subtask count | > 5 | If one intent needs more than ~5 reviewable PRs to deliver, it is probably multiple intents combined by mistake. Mis-scope smell — return to `/refine`. |
+| Estimated days | > 2 | Coarse calibration only. Does not by itself force a split. |
 
-When any threshold is exceeded, `suggest_split` presents split proposals (by feature axis, layer axis, or phase axis), confirms each split fits within thresholds, and asks for approval before creating the new Issues.
+If the answer to *"are these multiple intents?"* is no — this is one coherent intent that just happens to be large — the Issue stays. The work is then handled by `/breakdown` into Subtasks (delivery slices), not by Issue split.
 
-## When this applies
+**Edge case.** If re-evaluation confirms one coherent intent but the delivery still needs more than five reviewable Subtasks (major migrations, sweeping refactors), attempt one more slicing pass to see if related slices can collapse. If still > 5 after that second pass, treat as analogous to the refactoring exception below — surface the situation and defer to user judgment.
 
-- `/refine` checks the size gate when the Issue is first written, using the size-check SP from the PO.
-- `/breakdown` re-checks the gate when proposing subtasks. If the breakdown would exceed five subtasks, the split test fires again.
+## `/breakdown` trigger
+
+`/breakdown` produces Subtasks when delivering one Issue's intent as a single PR would produce an unreviewable PR — a delivery / reviewability question.
+
+- One PR is reviewable → no `/breakdown` needed; go directly to `/develop`. (`CLAUDE.md` states the same: *"Issues that fit within a single develop unit can skip this step"*; branch-per-Issue mode in the canonical [`soloscrum-define-branch-commit`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md).)
+- One PR would not be reviewable → `/breakdown` produces Subtasks, each carrying a reviewable slice. Subtasks slice the *delivery*, not the intent — see [`issue-format`](/policies/issue-format/)'s Subtask body section.
+
+## Split axes (Issue level)
+
+When the diagnosis is *"multiple intents bundled"*, propose splitting along one of:
+
+- **Feature axis** — MVP vs extensions, or distinct user-facing capabilities. Each yields its own intent (own why, own done).
+- **Phase axis** — only when the phase has its own independent "done" (e.g. performance hardening with its own SLO that can be verified on its own terms). A phase with no done of its own is delivery work, not a separate intent — it belongs in `/breakdown`, not Issue split.
+
+The historical **layer axis** (backend / frontend) is **not** an Issue split axis. Backend and frontend of one feature share one intent and one done; splitting along layer produces fragments whose AC (*"user can reset password"*) cannot be satisfied independently. Layer-axis splits are valid as `/breakdown` Subtask slices instead.
 
 ## Why days is calibration-only
 
-`max_sp: 5` operates on the scope x uncertainty scale defined in [`story-points`](/policies/story-points/). The split test asks: can this Issue fit in one PR's scope and decision set without compounding? If a single PR would span multiple subsystems **and** carry multiple unresolved design decisions, the Issue is too big regardless of how fast a model can draft it.
+`max_sp: 5` operates on the scope × uncertainty scale defined in [`story-points`](/policies/story-points/). The dominant driver of the threshold is the uncertainty axis (multiple unresolved decisions across multiple subsystems), which correlates strongly with *"are these actually multiple intents?"* Raw work volume on its own does not force an Issue split.
 
-`max_estimated_days` is a coarse calibration check during `/refine`. If the rough wall-clock feel obviously exceeds two days of solo-dev cycle time (including user review), that is a signal the scope/uncertainty estimate is probably too low. It is not the primary criterion.
+`max_estimated_days` is a coarse calibration check during `/refine`. If the rough wall-clock feel obviously exceeds two days of solo-dev cycle time (including user review), that is a signal the scope / uncertainty estimate is probably too low. Not the primary criterion.
 
 ## Exceptions
 
-Large-scale refactoring and tech debt reduction are exempt from these thresholds; defer to user judgment.
+Large-scale refactoring and tech debt reduction are exempt from these thresholds; defer to user judgment. A refactor's intent is *"the codebase is in state X"* — a single coherent intent regardless of file or PR count.
 
 ## See also
 
-- The SP scale: [`story-points`](/policies/story-points/).
+- [`issue-format`](/policies/issue-format/) — the Issue-vs-Subtask discriminator the split criteria flow from.
+- [`story-points`](/policies/story-points/) — the SP scale.
 - Canonical contract: [`skills/soloscrum-define-issue-size/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-issue-size/SKILL.md).
