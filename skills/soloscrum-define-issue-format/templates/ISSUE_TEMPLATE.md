@@ -10,9 +10,9 @@
 
 ## Acceptance Criteria
 
-- [ ] [Verifiable condition. Use "user can ..." / "... is displayed" format]
-- [ ] [Write from the user's perspective]
-- [ ] [Describe behavior, not technical implementation]
+- [ ] [Verifiable outcome — Shape A or Shape B; see AC Writing Guide]
+- [ ] [Another outcome — mixing shapes within one Issue is allowed]
+- [ ] [Describe outcome, not technical implementation]
 
 ## Out of Scope
 
