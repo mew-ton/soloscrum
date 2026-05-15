@@ -49,6 +49,8 @@ Title rules:
 - 50 characters or fewer
 - Describes the What, not the How
 
+The same title rules apply to Subtasks — still verb-first, still What not How.
+
 AC takes one of two shapes, picked per Issue:
 
 - **Shape A — user-facing behavior.** `user can log in with email`, `error message is shown on invalid input`. Use for product features and observable changes.
@@ -70,6 +72,7 @@ Parent: #<parent-issue-number>
 
 ## Checklist
 - [ ] [Concrete step toward the slice]
+- [ ] [Another step]
 
 ## Notes
 [Optional: design points, dependencies on other Subtasks, references.]

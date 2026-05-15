@@ -10,8 +10,8 @@
 
 ## Acceptance Criteria
 
-- [ ] [Verifiable outcome — Shape A (user-facing): "user can ..." / Shape B (structural): "<contract or capability> exists / produces ...". See AC Writing Guide.]
-- [ ] [Use whichever shape fits the Issue's surface; both may appear in one Issue]
+- [ ] [Verifiable outcome — Shape A or Shape B; see AC Writing Guide]
+- [ ] [Another outcome — mixing shapes within one Issue is allowed]
 - [ ] [Describe outcome, not technical implementation]
 
 ## Out of Scope

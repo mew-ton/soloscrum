@@ -49,6 +49,8 @@ soloscrum の Issue は **intent（目的・成功条件・スコープ境界）
 - 50 文字以内
 - What を書く（How は書かない）
 
+タイトルのルールは Subtask にも同じく適用されます（動詞始まり・How を書かない・50 文字以内）。
+
 AC は次の 2 つの shape のいずれかを使います（Issue ごとに選ぶ）。
 
 - **Shape A — ユーザー視点の挙動。** `user can log in with email` / `error message is shown on invalid input` のような形。プロダクト機能や、ユーザーが観測できる変化向け。
@@ -70,6 +72,7 @@ Parent: #<parent-issue-number>
 
 ## Checklist
 - [ ] [Concrete step toward the slice]
+- [ ] [Another step]
 
 ## Notes
 [Optional: design points, dependencies on other Subtasks, references.]

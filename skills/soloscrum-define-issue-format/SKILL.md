@@ -40,6 +40,8 @@ The boundary is **relational, not a fixed property of the work**. The same piece
 Good: `Allow users to reset their password`
 Bad: `Implement password_reset endpoint with Auth0 and return JWT`
 
+The same conventions apply to **Subtask** titles. A Subtask title describes what slice of the parent's intent it delivers — still verb-first, still What not How, still ≤ 50 characters.
+
 ## Body Structure (Issue / intent)
 
 The four sections below are the **intent body** — the durable record described in the Concept section. Use this format for parent Issues created via `/refine` (or human-direct via the companion template). Subtasks use the lighter format under `## Subtask Body (work)` below.
