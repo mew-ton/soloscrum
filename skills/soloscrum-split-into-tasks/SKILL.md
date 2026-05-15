@@ -22,16 +22,20 @@ Decomposes an Issue into implementable subtasks based on its AC and Goal. Assign
 ## Steps
 
 1. Read target Issue Goal, Acceptance Criteria, and Out of Scope: $ARGUMENTS
-2. **Decompose the Issue's delivery into reviewable work slices.** Each Subtask is one slice of the parent intent that can be shipped in one reviewable PR (per `soloscrum-define-issue-format`'s Subtask Body section). Subtasks do **not** carry their own AC — they slice the parent's delivery, and their done condition is "lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions."
+2. **Verify `/breakdown` is the right command** (per `soloscrum-define-issue-size`):
+   - If the Issue likely bundles multiple intents (SP > 5 or `/breakdown` would produce > 5 Subtasks — both read as mis-scope smells), route back to `/refine` for Issue split rather than proceed.
+   - If the Issue's intent is coherent and a single PR would be reviewable, skip `/breakdown` and go directly to `/develop` (per `CLAUDE.md`'s *"Issues that fit within a single develop unit can skip this step"*).
+   - Only continue with the decomposition below when intent is coherent **and** a single PR would not be reviewable.
+3. **Decompose the Issue's delivery into reviewable work slices.** Each Subtask is one slice of the parent intent that can be shipped in one reviewable PR (per `soloscrum-define-issue-format`'s Subtask Body section). Subtasks do **not** carry their own AC — they slice the parent's delivery, and their done condition is "lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions."
    - **Slice along reviewability seams** — file cluster, layer (backend / frontend), or phase (core / error handling / performance) when each slice produces a deliverable that can be reviewed on its own correctness/no-regression terms. Not along intent boundaries — that's an Issue split (see `soloscrum-define-issue-size`), not a Subtask split.
    - **1 Subtask = 1 reviewable PR.** Organise so dependencies between Subtasks are minimal and explicit.
    - Assign type using `soloscrum-define-task-type`.
-3. Calculate SP for each subtask (see `soloscrum-define-story-points`)
-4. If subtask count exceeds `max_subtasks` (5) in `soloscrum-define-issue-size`, treat as a mis-scope smell — the Issue likely bundles multiple intents. Return to `/refine` rather than proceed.
-5. After user approval, resolve the active profile via `soloscrum-define-tracker-profile`, then for each subtask invoke the matching operation skill:
+4. Calculate SP for each subtask (see `soloscrum-define-story-points`)
+5. If subtask count exceeds `max_subtasks` (5) in `soloscrum-define-issue-size`, treat as a mis-scope smell — the Issue likely bundles multiple intents. Return to `/refine` rather than proceed.
+6. After user approval, resolve the active profile via `soloscrum-define-tracker-profile`, then for each subtask invoke the matching operation skill:
    - `github-only` → `soloscrum-tracker-github-create-subtask`
    - `linear+github` → `soloscrum-tracker-linear-create-subtask`
-6. If any subtask depends on another, also invoke the active profile's `add-dependency` operation skill
+7. If any subtask depends on another, also invoke the active profile's `add-dependency` operation skill
 
 ## Output Format
 

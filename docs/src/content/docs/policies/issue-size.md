@@ -19,6 +19,8 @@ A large but coherent single intent is not split. Its delivery is sliced by `/bre
 
 If the answer to *"are these multiple intents?"* is no — this is one coherent intent that just happens to be large — the Issue stays. The work is then handled by `/breakdown` into Subtasks (delivery slices), not by Issue split.
 
+**Edge case.** If re-evaluation confirms one coherent intent but the delivery still needs more than five reviewable Subtasks (major migrations, sweeping refactors), attempt one more slicing pass to see if related slices can collapse. If still > 5 after that second pass, treat as analogous to the refactoring exception below — surface the situation and defer to user judgment.
+
 ## `/breakdown` trigger
 
 `/breakdown` produces Subtasks when delivering one Issue's intent as a single PR would produce an unreviewable PR — a delivery / reviewability question.

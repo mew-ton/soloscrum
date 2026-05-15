@@ -19,7 +19,7 @@ sidebar:
 
 1. **バックログ janitor。** open Issue を順に確認し、closing keyword (`Closes #N` / `Fixes #N` / `Resolves #N` など) を持つ PR が merge 済みかをチェックします。該当する Issue は `completed` の理由で close します。出力の 1 行目は `Closed N stale Issue(s): #X, #Y` か `No stale Issues found`、`--no-janitor` 指定時は `Janitor skipped` です。janitor は close するのみで、reopen することはありません。
 2. **アイデアの構造化。** PO agent がアイデアを読み、4 セクション構成の Issue 本文を組み立て、[priority](/ja/policies/priority/) ラベルを選び、size-check [SP](/ja/policies/story-points/) を算出します。
-3. **サイズゲート。** size-check SP が 5 を超えると、Issue を作成する前に「大きすぎる」と判定して分割を提案します。[issue size](/ja/policies/issue-size/) を参照してください。
+3. **サイズゲート。** size-check SP が 5 を超える、または計画される `/breakdown` で Subtask が 5 個を超えそうな場合、`/refine` はこれを *mis-scope の臭い*（複数 intent を束ねている可能性が高い）と判定し、Issue を作成する前に「複数の Issue への分割」を提案します。これは `/breakdown` の配信スライス（1 つの一貫した intent の PR がレビュー不能になるときに発火）とは別物です。[issue size](/ja/policies/issue-size/) を参照してください。
 4. **承認。** 整形した Issue 本文をユーザに提示します。
 5. **Issue 作成。** 承認後、priority ラベルを付けた状態で GitHub Issue を作成します。
 
@@ -27,7 +27,7 @@ sidebar:
 
 `/refine "users should be able to reset their password by email"` を実行すると、最初の行に janitor の結果が出ます。掃除済みのリポジトリでは通常 `No stale Issues found` です。続いて PO agent が、ユーザニーズを説明する Background 段落、1 文の Goal、3-5 個の AC チェックボックス、明示的な Out of Scope を組み合わせた Issue 本文を提示します。priority (ユーザが初日から触る機能なら `high` など) と size-check SP も提示します。
 
-SP が 5 以下なら承認して Issue を作成します。authentication / email infrastructure / form UI に跨って SP が 8 になるような場合、command は Issue を「大きすぎる」と判定し、機能軸で分割するよう提案します。それぞれに `/refine` を再実行するか、`/breakdown` で subtask に切ります。
+SP が 5 以下なら承認して Issue を作成します。authentication / email infrastructure / form UI が実際には別々の feature（それぞれ独自の user-facing done を持つ）として混ざっていて SP が 8 になるような場合、command は「複数 intent を束ねている」と判定し、機能軸で分割するよう提案します — 各 piece に対して `/refine` を再実行します。一方、変更が 1 つの一貫した intent（例: *"password reset"*）だが配信が 1 つの reviewable PR に収まらない場合は、ここではサイズゲートを通過し、次のステップで `/breakdown` が配信を Subtask に切ります。
 
 新規 Issue を起票しないセッションでも、`/refine` を最初に走らせるのは自然です。janitor sweep がバックログを正確に保ってくれます。
 

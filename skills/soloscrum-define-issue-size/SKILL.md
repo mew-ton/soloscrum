@@ -38,6 +38,8 @@ When any of the following holds, evaluate whether the Issue is actually bundling
 
 If the answer to the intent question is "no, this is one coherent intent that just happens to be large," the Issue stays — the work is then handled by `/breakdown` into multiple Subtasks (delivery slices), not by Issue split.
 
+**Edge case — confirmed coherent intent but still > 5 reviewable PRs needed.** Re-evaluation says this is one intent (the candidate parents in the discriminator's condition 2 don't subsume it; the AC has one unifying done), but the delivery genuinely requires more than 5 reviewable PRs — e.g. a major migration, a sweeping internal refactor. Attempt one more delivery-slicing pass to see if related slices can collapse without losing reviewability. If still > 5 after that second pass, treat as analogous to the refactoring exception below: surface the situation and defer to user judgment before proceeding.
+
 ## `/breakdown` trigger
 
 `/breakdown` produces Subtasks when delivering one Issue's intent as a single PR would produce an unreviewable PR. The question to ask: "If I tried to land this whole intent in one PR, would the diff be too large or too cross-cutting for a reviewer to verify the AC against?"
