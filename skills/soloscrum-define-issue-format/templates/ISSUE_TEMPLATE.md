@@ -10,9 +10,9 @@
 
 ## Acceptance Criteria
 
-- [ ] [Verifiable condition. Use "user can ..." / "... is displayed" format]
-- [ ] [Write from the user's perspective]
-- [ ] [Describe behavior, not technical implementation]
+- [ ] [Verifiable outcome — Shape A (user-facing): "user can ..." / Shape B (structural): "<contract or capability> exists / produces ...". See AC Writing Guide.]
+- [ ] [Use whichever shape fits the Issue's surface; both may appear in one Issue]
+- [ ] [Describe outcome, not technical implementation]
 
 ## Out of Scope
 
