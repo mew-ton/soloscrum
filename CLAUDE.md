@@ -11,14 +11,24 @@ This repository **is** the soloscrum framework. All non-trivial work on this rep
 - State transitions go through `soloscrum-tracker-github-transition-state`
 - Linear is **not** in use here — do not invoke any `soloscrum-tracker-linear-*` skill
 
+## Issue and Subtask: two-tier intent/work model
+
+soloscrum's Issue and Subtask layers have **distinct contracts** — they are not a parent/child variant of the same thing.
+
+- **Issue = durable record of intent.** Background / Goal / Acceptance Criteria / Out of Scope. Owns the "why" and the done-condition. AC sign-off happens at the Issue layer (per `soloscrum-define-dod`'s "AC verification" section). AC has two allowed shapes: user-facing (Shape A) and structural / contract / capability (Shape B).
+- **Subtask = work slice of the parent intent.** Lightweight body (Parent / What / Checklist / Notes). No AC of its own — the parent Issue owns it. Done condition: the slice lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions.
+- **Discriminator** for "is this candidate an Issue or a Subtask?": (1) self-contained, independently-checkable outcome; (2) not merely a delivery slice of an existing (or in-refinement) intent. Both hold → Issue; either fails → Subtask. The boundary is relational, not fixed by the work itself — same piece of work can be either depending on the surrounding intent landscape.
+
+Full contracts: `skills/soloscrum-define-issue-format/SKILL.md` (Concept, discriminator, Subtask Body, AC shapes), `skills/soloscrum-define-issue-size/SKILL.md` (split criteria as mis-scope smells, `/breakdown` reviewability trigger).
+
 ## Required flow
 
 For every change other than the explicit exemptions below, route through:
 
 1. **`/refine`** — turn the idea into a GitHub Issue with Background / Goal / Acceptance Criteria / Out of Scope per `soloscrum-define-issue-format`. User feedback that produces a discrete unit of work counts as the trigger.
-2. **`/breakdown`** — if the Issue exceeds the size threshold in `soloscrum-define-issue-size` (SP > 5 or > 5 subtasks; > 2 days is a calibration signal only), split into Sub-issues. Issues that fit within a single develop unit can skip this step.
-3. **`/develop`** — branch per `soloscrum-define-branch-commit`, implement, open a **draft** PR with `Closes #<issue>` in the body. PRs always start as draft (per `soloscrum-define-pr-lifecycle`).
-4. **`/review`** — DoD + AC verification, CodeRabbit + multi-agent pipeline, per-finding decisions, verdict, post-verdict actions through to the merge handoff.
+2. **`/breakdown`** — fires when delivering the Issue's intent as a single PR would be unreviewable (per `soloscrum-define-issue-size`'s `/breakdown` trigger). Subtasks are **delivery slices of one coherent intent**, not intent splits. If `soloscrum-define-issue-size` signals SP > 5 or > 5 Subtasks expected, treat that as a **mis-scope smell** (likely multiple intents bundled) and route back to `/refine` for **Issue split**, not into `/breakdown`. Issues whose intent fits one reviewable PR skip `/breakdown` entirely and go directly to `/develop` (branch-per-Issue mode of `soloscrum-define-branch-commit`).
+3. **`/develop`** — branch per `soloscrum-define-branch-commit`, implement, open a **draft** PR. PR body close-keyword depends on the case: `Closes #<subtask>` for per-Subtask PRs (never `Closes #<parent>` — see the parent-close anti-pattern below), `Closes #<issue>` for Issues without Subtasks. PRs always start as draft (per `soloscrum-define-pr-lifecycle`). Parent Issue close is the `/refine` backlog janitor's job once all Subtasks are closed — no individual Subtask PR closes the parent.
+4. **`/review`** — DoD + AC verification at the appropriate layer (Subtask PR = slice + no regression; Issue-without-Subtasks = full AC; parent Issue intent-level sign-off when all Subtasks close, per `soloscrum-define-dod`'s "AC verification" section), CodeRabbit + multi-agent pipeline, per-finding decisions, verdict, post-verdict actions through to the merge handoff.
 
 `/review` runs to **verdict completion** — not to draft-PR-creation. Stopping at "draft PR pushed" is the named anti-pattern this file exists to prevent.
 
@@ -34,6 +44,10 @@ These are the specific failure modes this file exists to prevent. Each has been 
 - ❌ **Running `gh pr merge` autonomously.** Merge is always the user's gate, regardless of verdict — `gh pr merge` is irreversible. Surface the exact command and stop.
 - ❌ **Re-prompting on reversible post-verdict steps** ("may I run `gh pr ready`?"). The verdict is the decision point; reversible steps execute without pre-confirm per `soloscrum-define-pr-lifecycle`.
 - ❌ **Writing inline `until ... gh pr view ... sleep ...` loops to wait for PR CI.** Use `soloscrum-tracker-github-wait-for-pr-checks` (invoke its colocated script from the repo root). Inline loops embed the PR number in the command string, defeat harness allowlist matching (causing per-PR re-prompts), and reinvent the rollup-normalisation `jq` filter every session.
+- ❌ **Adding `Closes #<parent>` to a per-Subtask PR.** Premature close on the first Subtask merge is the failure mode `soloscrum-define-branch-commit`'s Parent Issue close section prevents. Per-Subtask PRs reference only their own Subtask; the parent closes via the `/refine` janitor when its Subtask set is fully closed.
+- ❌ **Treating `SP > 5` as "too big — run `/breakdown`".** Under the post-#74 model, SP > 5 is a *mis-scope smell* (likely multiple intents bundled) and routes back to `/refine` for **Issue split**. `/breakdown` is for delivery slicing of one coherent intent whose PR would be unreviewable — a separate trigger.
+- ❌ **Verifying full Issue AC at a Subtask PR.** AC verification is layered: a Subtask PR checks slice delivery + no regression on parent AC; an Issue-without-Subtasks PR checks the full Issue AC; the parent Issue's intent-level AC sign-off happens once all Subtasks close, not at any single Subtask PR. Per `soloscrum-define-dod`'s "AC verification" section.
+- ❌ **Putting AC on a Subtask body.** Subtasks have no AC by contract — the parent Issue owns the AC. Subtask bodies use the lightweight work format (Parent / What / Checklist / Notes) per `soloscrum-define-issue-format`'s Subtask Body section.
 
 ## Permission settings
 
@@ -75,12 +89,12 @@ Anything that touches `skills/`, `agents/`, `commands/`, `marketplace.json`, or 
 
 Skills (the soloscrum spec — read these for the contract):
 
-- `skills/soloscrum-define-pr-lifecycle/SKILL.md` — autonomy contract, reversible-vs-irreversible, anti-patterns, self-approve fallback
+- `skills/soloscrum-define-pr-lifecycle/SKILL.md` — autonomy contract, reversible-vs-irreversible, anti-patterns, self-approve fallback, parent-close mechanism (janitor-only)
 - `skills/soloscrum-define-code-review-process/SKILL.md` — review pipeline, per-finding decision, verdict mapping, draft-window override
-- `skills/soloscrum-define-issue-format/SKILL.md` — Issue body format
-- `skills/soloscrum-define-issue-size/SKILL.md` — size thresholds and split criteria
-- `skills/soloscrum-define-branch-commit/SKILL.md` — branch naming and Conventional Commits
-- `skills/soloscrum-define-dod/SKILL.md` — DoD checklist
+- `skills/soloscrum-define-issue-format/SKILL.md` — Concept (Issue = intent), Issue body format, Issue-vs-Subtask discriminator, Subtask body contract, the two AC shapes (Shape A user-facing / Shape B structural)
+- `skills/soloscrum-define-issue-size/SKILL.md` — split criteria as mis-scope smells, `/breakdown` reviewability trigger, split axes (feature / phase — layer is NOT an Issue split axis)
+- `skills/soloscrum-define-branch-commit/SKILL.md` — branch-per-Subtask vs branch-per-Issue, Conventional Commits, parent Issue close (janitor-only)
+- `skills/soloscrum-define-dod/SKILL.md` — DoD checklist with layered AC verification (Subtask PR / Issue-without-Subtasks / parent Issue sign-off)
 - `skills/soloscrum-define-tracker-profile/SKILL.md` — profile resolution
 
 Commands the user invokes:
