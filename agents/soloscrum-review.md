@@ -1,6 +1,6 @@
 ---
 name: soloscrum-review
-description: Review agent. Reviews PR code quality, verifies DoD, checks all Issue AC, makes Pass/Fail verdict. Use during /review command.
+description: Review agent. Reviews PR code quality, verifies DoD with layered AC check (Subtask PR vs Issue-without-Subtasks vs parent Issue intent-level sign-off per soloscrum-define-dod), makes Pass/Fail verdict. Use during /review command.
 tools: Read, Glob, Grep
 model: inherit
 skills:
@@ -40,7 +40,7 @@ PR merge itself is **not** an agent action — it is the user's gate, per `solos
 
 1. Confirm DoD criteria with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
 2. Check every DoD item without exception and state results explicitly
-3. Verify all Issue AC and mark as Fail if any are unmet
+3. Verify AC at the appropriate layer per `soloscrum-define-dod`'s "AC verification" section: Subtask PR (slice delivered + no regression on parent AC); Issue-without-Subtasks PR (full Issue AC satisfied); parent Issue intent-level sign-off (when all Subtasks close, **not** at any single Subtask PR). Mark as Fail if the layer-appropriate check fails.
 4. Run the automated code review pipeline per `soloscrum-define-code-review-process` (CodeRabbit + multi-agent), apply the per-item decision (fix / skip with stated reason) to every surviving finding, and consolidate into the PR comment using the canonical template
 5. Complement the automated pipeline with a manual code review for items the tools cannot judge:
    - Logic correctness

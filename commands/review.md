@@ -1,6 +1,6 @@
 ---
 name: review
-description: Reviews a PR or Figma file against the DoD and all AC. On Pass, approves, transitions the Subtask to Done, promotes the PR to ready, and surfaces the merge command for the user. Issue close happens at merge time (via the PR body's Closes # keyword), not at verdict. Merge itself is always the user's gate.
+description: Reviews a PR or Figma file against the DoD with layered AC verification (Subtask PR vs Issue-without-Subtasks vs parent Issue intent-level sign-off per soloscrum-define-dod). On Pass, approves, transitions the Subtask to Done, promotes the PR to ready, and surfaces the merge command for the user. Issue close happens at merge time (via the PR body's Closes # keyword), not at verdict. Merge itself is always the user's gate.
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
 effort: high
@@ -30,9 +30,8 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
 
 1. Receive target PR or Figma file (`$ARGUMENTS`)
 2. Launch `soloscrum-review` to:
-   - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
+   - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`. AC verification operates at two layers per the DoD's "AC verification" section: a **Subtask PR** verifies slice-level delivery + no-regression on parent AC; an **Issue-without-Subtasks PR** verifies the full Issue AC; the **parent Issue's intent-level AC sign-off** happens once all its Subtasks close, not at any single Subtask PR.
    - Check code quality (for PRs)
-   - Verify all Issue AC (Acceptance Criteria)
    - Flag issues and post review comments
 3. Optional: `soloscrum-design` checks for feature scope deviation
 4. Optional: `soloscrum-ui` checks design fidelity

@@ -16,7 +16,7 @@ Creates a Linear subtask under the Linear Task that was auto-synced from a paren
 
 - `parent_issue_number` — parent GH Issue number (used to look up the synced Linear Task)
 - `title` — subtask title
-- `body` — subtask body (AC, notes)
+- `body` — subtask body in the lightweight work-body format per `soloscrum-define-issue-format`'s Subtask Body section (Parent / What / Checklist / Notes — Subtasks do **not** carry AC; the parent Issue owns the AC and the Subtask slices its delivery)
 - `type` — `develop` or `design-ui` (per `soloscrum-define-task-type`)
 - `sp` — story points (per `soloscrum-define-story-points`)
 

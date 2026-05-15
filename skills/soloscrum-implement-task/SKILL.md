@@ -21,15 +21,15 @@ Implement code and generate a draft PR for a Subtask of type `develop`.
 
 ## Overview
 
-Implements code for a Subtask (type: develop) based on its AC and generates a **draft** PR. The draft phase is the local-quality-gate window defined in `soloscrum-define-pr-lifecycle`; promotion to ready is owned by `soloscrum-review` after the review pipeline has decided every finding. Follows `soloscrum-define-branch-commit` conventions. Subtask state transitions delegate to the active profile's tracker operation skill.
+Implements code for a Subtask (type: develop) based on its Checklist / "what" slice scope and the **parent Issue's AC** (per `soloscrum-define-issue-format`'s Subtask Body section — Subtasks themselves do not carry AC), and generates a **draft** PR. The draft phase is the local-quality-gate window defined in `soloscrum-define-pr-lifecycle`; promotion to ready is owned by `soloscrum-review` after the review pipeline has decided every finding. Follows `soloscrum-define-branch-commit` conventions. Subtask state transitions delegate to the active profile's tracker operation skill.
 
 ## Steps
 
-1. Read target Subtask AC, description, and related Issue: $ARGUMENTS
+1. Read target Subtask's "what" + Checklist (its slice scope per `soloscrum-define-issue-format`'s Subtask Body section) and the **parent Issue's AC** (which is what the slice must move closer to satisfying without regression): $ARGUMENTS
 2. Check tech stack in `.claude/rules/stack.md`
 3. Create branch following `soloscrum-define-branch-commit` conventions:
    - `{type}/{issue-id}-{slug}`
-4. Implement code to satisfy AC:
+4. Implement code to deliver the slice (and to move the parent Issue's AC closer to satisfied without regression):
    - Write tests (when applicable)
    - Confirm zero lint errors
 5. Commit using Conventional Commits format

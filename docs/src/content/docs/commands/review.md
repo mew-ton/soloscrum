@@ -18,8 +18,8 @@ sidebar:
 
 ## What happens
 
-1. **DoD verification.** Every checklist item in the [DoD](/policies/dod/) is checked. The PR body must contain a closing keyword (`Closes #N`); lint must be clean; tests must exist where applicable; AC must be satisfied.
-2. **AC verification.** Every checkbox in the parent Issue's AC is verified against the diff and the running build.
+1. **DoD verification.** Every checklist item in the [DoD](/policies/dod/) is checked. The PR body must contain a closing keyword (`Closes #<subtask>` for Subtask PRs / `Closes #<issue>` for Issues without Subtasks); lint must be clean; tests must exist where applicable.
+2. **AC verification at the appropriate layer.** For a Subtask PR: verify slice delivery + no regression on parent AC. For an Issue-without-Subtasks PR: verify the full Issue AC against diff and running build. The parent Issue's intent-level AC sign-off happens when all its Subtasks close (not at any single Subtask PR) — see [DoD](/policies/dod/)'s *AC verification* section.
 3. **CodeRabbit run.** The CodeRabbit CLI runs against the diff. Even a "No findings" result still requires the multi-agent pass — skipping the multi-agent step because the PR is small or docs-only is a named anti-pattern.
 4. **Multi-agent review.** Specialist agents (security, accessibility, performance, etc.) review the diff in parallel. Findings with confidence ≥ 80 are consolidated.
 5. **Per-finding decision.** Each surviving finding is decided individually: fix it, or skip it with a stated reason. Severity is informational, not a skip reason.

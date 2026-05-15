@@ -15,7 +15,7 @@ Creates a subtask of a parent GitHub Issue using the native Sub-issue feature. A
 
 - `parent_issue_number` — GH Issue number of the parent (e.g. `123`)
 - `title` — subtask title
-- `body` — subtask body (AC, notes)
+- `body` — subtask body in the lightweight work-body format per `soloscrum-define-issue-format`'s Subtask Body section (Parent / What / Checklist / Notes — Subtasks do **not** carry AC; the parent Issue owns the AC and the Subtask slices its delivery)
 - `type` — `develop` or `design-ui` (per `soloscrum-define-task-type`)
 - `sp` — story points (per `soloscrum-define-story-points`)
 
