@@ -80,7 +80,7 @@ Parent: #<parent-issue-number>
 [Optional: design points, dependencies on other Subtasks, references.]
 ```
 
-A Subtask's done condition is concrete: the slice lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions. A pure spike that does not feed back into the parent's AC is not done at the parent's level even when its own PR lands cleanly. The intent-level AC sign-off itself happens at the parent Issue when **all of its Sub-issues are closed** — not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier.
+A Subtask's done condition is concrete: the slice lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions. A pure spike that does not feed back into the parent's AC is not done at the parent's level even when its own PR lands cleanly. The intent-level AC sign-off itself happens at the parent Issue when **all of its Subtasks are closed** — not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier.
 
 ## When this applies
 

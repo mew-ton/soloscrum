@@ -20,7 +20,7 @@ soloscrum の Issue は **intent（目的・成功条件・スコープ境界）
 
 どちらかが満たされなければ、その候補は親 intent の Subtask です。
 
-**条件 2 の tie-breaker**: 親候補となり得る open Issue が既に存在する場合、その「why」が候補を明確に包含しないと言える場合を除いて、default で **Subtask** 扱いにします。default を小さく一貫した intent 単位側に寄せる方針で、候補が独立した「why」を持つ場合だけ sibling Issue に昇格させます。
+**条件 2 の tie-breaker**: 親候補となり得る open Issue が既に存在する場合、候補が独立した「why」を明確に持つときを除き、default で **Subtask** 扱いにします。default を小さく一貫した intent 単位側に寄せる方針で、候補が独立した「why」を持つ場合だけ sibling Issue に昇格させます。
 
 この境界は**固定された属性ではなく、関係**で決まります。同じ作業でも、文脈が違えば Issue にも Subtask にもなります。リリース前で上位 intent が存在しなければ基盤的な作業もそれ自体が Issue になり、リリース後にユーザー向け機能という上位 intent が登場すれば同じ作業はその Subtask に降ります。リリース状態・プロジェクトの成熟度・周囲の intent ランドスケープが、条件 2 の通過可否を動かします。
 
@@ -80,7 +80,7 @@ Parent: #<parent-issue-number>
 [Optional: design points, dependencies on other Subtasks, references.]
 ```
 
-Subtask の done 条件は具体的に定義されています — そのスライスが**親の AC が検証可能な形で依存する artefact を残す**か、あるいは**親の AC チェックリストの達成数を厳密に進める**こと（かつ退行がないこと）。親の AC に何もフィードバックしない純粋な spike / 調査 Subtask は、自身の PR が綺麗に着地しても親レベルでは done になりません。intent 単位の AC サインオフ自体は、**親 Issue の Sub-issue がすべて close した時点で**親 Issue 側で行います（時系列で最後にマージされた Subtask PR とは限りません — 依存順序で論理的に最後の作業がもっと早くマージされることがあります）。
+Subtask の done 条件は具体的に定義されています — そのスライスが**親の AC が検証可能な形で依存する artefact を残す**か、あるいは**親の AC チェックリストの達成数を厳密に進める**こと（かつ退行がないこと）。親の AC に何もフィードバックしない純粋な spike / 調査 Subtask は、自身の PR が綺麗に着地しても親レベルでは done になりません。intent 単位の AC サインオフ自体は、**親 Issue の Subtask がすべて close した時点で**親 Issue 側で行います（時系列で最後にマージされた Subtask PR とは限りません — 依存順序で論理的に最後の作業がもっと早くマージされることがあります）。
 
 ## 適用される場面
 
