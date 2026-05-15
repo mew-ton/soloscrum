@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-dod
-description: "Reference: soloscrum Definition of Done checklist. All AC satisfied, tests exist if applicable, PR body links issue number with Closes/Fixes, lint passes, review approved."
+description: "Reference: soloscrum Definition of Done checklist. AC verified at the appropriate layer (Subtask PR slice + no regression; Issue-without-Subtasks full AC; parent Issue intent-level sign-off when all Subtasks close). Tests exist if applicable, PR body links Issue number with Closes/Fixes (per-Subtask PRs reference only the Subtask, never the parent), lint passes, review approved."
 user-invocable: false
 ---
 
@@ -12,7 +12,7 @@ Definition of Done (generic).
 
 - [ ] AC verified at the appropriate layer (see "AC verification (Issue-level vs Subtask-level)" below — Subtask PRs check slice delivery + no regressions; Issues without Subtasks check full Issue AC; the parent Issue's intent-level AC sign-off happens when all its Subtasks close, not at any single Subtask PR)
 - [ ] Tests exist (when applicable)
-- [ ] PR body contains Issue number (`Closes #N` or `Fixes #N` format — `<subtask>` for Subtask PRs, `<issue>` for Issues without Subtasks; per `soloscrum-define-branch-commit`, per-Subtask PRs do **not** reference the parent Issue via `Closes #`)
+- [ ] PR body contains Issue number (`Closes #N` / `Fixes #N` / `Resolves #N` format — `<subtask>` for Subtask PRs, `<issue>` for Issues without Subtasks; per `soloscrum-define-branch-commit`, per-Subtask PRs do **not** reference the parent Issue via `Closes #`)
 - [ ] Zero lint errors
 - [ ] Code review pipeline executed and findings addressed (per `soloscrum-define-code-review-process`)
 - [ ] Review has passed

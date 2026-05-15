@@ -1,6 +1,6 @@
 ---
 name: soloscrum-review-implementation
-description: Reviews a PR or Figma file against the DoD checklist and all Acceptance Criteria. PRs are expected in draft; on Pass the review agent promotes the PR to ready, transitions the Subtask to Done via the active profile's tracker operation skill, and hands the merge command off to the user. Issue close is not part of this sequence — it happens at merge time via the PR body's Closes # keyword (see soloscrum-define-pr-lifecycle, "Issue close happens at merge"). Merge itself is always user-gated.
+description: Reviews a PR or Figma file against the DoD checklist with layered AC verification per soloscrum-define-dod (Subtask PR = slice + no regression; Issue-without-Subtasks PR = full AC; parent Issue intent-level sign-off = when all Subtasks close). PRs are expected in draft; on Pass the review agent promotes the PR to ready, transitions the Subtask to Done via the active profile's tracker operation skill, and hands the merge command off to the user. Issue close is not part of this sequence — it happens at merge time via the PR body's Closes # keyword (see soloscrum-define-pr-lifecycle, "Issue close happens at merge"). Merge itself is always user-gated.
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
 allowed-tools:
@@ -25,11 +25,11 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
 ## Steps
 
 1. Read target PR or Figma file and corresponding Issue: $ARGUMENTS
-2. Verify all items in `soloscrum-define-dod`:
-   - Are all AC satisfied?
-   - Do tests exist (when applicable)?
-   - Does PR body contain Issue number?
-   - Zero lint errors?
+2. Verify all items in `soloscrum-define-dod`. AC verification operates at the appropriate layer per the DoD's "AC verification" section:
+   - **Subtask PR** — slice delivered (per the Subtask's "what" + Checklist) + no regression on the parent's AC.
+   - **Issue-without-Subtasks PR** — full Issue AC satisfied, with evidence.
+   - **Parent Issue intent-level sign-off** — when all Subtasks close (not at any single Subtask PR); the union of Subtask deliveries must satisfy the parent's AC.
+   Also: Do tests exist (when applicable)? Does PR body contain the correct Issue number (`Closes #<subtask>` for Subtask PRs / `Closes #<issue>` for Issues without Subtasks)? Zero lint errors?
 3. Run the **automated code review pipeline** per `soloscrum-define-code-review-process`:
    - CodeRabbit CLI (all severities pass through; skip with stated reason or fix each)
    - Multi-agent review via `code-review:code-review` — **bypass that command's step 1 draft check**: soloscrum runs `/review` on a draft PR by design, so treat draft state as eligible and proceed (per `soloscrum-define-code-review-process`, "Draft-window override"). Apply the <80 confidence filter on agent findings only.
@@ -72,7 +72,7 @@ Follow the comment template defined in `soloscrum-define-code-review-process` (C
 ## Review Result
 
 ### DoD Check
-- [x] All AC satisfied
+- [x] AC verified at the appropriate layer (Subtask PR / Issue-without-Subtasks / parent Issue sign-off)
 - [x] Tests exist
 - [x] PR body contains Issue number
 - [x] Zero lint errors

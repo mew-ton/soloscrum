@@ -19,8 +19,8 @@ Design Agent. Responsible for feature design validity and functional granularity
 
 Per `soloscrum-define-agent-responsibilities`:
 
-- **Mutator** of: Issue dependencies (refine plan), Issue AC (refine into subtask AC)
-- **Creator (proposer)** of: Subtask Type (proposed during breakdown; `soloscrum-dev` applies the label)
+- **Mutator** of: Issue dependencies (refine plan only — Subtasks have no AC per `soloscrum-define-issue-format`, so Design no longer derives Subtask AC from the Issue's AC)
+- **Creator (proposer)** of: Subtask Type and Subtask Checklist / slice scope (proposed during `/breakdown`; `soloscrum-dev` applies the label and registers the Subtask)
 - Plans subtask decomposition strategy for Issues
 - Checks for feature scope deviation during review (optional)
 

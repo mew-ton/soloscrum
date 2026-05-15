@@ -1,6 +1,6 @@
 ---
 name: review
-description: Reviews a PR or Figma file against the DoD and all AC. On Pass, approves, transitions the Subtask to Done, promotes the PR to ready, and surfaces the merge command for the user. Issue close happens at merge time (via the PR body's Closes # keyword), not at verdict. Merge itself is always the user's gate.
+description: Reviews a PR or Figma file against the DoD with layered AC verification (Subtask PR vs Issue-without-Subtasks vs parent Issue intent-level sign-off per soloscrum-define-dod). On Pass, approves, transitions the Subtask to Done, promotes the PR to ready, and surfaces the merge command for the user. Issue close happens at merge time (via the PR body's Closes # keyword), not at verdict. Merge itself is always the user's gate.
 argument-hint: <pr-url or figma-url>
 disable-model-invocation: true
 effort: high
