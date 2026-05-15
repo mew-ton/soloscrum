@@ -27,10 +27,15 @@ Branch naming and commit conventions.
 
 ### issue-id
 
-Identifier of the Subtask the branch implements. Format depends on the active tracker profile (per `soloscrum-define-tracker-profile`):
+Identifier of the work unit the branch implements:
 
-- `github-only` → GH Sub-issue number (e.g. `123`)
-- `linear+github` → Linear subtask ID (e.g. `PRJ-42`)
+- **When the parent Issue has Subtasks** (the common case for any intent that went through `/breakdown`), use the **Subtask** identifier — one branch per Subtask, one PR per Subtask. Each PR closes only its own Subtask via `Closes #<subtask>`.
+- **When the Issue has no Subtasks** (per `soloscrum-define-issue-size`, an intent small enough to fit in a single `/develop` unit and that skipped `/breakdown`), use the **Issue** identifier directly. The PR closes the Issue via `Closes #<issue>` at merge.
+
+Format depends on the active tracker profile (per `soloscrum-define-tracker-profile`):
+
+- `github-only` → GH Issue / Sub-issue number (e.g. `123`)
+- `linear+github` → Linear Issue / subtask ID (e.g. `PRJ-42`)
 
 ### slug
 
@@ -71,6 +76,18 @@ verification flow.
 
 Closes #123
 ```
+
+## Parent Issue close
+
+GitHub's `Closes #` keyword in a PR body auto-closes only the **directly-referenced** Issue at merge — it does not traverse a Sub-issue tree to close parents. The soloscrum contract for parent Issue close is therefore:
+
+- Each Subtask PR body contains `Closes #<subtask>` and **only** the Subtask reference. Do not add `Closes #<parent>` to per-Subtask PRs — that would either close the parent prematurely (on the first Subtask merge) or require predicting which Subtask PR will be the chronologically last to merge.
+- The parent Issue stays open while at least one of its Subtasks is open.
+- The parent Issue is closed by the next `/refine` backlog janitor sweep once all its Subtasks are closed (intent-level AC sign-off having happened at that point per `soloscrum-define-issue-format`'s Subtask Body section).
+
+See `commands/refine.md` (backlog janitor step) and `soloscrum-define-pr-lifecycle` ("Issue close happens at merge") for the janitor's mechanism.
+
+For Issues without Subtasks, the standard `Closes #<issue>` keyword in the PR body closes the Issue directly at merge — no janitor step needed.
 
 ## Notes
 
