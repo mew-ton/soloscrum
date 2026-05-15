@@ -73,7 +73,7 @@ Follow the comment template defined in `soloscrum-define-code-review-process` (C
 
 ### DoD Check
 - [x] AC verified at the appropriate layer (Subtask PR / Issue-without-Subtasks / parent Issue sign-off)
-- [x] Tests exist
+- [x] Tests exist (when applicable) / N/A documented
 - [x] PR body contains Issue number
 - [x] Zero lint errors
 
