@@ -27,8 +27,26 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 1. **Backlog janitor** — close open Issues that should be closed but aren't. Two detection paths run together: (a) **parent Issues whose Sub-issue tree is fully closed** (per `soloscrum-define-branch-commit`'s parent-close contract, per-Subtask PRs do not reference the parent via `Closes #`, so the parent has no closing PR of its own — the janitor is the only close path for parents), and (b) **standalone Issues** (no Sub-issues) whose direct closing PR merged without GH's auto-close firing (the original safety-net case). Skipped when `--no-janitor` appears in `$ARGUMENTS`.
    - Resolve active tracker profile via `soloscrum-define-tracker-profile`.
    - **`github-only`**: scan open Issues; for each:
-     - **If the Issue has linked Sub-issues** (via the GH sub-issue feature), check whether **all** linked Sub-issues are in `state: closed`. If so, close the parent with reason `completed`. Use `gh issue view <n> --json subIssues` (or equivalent GraphQL query on `subIssues`); close eligibility is the conjunction `every(sub-issue → state == "closed")`. The PR-keyword detection below does **not** apply to parent Issues — the contract guarantees their `closedByPullRequestsReferences` is empty.
-     - **Otherwise** (standalone Issue with no Sub-issues), find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set.
+     - **If the Issue has linked Sub-issues** (predicate: `subIssues.totalCount > 0`), check whether **all** linked Sub-issues are in `state: CLOSED`. If so, close the parent with reason `completed`. The linked-Subtask set is queried via GraphQL — the relevant field on the GitHub `Issue` type is `subIssues`, returning a `SubIssueConnection`. The `gh` CLI does not expose a `subIssues` value in `gh issue view --json`, so go through `gh api graphql`:
+
+       ```
+       gh api graphql -f query='
+         query($owner: String!, $repo: String!, $number: Int!) {
+           repository(owner: $owner, name: $repo) {
+             issue(number: $number) {
+               subIssues(first: 100) {
+                 totalCount
+                 nodes { number state }
+               }
+             }
+           }
+         }' -F owner=<owner> -F repo=<repo> -F number=<n>
+       ```
+
+       Close eligibility is the conjunction `subIssues.totalCount > 0 AND every(node → state == "CLOSED")`. The PR-keyword detection below does **not** apply to parent Issues — the contract guarantees their `closedByPullRequestsReferences` is empty.
+
+       **Nested Sub-issue trees** (3+ levels): this check is one-level (only direct children of the scanned Issue). Deeper trees converge over successive `/refine` runs — each sweep closes one nesting level whose direct children are all closed, and the next sweep can then close its parent. Explicit recursion is unnecessary because the next `/refine` invocation re-scans.
+     - **Otherwise** (standalone Issue, `subIssues.totalCount == 0`), find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set.
    - **`linear+github`**: skip — Linear's native sync auto-manages parent close (per `soloscrum-tracker-linear-transition-state`), so a janitor sweep on the GH side would dual-update.
    - Surface the result at the start of `/refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`).
    - **Always use `gh issue close --reason completed`.** Janitor never closes with `--reason not-planned` — that is a deliberate human decision. Janitor never reopens already-closed Issues.
