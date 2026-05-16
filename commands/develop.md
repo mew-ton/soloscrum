@@ -43,7 +43,7 @@ Implement a develop work unit (Subtask of type `develop`, or a no-Subtask Issue 
 ## Input
 
 - Subtask URL or ID, **or** no-Subtask Issue URL or ID (GH issue number `#N` or Linear ID `PRJ-N` depending on active profile). Both share the same numeric address space on GH; the case is determined by whether the referenced Issue is a Subtask of a parent or stands alone with no Sub-issues (per `soloscrum-define-branch-commit`).
-- (If omitted) auto-select an `in-progress` Subtask or no-Subtask Issue via `soloscrum-tracker-{profile}-query-state`
+- (If omitted) auto-select an `in-progress` Subtask or no-Subtask Issue via `soloscrum-tracker-{profile}-query-state`. **Tie-break on multiple candidates**: if more than one `in-progress` candidate exists, do **not** auto-pick — surface the candidate list and ask the user to specify (silent auto-pick on ambiguity would produce inconsistent cross-session behaviour).
 
 ## Output
 
