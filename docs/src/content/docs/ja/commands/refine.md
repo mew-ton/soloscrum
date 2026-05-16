@@ -17,7 +17,7 @@ sidebar:
 
 ## 処理の流れ
 
-1. **バックログ janitor。** open Issue を順に確認し、closing keyword (`Closes #N` / `Fixes #N` / `Resolves #N` など) を持つ PR が merge 済みかをチェックします。該当する Issue は `completed` の理由で close します。出力の 1 行目は `Closed N stale Issue(s): #X, #Y` か `No stale Issues found`、`--no-janitor` 指定時は `Janitor skipped` です。janitor は close するのみで、reopen することはありません。
+1. **バックログ janitor。** `/refine` は open Issue を 2 つの検出経路で走査します。**親 Issue（Sub-issue を持つもの）**については、すべての Sub-issue が close 済みなら親を close します。各 Subtask PR は `Closes #` で親を参照しない契約（[branch-commit](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md) の parent-close セクションを参照）なので、janitor が親の唯一の close 経路です。**スタンドアロン Issue（Sub-issue なし）**については、closing keyword (`Closes #N` / `Fixes #N` / `Resolves #N` など) を持つ PR が merge 済みなら close します — GH の auto-close が発火しなかった場合の safety net です。出力の 1 行目は `Closed N stale Issue(s): #X, #Y` か `No stale Issues found`、`--no-janitor` 指定時は `Janitor skipped` です。janitor は close するのみで、reopen することはありません。
 2. **アイデアの構造化。** PO agent がアイデアを読み、4 セクション構成の Issue 本文を組み立て、[priority](/ja/policies/priority/) ラベルを選び、size-check [SP](/ja/policies/story-points/) を算出します。
 3. **サイズゲート。** size-check SP が 5 を超える、または計画される `/breakdown` で Subtask が 5 個を超えそうな場合、`/refine` はこれを *mis-scope の臭い*（複数 intent を束ねている可能性が高い）と判定し、Issue を作成する前に「複数の Issue への分割」を提案します。これは `/breakdown` の配信スライス（1 つの一貫した intent の PR がレビュー不能になるときに発火）とは別物です。[issue size](/ja/policies/issue-size/) を参照してください。
 4. **承認。** 整形した Issue 本文をユーザに提示します。
