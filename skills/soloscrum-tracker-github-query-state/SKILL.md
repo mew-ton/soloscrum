@@ -33,13 +33,17 @@ Returns active work — items in `state:in-progress` or `state:in-review`. Activ
 
 ## Output
 
-- Two grouped lists:
+- Two grouped lists; each entry distinguishes Subtask vs no-Subtask Issue (per `soloscrum-define-branch-commit`'s case-split — `/develop` accepts either):
   ```
   In Progress:
-    #200 (develop) — Implement password reset endpoint
+    #200 (Subtask, develop) — Implement password reset endpoint
+    #210 (Issue, develop) — Fix login crash on empty input
   In Review:
-    #201 (develop) — Add reset email template → PR #45
+    #201 (Subtask, develop) — Add reset email template → PR #45
+    #212 (Issue, develop) — Cleanup legacy router → PR #50
   ```
+
+  Determine the kind per entry by checking whether the Issue has a parent (Subtask) or none and no Sub-issues (no-Subtask Issue) — i.e. predicates `parent != null` vs `parent == null AND subIssuesSummary.total == 0`. Use the same GraphQL `subIssuesSummary` field as the `/refine` janitor (with the `GraphQL-Features: sub_issues` header) for the Sub-issue probe.
 
 ## Notes
 
