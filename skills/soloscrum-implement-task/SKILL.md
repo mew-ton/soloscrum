@@ -1,7 +1,7 @@
 ---
 name: soloscrum-implement-task
-description: Implements a Subtask (type develop) by creating a branch, writing code and tests, committing with Conventional Commits, generating a PR body, creating the PR as draft, and transitioning the Subtask to In Review via the active profile's tracker operation skill.
-argument-hint: <subtask-id>
+description: Implements a develop work unit — Subtask or no-Subtask Issue (per soloscrum-define-branch-commit's case-split) — by creating a branch, writing code and tests, committing with Conventional Commits, generating a PR body, creating the PR as draft, and transitioning the target to In Review via the active profile's tracker operation skill.
+argument-hint: <subtask-id-or-issue-id>
 disable-model-invocation: true
 allowed-tools:
   - Read
@@ -17,7 +17,7 @@ allowed-tools:
 
 # soloscrum-implement-task
 
-Implement code and generate a draft PR for a Subtask of type `develop`.
+Implement code and generate a draft PR for a develop work unit (Subtask or no-Subtask Issue per `soloscrum-define-branch-commit`).
 
 ## Overview
 

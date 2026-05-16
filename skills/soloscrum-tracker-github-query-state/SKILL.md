@@ -29,12 +29,30 @@ Returns active work — items in `state:in-progress` or `state:in-review`. Activ
      --json number,title,labels,url
    ```
 3. For each in-review item, attach its PR via `gh issue view <n> --json closingIssuesReferences,...` or `gh pr list --search "linked:<n>"`
-4. (If `issue_number` given) restrict results to that Issue's Sub-issues
+4. **For each item, classify Subtask vs no-Subtask Issue** by fetching its `parent` and `subIssuesSummary` via the Sub-issues GraphQL preview (requires the `GraphQL-Features: sub_issues` header — the same header `/refine`'s parent-detection path uses, but the per-Issue probe shape is different so the snippet is included here):
+
+   ```bash
+   gh api graphql \
+     -H "GraphQL-Features: sub_issues" \
+     -f query='
+       query($owner: String!, $repo: String!, $number: Int!) {
+         repository(owner: $owner, name: $repo) {
+           issue(number: $number) {
+             parent { number }
+             subIssuesSummary { total }
+           }
+         }
+       }' -F owner=<owner> -F repo=<repo> -F number=<n>
+   ```
+
+   Classification predicates: `parent != null` → **Subtask**; `parent == null AND subIssuesSummary.total == 0` → **no-Subtask Issue**; `parent == null AND subIssuesSummary.total > 0` → **parent Issue** (not a `/develop` target — surfaces only as context).
+5. (If `issue_number` given) restrict results to that Issue's Sub-issues
 
 ## Output
 
 - Two grouped lists; each entry distinguishes Subtask vs no-Subtask Issue (per `soloscrum-define-branch-commit`'s case-split — `/develop` accepts either):
-  ```
+
+  ```text
   In Progress:
     #200 (Subtask, develop) — Implement password reset endpoint
     #210 (Issue, develop) — Fix login crash on empty input
@@ -43,7 +61,7 @@ Returns active work — items in `state:in-progress` or `state:in-review`. Activ
     #212 (Issue, develop) — Cleanup legacy router → PR #50
   ```
 
-  Determine the kind per entry by checking whether the Issue has a parent (Subtask) or none and no Sub-issues (no-Subtask Issue) — i.e. predicates `parent != null` vs `parent == null AND subIssuesSummary.total == 0`. Use the same GraphQL `subIssuesSummary` field as the `/refine` janitor (with the `GraphQL-Features: sub_issues` header) for the Sub-issue probe.
+  The per-entry `(Subtask, ...)` / `(Issue, ...)` label comes from the step 4 classification.
 
 ## Notes
 

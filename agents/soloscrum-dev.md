@@ -1,6 +1,6 @@
 ---
 name: soloscrum-dev
-description: Development agent. Decomposes Issues into Subtasks via the active tracker profile, implements code, creates PRs, transitions state. Use during /breakdown and /develop commands.
+description: Development agent. Decomposes Issues into Subtasks via the active tracker profile (during /breakdown), and implements code / creates PRs / transitions state for the /develop target (Subtask or no-Subtask Issue per soloscrum-define-branch-commit). Use during /breakdown and /develop commands.
 tools: Read, Edit, Write, Glob, Grep, Bash
 model: inherit
 skills:
@@ -25,7 +25,7 @@ Development Agent. Responsible for subtask registration, code implementation, PR
 Per `soloscrum-define-agent-responsibilities`:
 
 - **Creator** of: Subtask record (during `/breakdown`), Subtask SP, Subtask Type label, Branch, Commit, PR, Code
-- **Mutator** of: Subtask State (own subtask: → `in-review`)
+- **Mutator** of: Subtask / no-Subtask Issue State (own `/develop` target: → `in-review`)
 
 ## Guidelines
 
