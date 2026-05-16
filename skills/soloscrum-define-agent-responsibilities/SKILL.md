@@ -56,8 +56,10 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
                            not at verdict — see soloscrum-define-pr-lifecycle)
 user           user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate);
                            merge fires GH `Closes #` auto-close on referenced Issues
-/refine        po       → janitor sweep at start: closes open Issues whose closing PR has merged
-                           (cleans up parent Issues GH did not auto-close)
+/refine        po       → janitor sweep at start: (a) closes parent Issues whose Sub-issue tree is fully closed
+                           (the only close path for parents, since per-Subtask PRs do not reference the parent
+                           via Closes #); (b) closes standalone Issues whose direct merged PR did not fire GH's
+                           auto-close (safety-net case)
 ```
 
 ## Cross-cutting Rules

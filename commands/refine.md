@@ -29,7 +29,7 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
    - **`github-only`**: scan open Issues; for each:
      - **If the Issue has linked Sub-issues** (predicate: `subIssuesSummary.total > 0`), check whether **all** linked Sub-issues are closed. If so, close the parent with reason `completed`. Sub-issue data is only accessible via GraphQL — the `gh` CLI does not expose `subIssues` or `subIssuesSummary` through `gh issue view --json`. The GitHub sub-issues feature also requires the `GraphQL-Features: sub_issues` request header. Prefer the `subIssuesSummary` aggregate over paginating individual nodes:
 
-       ```
+       ```bash
        gh api graphql \
          -H "GraphQL-Features: sub_issues" \
          -f query='
@@ -44,8 +44,10 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 
        Close eligibility is `subIssuesSummary.total > 0 AND subIssuesSummary.total == subIssuesSummary.completed`. When per-Subtask detail is needed (e.g. surface which Subtasks are still open in the janitor's diagnostic output), fall back to `subIssues(first: 100) { nodes { number state } }` under the same header. The PR-keyword detection below does **not** apply to parent Issues — the contract guarantees their `closedByPullRequestsReferences` is empty.
 
+       **Error / null handling**: on a non-empty `.errors` array (e.g. the `sub_issues` preview not enabled at the org or a missing token scope; the API returns HTTP 200 with `.errors` populated rather than a non-zero exit), or a `null` `repository.issue` (Issue was deleted between the list scan and the per-Issue probe), log the condition and skip that Issue — janitor failures per-Issue must not block the rest of the sweep (matching the "Janitor failures MUST NOT block `/refine`" policy below).
+
        **Nested Sub-issue trees** (3+ levels): this check is one-level (only direct children of the scanned Issue). Deeper trees converge over successive `/refine` runs — each sweep closes one nesting level whose direct children are all closed, and the next sweep can then close its parent. Explicit recursion is unnecessary because the next `/refine` invocation re-scans.
-     - **Otherwise** (standalone Issue, `subIssuesSummary.total == 0`), find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set.
+     - **Otherwise** (standalone Issue, `subIssuesSummary.total == 0`), find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set — `closedByPullRequestsReferences` already encodes GitHub's server-side closing-keyword resolution, so the keyword list above is the contract GitHub honours, not a client-side regex the janitor needs to re-run; treat any merged PR present in that field as a positive match.
    - **`linear+github`**: skip — Linear's native sync auto-manages parent close (per `soloscrum-tracker-linear-transition-state`), so a janitor sweep on the GH side would dual-update.
    - Surface the result at the start of `/refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`).
    - **Always use `gh issue close --reason completed`.** Janitor never closes with `--reason not-planned` — that is a deliberate human decision. Janitor never reopens already-closed Issues.
