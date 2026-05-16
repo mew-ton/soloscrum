@@ -24,9 +24,30 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 
 ## Behavior
 
-1. **Backlog janitor** — close open Issues whose closing PR has already merged. This catches parent Issues that GitHub did not auto-close (GH's `Closes #` only auto-closes the directly-referenced Issue, not the parent of a sub-issue tree) and recovers from any other case where merge-time auto-close did not fire. Skipped when `--no-janitor` appears in `$ARGUMENTS`.
+1. **Backlog janitor** — close open Issues that should be closed but aren't. Two detection paths run together: (a) **parent Issues whose Sub-issue tree is fully closed** (per `soloscrum-define-branch-commit`'s parent-close contract, per-Subtask PRs do not reference the parent via `Closes #`, so the parent has no closing PR of its own — the janitor is the only close path for parents), and (b) **standalone Issues** (no Sub-issues) whose direct closing PR merged without GH's auto-close firing (the original safety-net case). Skipped when `--no-janitor` appears in `$ARGUMENTS`.
    - Resolve active tracker profile via `soloscrum-define-tracker-profile`.
-   - **`github-only`**: scan open Issues; for each, find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set.
+   - **`github-only`**: scan open Issues; for each:
+     - **If the Issue has linked Sub-issues** (predicate: `subIssuesSummary.total > 0`), check whether **all** linked Sub-issues are closed. If so, close the parent with reason `completed`. Sub-issue data is only accessible via GraphQL — the `gh` CLI does not expose `subIssues` or `subIssuesSummary` through `gh issue view --json`. The GitHub sub-issues feature also requires the `GraphQL-Features: sub_issues` request header. Prefer the `subIssuesSummary` aggregate over paginating individual nodes:
+
+       ```bash
+       gh api graphql \
+         -H "GraphQL-Features: sub_issues" \
+         -f query='
+           query($owner: String!, $repo: String!, $number: Int!) {
+             repository(owner: $owner, name: $repo) {
+               issue(number: $number) {
+                 subIssuesSummary { total completed percentCompleted }
+               }
+             }
+           }' -F owner=<owner> -F repo=<repo> -F number=<n>
+       ```
+
+       Close eligibility is `subIssuesSummary.total > 0 AND subIssuesSummary.total == subIssuesSummary.completed`. When per-Subtask detail is needed (e.g. surface which Subtasks are still open in the janitor's diagnostic output), fall back to `subIssues(first: 100) { nodes { number state } }` under the same header. The PR-keyword detection below does **not** apply to parent Issues — the contract guarantees their `closedByPullRequestsReferences` is empty.
+
+       **Error / null handling**: on a non-empty `.errors` array (e.g. the `sub_issues` preview not enabled at the org or a missing token scope; the API returns HTTP 200 with `.errors` populated rather than a non-zero exit), or a `null` `repository.issue` (Issue was deleted between the list scan and the per-Issue probe), log the condition and skip that Issue — janitor failures per-Issue must not block the rest of the sweep (matching the "Janitor failures MUST NOT block `/refine`" policy below).
+
+       **Nested Sub-issue trees** (3+ levels): this check is one-level (only direct children of the scanned Issue). Deeper trees converge over successive `/refine` runs — each sweep closes one nesting level whose direct children are all closed, and the next sweep can then close its parent. Explicit recursion is unnecessary because the next `/refine` invocation re-scans.
+     - **Otherwise** (standalone Issue, `subIssuesSummary.total == 0`), find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set — `closedByPullRequestsReferences` already encodes GitHub's server-side closing-keyword resolution, so the keyword list above is the contract GitHub honours, not a client-side regex the janitor needs to re-run; treat any merged PR present in that field as a positive match.
    - **`linear+github`**: skip — Linear's native sync auto-manages parent close (per `soloscrum-tracker-linear-transition-state`), so a janitor sweep on the GH side would dual-update.
    - Surface the result at the start of `/refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`).
    - **Always use `gh issue close --reason completed`.** Janitor never closes with `--reason not-planned` — that is a deliberate human decision. Janitor never reopens already-closed Issues.
@@ -46,7 +67,7 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 
 `/refine` is the natural moment to clean the backlog: it's the entry point where the user touches the Issue list, and any new Issue is created against the current open set. Sweeping closed-but-still-open Issues here keeps the backlog accurate before the user picks the next thing to work on.
 
-The janitor exists because Issue close happens at merge time (per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge"), but GitHub's auto-close only fires on the directly-referenced Issue. Parent Issues in a sub-issue tree are not auto-closed when their last sub-issue's PR merges, so they need a separate sweep — which is what this step provides.
+The janitor exists because Issue close happens at merge time (per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge"), but GitHub's auto-close only fires on the directly-referenced Issue. Two cases need the janitor: (1) **parent Issues** in a sub-issue tree — `soloscrum-define-branch-commit`'s parent-close contract deliberately forbids per-Subtask PRs from including `Closes #<parent>` (to avoid premature close on the first Subtask merge), so the parent has no closing PR of its own; the janitor's parent-detection path catches parents whose Sub-issue tree is fully closed. (2) **standalone Issues** whose direct PR merged without GH's auto-close firing — the janitor's standalone-detection path is the safety net.
 
 ## Input
 

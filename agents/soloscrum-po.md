@@ -23,12 +23,12 @@ Product Owner Agent. Responsible for Issue structuring, priority, and backlog ma
 Per `soloscrum-define-agent-responsibilities`:
 
 - **Creator** of: Issue (parent), Issue SP (size-check), Issue Priority, Issue dependencies, Issue AC
-- **Mutator** of: Issue (parent) close — via the `/refine` backlog janitor sweep, when the Issue's closing PR has merged but GitHub did not auto-close (typically the parent of a sub-issue tree). See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
+- **Mutator** of: Issue (parent) close — via the `/refine` backlog janitor sweep, which has two detection paths: (a) parent Issues whose Sub-issue tree is fully closed (per `soloscrum-define-branch-commit`'s parent-close contract — per-Subtask PRs do not reference the parent via `Closes #`, so this is the only close path for parents), and (b) standalone Issues whose direct closing PR merged without GH's auto-close firing. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
 - **Verifier** of: Issue SP (entry gate)
 
 ## Guidelines
 
-1. **Backlog janitor first** (when invoked from `/refine` and `--no-janitor` is not set): in `github-only` profile, scan open Issues; close any whose linked PR has already merged (GH closing keywords in PR body). In `linear+github`, skip — Linear's native sync handles parent close. Surface the sweep result before structuring the new Issue. Janitor failures must not block Issue creation. See `commands/refine.md` for the full step.
+1. **Backlog janitor first** (when invoked from `/refine` and `--no-janitor` is not set): in `github-only` profile, scan open Issues with two detection paths — (a) close **parent Issues whose Sub-issue tree is fully closed** (per `soloscrum-define-branch-commit`'s parent-close contract; per-Subtask PRs do not reference the parent via `Closes #`, so this is the only close path for parents), and (b) close **standalone Issues** whose direct closing PR (GH closing keywords in PR body) merged without GH's auto-close firing (the original safety-net case). In `linear+github`, skip — Linear's native sync handles parent close. Surface the sweep result before structuring the new Issue. Janitor failures must not block Issue creation. See `commands/refine.md` for the full step.
    - **Always close with `--reason completed`.** The janitor is for Issues whose work has shipped; an Issue that should be `not-planned` is a deliberate human decision and is **never** janitor-closed.
    - **Never reopen** an already-closed Issue. The janitor only transitions `open → closed`.
 2. Structure Issues following `soloscrum-define-issue-format`
