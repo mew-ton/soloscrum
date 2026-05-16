@@ -141,7 +141,7 @@ For `linear+github`: Subtask state is on Linear (via `soloscrum-tracker-linear-t
 |---|---|---|
 | Subtask Issue | At merge of its `/develop` PR | GH auto-close on `Closes #subtask` in PR body |
 | Parent Issue (with sub-issues) | Next `/refine` backlog janitor sweep once all Subtasks are closed | `/refine` janitor (per `soloscrum-define-branch-commit`, per-Subtask PRs do **not** include `Closes #<parent>` — premature close on the first Subtask merge is the failure mode this contract prevents) |
-| Stand-alone Issue (no sub-issues, single PR) | At merge of its PR | GH auto-close on `Closes #issue` in PR body |
+| Stand-alone Issue (no sub-issues, single PR) | At merge of its PR | GH auto-close on `Closes #issue` in PR body, with the `/refine` janitor as a safety net when auto-close does not fire |
 
 The `/refine` janitor exists because GitHub does **not** auto-close a parent Issue when its Subtasks all close. For the github-only profile, the janitor scans open Issues at the start of `/refine` with two detection paths: (1) **parent Issues** whose Subtask set is fully closed (the contract in `soloscrum-define-branch-commit` forbids per-Subtask PRs from including `Closes #<parent>`, so the parent has no closing PR of its own — the janitor is the only close path), and (2) **standalone Issues** (no Sub-issues) whose direct closing PR merged without GH's auto-close firing — the safety-net case for the original failure mode. For `linear+github`, parent state is already auto-managed by Linear's native sync (per `soloscrum-tracker-linear-transition-state`), so the janitor is a no-op. See `commands/refine.md` for the janitor step.
 
