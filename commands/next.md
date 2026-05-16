@@ -25,10 +25,12 @@ Recommend the next action.
 
 ## Decision Logic
 
-1. In Progress Subtask exists → `Continue as-is`
-2. In Review Subtask exists → Suggest `/review`
-3. Untouched Subtask in Backlog → Suggest `/develop` or `/design-ui` for the highest-priority Subtask
-4. All Subtasks done, undecomposed Issue exists → Suggest `/breakdown`
+`/develop` accepts either a Subtask or a no-Subtask Issue per `soloscrum-define-branch-commit`, so the rules below consider both classes when describing `/develop` targets:
+
+1. In Progress Subtask **or no-Subtask Issue** exists → `Continue as-is`
+2. In Review Subtask **or no-Subtask Issue** exists → Suggest `/review`
+3. Untouched Subtask **or untouched no-Subtask Issue** in Backlog → Suggest `/develop` (Subtask / no-Subtask Issue) or `/design-ui` (Subtask) for the highest-priority candidate
+4. All Subtasks done, undecomposed Issue exists → Suggest `/breakdown` (only when the Issue's intent needs delivery slicing per `soloscrum-define-issue-size`; otherwise treat as a no-Subtask Issue and route to rule 3)
 5. Backlog empty → Suggest refining a new idea with `/refine`
 
 ## Input
