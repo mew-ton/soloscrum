@@ -6,6 +6,7 @@ model: inherit
 skills:
   - soloscrum-split-into-tasks
   - soloscrum-implement-task
+  - soloscrum-define-worktree
   - soloscrum-define-branch-commit
   - soloscrum-define-dod
   - soloscrum-define-pr-lifecycle
@@ -30,14 +31,15 @@ Per `soloscrum-define-agent-responsibilities`:
 ## Guidelines
 
 1. Follow branch naming and commits per `soloscrum-define-branch-commit`
-2. Reference `.claude/rules/stack.md` for tech stack and naming conventions
-3. Check repository-specific branch strategy in `.claude/rules/branch.md`
-4. Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
-5. Always include the corresponding Issue number in the PR body
-6. Always review the target's reference material before starting implementation: **for a Subtask target**, the Subtask's slice scope (its "what" + Checklist) and the **parent Issue's AC** (Subtasks do not carry their own AC per `soloscrum-define-issue-format`'s Subtask Body section — the parent owns the AC and the Subtask delivers a slice toward it); **for a no-Subtask Issue target** (per `soloscrum-define-branch-commit`'s branch-per-Issue case), the Issue's AC directly
-7. Commit with zero lint errors. Create the PR as draft (`gh pr create --draft`); promotion to ready is owned by `soloscrum-review`. The draft creation itself is reversible per `soloscrum-define-pr-lifecycle` and does not require a pre-confirm. After PR creation, confirm CI started cleanly via `soloscrum-tracker-github-wait-for-pr-checks` (short `timeout_sec`, e.g. `300`); never write inline `until ... gh pr view ... sleep ...` loops — see `CLAUDE.md` anti-patterns.
-8. Set Subtask SP per `soloscrum-define-story-points` when registering Subtasks
-9. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every tracker **write** operation (create-subtask / set-sp / transition-state / add-dependency) through the matching `soloscrum-tracker-{profile}-<op>` skill — never call Linear MCP or `gh issue create` / `gh issue edit` / `gh issue close` for tracker mutations directly. **Read** operations (e.g. `gh issue view` to read an Issue's AC) are allowed to run directly without going through a tracker operation skill
+2. Work inside the target's **own worktree** per `soloscrum-define-worktree` — create it under the resolved `worktree_root`, with the path built from the main checkout root (`git rev-parse --path-format=absolute --git-common-dir`) rather than the current directory (reusing an existing worktree for the same branch), and run implementation, commits, and `gh pr create` with that worktree as the working directory. Never switch the main checkout onto the branch. Never use `git worktree remove --force` or `git branch -D`; both are denied and both defeat the safety conditions reclamation depends on.
+3. Reference `.claude/rules/stack.md` for tech stack and naming conventions
+4. Check repository-specific branch strategy and `worktree_root` override in `.claude/rules/branch.md`
+5. Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
+6. Always include the corresponding Issue number in the PR body
+7. Always review the target's reference material before starting implementation: **for a Subtask target**, the Subtask's slice scope (its "what" + Checklist) and the **parent Issue's AC** (Subtasks do not carry their own AC per `soloscrum-define-issue-format`'s Subtask Body section — the parent owns the AC and the Subtask delivers a slice toward it); **for a no-Subtask Issue target** (per `soloscrum-define-branch-commit`'s branch-per-Issue case), the Issue's AC directly
+8. Commit with zero lint errors. Create the PR as draft (`gh pr create --draft`); promotion to ready is owned by `soloscrum-review`. The draft creation itself is reversible per `soloscrum-define-pr-lifecycle` and does not require a pre-confirm. After PR creation, confirm CI started cleanly via `soloscrum-tracker-github-wait-for-pr-checks` (short `timeout_sec`, e.g. `300`); never write inline `until ... gh pr view ... sleep ...` loops — see `CLAUDE.md` anti-patterns.
+9. Set Subtask SP per `soloscrum-define-story-points` when registering Subtasks
+10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every tracker **write** operation (create-subtask / set-sp / transition-state / add-dependency) through the matching `soloscrum-tracker-{profile}-<op>` skill — never call Linear MCP or `gh issue create` / `gh issue edit` / `gh issue close` for tracker mutations directly. **Read** operations (e.g. `gh issue view` to read an Issue's AC) are allowed to run directly without going through a tracker operation skill
 
 ## External Access
 

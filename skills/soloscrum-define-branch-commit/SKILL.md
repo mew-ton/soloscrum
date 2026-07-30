@@ -94,3 +94,4 @@ For Issues without Subtasks, the standard `Closes #<issue>` keyword in the PR bo
 
 - Repository-specific branch strategy in `.claude/rules/branch.md` takes precedence
 - Never commit directly to main / master
+- This skill defines what a branch is **called**; `soloscrum-define-worktree` defines where it is **checked out**. `/soloscrum:develop` gives each branch its own worktree under a repo-internal root, and the directory is the branch name verbatim

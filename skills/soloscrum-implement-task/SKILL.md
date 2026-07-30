@@ -27,9 +27,13 @@ Implements code for a develop work unit and generates a **draft** PR. The target
 
 1. Read target's reference material — **for a Subtask target**: its "what" + Checklist (slice scope per `soloscrum-define-issue-format`'s Subtask Body section) and the **parent Issue's AC** (what the slice must move closer to satisfying without regression); **for a no-Subtask Issue target** (per `soloscrum-define-branch-commit`'s branch-per-Issue case): the Issue's full AC directly. Arguments: $ARGUMENTS
 2. Check tech stack in `.claude/rules/stack.md`
-3. Create branch following `soloscrum-define-branch-commit` conventions:
-   - `{type}/{issue-id}-{slug}`
+3. Create the work unit's **worktree and branch** per `soloscrum-define-worktree`:
+   - Branch name `{type}/{issue-id}-{slug}` per `soloscrum-define-branch-commit`
+   - Resolve the main checkout root (`git rev-parse --path-format=absolute --git-common-dir`), `git fetch origin`, resolve `worktree_root`, then `git worktree add -b <branch> <main-root>/<worktree_root>/<branch> "$default_ref"` (where `default_ref` is `git rev-parse --abbrev-ref origin/HEAD`, already `origin/`-prefixed — do not prefix it again). Build the path from the main root, **never** from the current directory — starting from a previous worktree would nest the new one inside it. If a worktree for the branch already exists, reuse it — and inspect it first, since it may hold work from an interrupted run.
+   - Every step below runs with that worktree as the working directory. The main checkout is never switched onto the branch.
+   - Write the resolved root as a repo-root-anchored pattern (`/<worktree_root>/`) to `.git/info/exclude` right away (untracked, effective immediately — this is what stops `git add -A` from staging a worktree as a gitlink), and if `.gitignore` does not already cover it, add the entry here too so the durable form lands in this unit's PR. Never commit it directly to the default branch.
 4. Implement code to deliver the slice (and to move the parent Issue's AC closer to satisfied without regression):
+   - **First, if `.claude/rules/stack.md` records an install command, run it in the worktree.** `git worktree add` checks out tracked files only, so gitignored dependency trees (`node_modules/`, `.venv/`, build caches) do not exist in a fresh worktree and the lint and test steps below will fail for an unrelated-looking reason. Skip when reusing an already-provisioned worktree. See `soloscrum-define-worktree`, "Known limitation" (tracked for automation in #99).
    - Write tests (when applicable)
    - Confirm zero lint errors
 5. Commit using Conventional Commits format
@@ -53,7 +57,7 @@ Implements code for a develop work unit and generates a **draft** PR. The target
    ```bash
    skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number> 15 300
    ```
-   This is a startup-confirmation step, not a green-gate — surface non-`SUCCESS` conclusions if any but proceed to handoff regardless. The intent is to catch CI startup failures (workflow syntax errors, missing secrets) early. **Do not** write inline `until` loops over `gh pr view`; that pattern is the named anti-pattern in `CLAUDE.md` and the reason this skill exists (see `soloscrum-tracker-github-wait-for-pr-checks`).
+   That path is repo-root-relative, so run it with the **main checkout** as the working directory rather than the worktree — see `soloscrum-define-worktree`, "Paths that stay anchored to the main checkout". This is a startup-confirmation step, not a green-gate — surface non-`SUCCESS` conclusions if any but proceed to handoff regardless. The intent is to catch CI startup failures (workflow syntax errors, missing secrets) early. **Do not** write inline `until` loops over `gh pr view`; that pattern is the named anti-pattern in `CLAUDE.md` and the reason this skill exists (see `soloscrum-tracker-github-wait-for-pr-checks`).
 9. Verify DoD self-check with `soloscrum-define-dod` (every item except "Review has passed", which is owned by `soloscrum-review`).
 10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then invoke the matching `transition-state` operation skill to move the **target** (Subtask or no-Subtask Issue) to `in-review`:
     - `github-only` → `soloscrum-tracker-github-transition-state`
@@ -63,6 +67,7 @@ Implements code for a develop work unit and generates a **draft** PR. The target
 
 ## Depends On
 
+- `soloscrum-define-worktree` (where the work happens; worktree creation and reuse)
 - `soloscrum-define-branch-commit`
 - `soloscrum-define-dod`
 - `soloscrum-define-pr-lifecycle` (draft creation, autonomy of reversible transitions, handoff boundary)

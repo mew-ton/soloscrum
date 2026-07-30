@@ -1,11 +1,11 @@
 ---
 title: "/soloscrum:develop"
-description: Implements a develop work unit — Subtask or no-Subtask Issue. Cuts the branch, writes code, opens a draft PR, and transitions the target to in-review.
+description: Implements a develop work unit — Subtask or no-Subtask Issue. Creates the work unit's own git worktree inside the repository, writes code, opens a draft PR, and transitions the target to in-review.
 sidebar:
   order: 3
 ---
 
-`/soloscrum:develop` implements a `type:develop` work unit — either a **Subtask** (when the parent went through `/soloscrum:breakdown`) or a **no-Subtask Issue** (when the Issue's intent fits one reviewable PR per [issue size](/policies/issue-size/) and skipped `/soloscrum:breakdown`). It cuts a branch following the soloscrum naming convention, writes the implementation, runs the [DoD](/policies/dod/) self-checks, and opens a **draft** PR. The target (Subtask or no-Subtask Issue) transitions from `in-progress` to `in-review` once the draft is open.
+`/soloscrum:develop` implements a `type:develop` work unit — either a **Subtask** (when the parent went through `/soloscrum:breakdown`) or a **no-Subtask Issue** (when the Issue's intent fits one reviewable PR per [issue size](/policies/issue-size/) and skipped `/soloscrum:breakdown`). It creates the work unit's branch **and its own git worktree** inside the repository, writes the implementation, runs the [DoD](/policies/dod/) self-checks, and opens a **draft** PR. The target (Subtask or no-Subtask Issue) transitions from `in-progress` to `in-review` once the draft is open.
 
 ## Usage
 
@@ -18,7 +18,7 @@ The argument is a Subtask URL or ID **or** a no-Subtask Issue URL or ID (`#N` un
 ## What happens
 
 1. **Read the target.** For a Subtask target, Dev reads the Subtask's "what" + Checklist (its slice scope per [issue format](/policies/issue-format/)'s Subtask body) and the **parent Issue's AC**. For a no-Subtask Issue target, Dev reads the Issue's AC directly. Plus any `.claude/rules/*.md` overrides for stack, branch strategy, and DoD extras.
-2. **Cut the branch.** A new branch follows the [branch naming](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md) convention: `<type>/<issue-id>-<slug>` — `feat/123-password-reset` for a Subtask target, `refactor/456-cleanup-legacy-router` for a no-Subtask Issue target.
+2. **Create the worktree and branch.** The branch follows the [branch naming](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md) convention: `<type>/<issue-id>-<slug>` — `feat/123-password-reset` for a Subtask target, `refactor/456-cleanup-legacy-router` for a no-Subtask Issue target. It is checked out into its **own git worktree** under `<worktree_root>/<branch>/`, inside the repository — `worktree_root` defaults to `.soloscrum/worktrees` and is overridable per repo in `.claude/rules/branch.md`. Your main checkout stays on the default branch and stays clean; two work units can be in flight without contending for it. Before creating the new one, the command reclaims any worktree whose branch has already merged — the same pass [`/soloscrum:cleanup`](/commands/cleanup/) runs.
 3. **Implement.** Code lands as Conventional Commits (`feat: …`, `fix: …`, `refactor: …`).
 4. **DoD self-check.** Dev verifies every DoD item it owns: AC verified at the appropriate layer per [DoD](/policies/dod/) (slice delivered + no regression on parent AC for a Subtask PR; full Issue AC for a no-Subtask Issue PR), tests written where applicable, lint clean, PR body will contain the closing keyword (`Closes #<subtask>` for a Subtask target, `Closes #<issue>` for a no-Subtask Issue target — never `Closes #<parent>` for a Subtask PR per branch-commit's parent-close contract). "Review has passed" is the one item Dev cannot self-grant — that belongs to `/soloscrum:review`.
 5. **Open the PR as draft.** `gh pr create --draft` is the boundary. PRs always start as draft so the local quality gate runs in a defined window before any GitHub-side reviewer fires (see [PR lifecycle](/concept/pr-lifecycle/)).
@@ -37,7 +37,7 @@ The handoff to you is a draft PR URL and a recommendation to run `/soloscrum:rev
 
 ## Output
 
-- New branch pushed to origin.
+- New branch pushed to origin, checked out in its own worktree under the worktree root.
 - Draft PR URL.
 - DoD self-check result.
 - Target (Subtask or no-Subtask Issue) state advanced to `in-review`.
@@ -48,5 +48,6 @@ The handoff to you is a draft PR URL and a recommendation to run `/soloscrum:rev
 - [Agents and responsibilities](/concept/agent-responsibilities/) — Dev owns this command.
 - [PR lifecycle](/concept/pr-lifecycle/) — why PRs start as draft and why `/soloscrum:develop` does not promote to ready.
 - [DoD](/policies/dod/) — the checklist Dev self-applies before opening the draft.
+- [`/soloscrum:cleanup`](/commands/cleanup/) — reclaims the worktree once the PR has merged.
 - Previous: [`/soloscrum:breakdown`](/commands/breakdown/). Next: [`/soloscrum:review`](/commands/review/).
 - Canonical contract: [`commands/develop.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/develop.md).
