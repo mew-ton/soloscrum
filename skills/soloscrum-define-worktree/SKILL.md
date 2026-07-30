@@ -41,6 +41,8 @@ Resolve in this order and stop at the first match — the same shape as `soloscr
 2. **User config** — `${user_config.worktree_root}` (set via plugin install prompt)
 3. **Built-in default** — `.soloscrum/worktrees`
 
+**Resolve it from the main checkout.** `.claude/rules/branch.md` is a tracked file, so reading it from inside a worktree yields *that branch's* copy — which may predate the current setting, or belong to a work unit that changed it. Establish the main checkout as the working directory first (see "Creating the worktree" step 1), then resolve.
+
 The value is always interpreted **relative to the repository root**, never to the current working directory. An absolute path or a path escaping the repository (`../`) is a configuration error: reject it and surface the reason rather than creating a worktree outside the repo, which is the arrangement this skill exists to avoid.
 
 ### Repo override file format

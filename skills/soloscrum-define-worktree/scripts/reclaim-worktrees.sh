@@ -86,6 +86,20 @@ if [ -z "$worktree_root" ]; then
   exit 2
 fi
 
+# Reject dot segments after normalisation. A bare "." or ".." survives the
+# checks above (neither is absolute, and neither matches the ../ patterns), but
+# builds a root_abs of "<main>/." or "<main>/.." — the first never matches the
+# canonical paths git reports, so every worktree is silently omitted; the second
+# points outside the repository entirely. An interior "/./" or "/../" has the
+# same effect. Reject rather than resolve: a root that needs normalising to be
+# understood is a misconfiguration worth surfacing.
+case "/${worktree_root}/" in
+  */./*|*/../*)
+    echo "worktree_root must not contain '.' or '..' path segments: $worktree_root" >&2
+    exit 2
+    ;;
+esac
+
 # The main checkout's root, resolved from the shared common directory so this
 # works identically whether invoked from the main checkout or from a worktree.
 common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
