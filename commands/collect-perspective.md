@@ -10,6 +10,7 @@ allowed-tools:
   - Grep
   - Bash(gh pr view:*)
   - Bash(gh api repos/:*)
+  - Bash(skills/soloscrum-define-review-perspective/scripts/list-perspectives.sh:*)
 ---
 
 # /soloscrum:collect-perspective
@@ -24,7 +25,7 @@ Turn review knowledge into something the next review can apply.
 2. **Extract candidate judgements.** A candidate is a statement about what to look for that would still be true on a different change. Skip anything that only reports a fact about the specific diff.
 3. **Assess whether the claim is actually right.** A reviewer can be wrong, or right only for their project's conventions, or right only for a library version. The user's interest in the source is not evidence the claim is correct, and the confirmation in step 7 reviews the *generalised* form — one step removed from the context that would make a bad claim obvious. Say plainly when a candidate looks project-specific or contestable, rather than laundering it into a rule.
 4. **Generalise.** Strip the originating case down to its transferable core — the framework, not the file; the class of mistake, not the instance. A perspective that only fires on the situation that produced it will never fire again. Keep the concrete example; move it to the body.
-5. **Reconcile against what exists.** Read the `description` of every perspective under `~/.claude/review-perspectives/*/PERSPECTIVE.md`. If a candidate overlaps one, propose an **update** to that perspective rather than a new sibling. Near-duplicates are the failure mode that makes a corpus unselectable — two perspectives with overlapping triggers force the selector to guess, and both get applied or neither does.
+5. **Reconcile against what exists.** List existing descriptions with `skills/soloscrum-define-review-perspective/scripts/list-perspectives.sh` (frontmatter only — bodies are not loaded); fall back to globbing `~/.claude/review-perspectives/*/PERSPECTIVE.md` where no Bash surface is available. If a candidate overlaps one, propose an **update** to that perspective rather than a new sibling. Near-duplicates are the failure mode that makes a corpus unselectable — two perspectives with overlapping triggers force the selector to guess, and both get applied or neither does.
 6. **Draft the file** per `soloscrum-define-review-perspective`: kebab-case directory, `PERSPECTIVE.md`, `name` + `description` frontmatter. Hold the description to the rules that skill defines — English, ≤ 2048 characters, When and What, a stated boundary (either where it does not apply, or an explicit claim that it applies broadly), and decidable without the body. State the language / framework / ecosystem scope in the description as well — explicitly "agnostic" when it is, since selection never reads the body and cannot tell universal from unstated.
 7. **Show the content and take one confirmation**, then write. See Autonomy below.
 

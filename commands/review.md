@@ -12,6 +12,7 @@ allowed-tools:
   - Bash(gh issue:*)
   - Bash(gh api:*)
   - Bash(gh label:*)
+  - Bash(skills/soloscrum-define-review-perspective/scripts/list-perspectives.sh:*)
 ---
 
 # /soloscrum:review

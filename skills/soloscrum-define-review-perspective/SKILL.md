@@ -150,13 +150,30 @@ The template is for **writing a perspective by hand**, when the user already kno
 
 The template exists because the alternative for a hand-written perspective is copying an existing one, which propagates whatever that one happened to get wrong.
 
+## Companion script
+
+`scripts/list-perspectives.sh`, colocated with this skill, emits every stored perspective's `name` and `description` as JSON — **without reading past each file's frontmatter**.
+
+```bash
+skills/soloscrum-define-review-perspective/scripts/list-perspectives.sh
+skills/soloscrum-define-review-perspective/scripts/list-perspectives.sh --names
+```
+
+Selection needs the frontmatter and nothing else, but reading a perspective file returns the whole body — the checks, the examples, the provenance — which the caller discards for every perspective it does not select. Reading N files to use a fraction of each is the cost this removes. `--names` is the cheaper still form, for a caller that only needs to know what exists.
+
+Each entry carries `chars`, the description's length, so a caller can see which descriptions approach the 2048-character limit without measuring them.
+
+A file whose frontmatter cannot be parsed is reported as an entry with an `error` rather than dropped. A perspective the selector never sees because its frontmatter is broken is worse than one it sees and rejects — the author has no other signal that the file is inert.
+
+The dependency surface is `jq` only; frontmatter parsing is done in-script, scoped to the forms this format permits.
+
 ## Consumers
 
 | Author | Reads | Behaviour |
 |---|---|---|
-| `/soloscrum:collect-perspective` | all descriptions (for deduplication) | Creates or updates a perspective from a PR's review comments or the current conversation |
+| `/soloscrum:collect-perspective` | all descriptions via `scripts/list-perspectives.sh` (for deduplication) | Creates or updates a perspective from a PR's review comments or the current conversation |
 | a human, by hand | — | Copies `templates/PERSPECTIVE_TEMPLATE.md` and fills it in |
-| `/soloscrum:review` | all descriptions, then the bodies of the selected few | Applies the selected perspectives as additional review lenses per `soloscrum-define-code-review-process` |
+| `/soloscrum:review` | all descriptions via `scripts/list-perspectives.sh`, then the bodies of the selected few | Applies the selected perspectives as additional review lenses per `soloscrum-define-code-review-process` |
 
 ## Depends On
 

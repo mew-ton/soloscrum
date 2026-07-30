@@ -13,7 +13,7 @@ sidebar:
 
 **The multi-agent review** runs via the `code-review:code-review` slash command. That command spins up several Sonnet agents in parallel, each with a focused lens (security, architecture, bug scan, history, in-file rules, coverage gaps). A separate Haiku agent scores each finding 0–100. The score is calibrated for the noise pattern of fresh agents, which tend to invent constraints and mis-cite rules.
 
-**Review perspectives** are your own accumulated judgements, stored machine-locally at `~/.claude/review-perspectives/` and collected via [`/soloscrum:collect-perspective`](/commands/collect-perspective/). The first two sources are general; this one is what *you* have specifically learned and do not want re-learned. The review reads only each perspective's `description` to decide which apply to this PR, then reads the bodies of the selected few. An empty or absent corpus is the normal starting state — the step is skipped silently, not reported as a gap.
+**Review perspectives** are your own accumulated judgements, stored machine-locally at `~/.claude/review-perspectives/` and collected via [`/soloscrum:collect-perspective`](/commands/collect-perspective/). The first two sources are general; this one is what *you* have specifically learned and do not want re-learned. The review lists the corpus's descriptions with `list-perspectives.sh`, which reads only each file's frontmatter, decides which apply to this PR, and then reads the bodies of the selected few. Bodies are never loaded for perspectives that are not selected. An empty or absent corpus is the normal starting state — the step is skipped silently, not reported as a gap.
 
 All three sources' findings are consolidated into one PR comment with a single verdict line at the bottom.
 
