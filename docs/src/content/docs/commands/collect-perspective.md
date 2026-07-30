@@ -59,6 +59,14 @@ Adding `Write(~/.claude/review-perspectives/**)` to your own `~/.claude/settings
 
 The full contract, with worked good and bad examples, is in [`skills/soloscrum-define-review-perspective`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-review-perspective/SKILL.md).
 
+## Writing one by hand
+
+You do not have to route a perspective through this command. When you already know the judgement you want to record, copy [`templates/PERSPECTIVE_TEMPLATE.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-review-perspective/templates/PERSPECTIVE_TEMPLATE.md) to `~/.claude/review-perspectives/<name>/PERSPECTIVE.md` and fill in the placeholders.
+
+The template's frontmatter has one placeholder per element the description rules require, so filling it in gets you a conforming description without re-deriving the shape. The alternative — copying an existing perspective — propagates whatever that one happened to get wrong.
+
+`/soloscrum:collect-perspective` does not read the template; it generates from the format rules directly.
+
 ## Output
 
 Per perspective: created or updated, its path, and its description. Plus what was discarded as too case-specific to generalise — the discards matter, because they are what you would otherwise assume had been captured.

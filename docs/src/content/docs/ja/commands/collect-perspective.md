@@ -59,6 +59,14 @@ frontmatter は skill と同型（`name` と `description`）ですが、観点�
 
 良い例・悪い例を含む完全な契約は [`skills/soloscrum-define-review-perspective`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-review-perspective/SKILL.md) にあります。
 
+## 手で書く場合
+
+観点は必ずしもこのコマンドを通す必要はありません。記録したい判断がすでに分かっているなら、[`templates/PERSPECTIVE_TEMPLATE.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-review-perspective/templates/PERSPECTIVE_TEMPLATE.md) を `~/.claude/review-perspectives/<name>/PERSPECTIVE.md` にコピーし、プレースホルダを埋めてください。
+
+テンプレートの frontmatter には description のルールが要求する要素ごとにプレースホルダが 1 つずつ置かれているので、形を毎回導き直さなくても適合する description になります。代替手段である「既存の観点をコピーして編集する」は、その観点がたまたま間違えていた点をそのまま複製してしまいます。
+
+`/soloscrum:collect-perspective` はこのテンプレートを読みません。フォーマット規則から直接生成します。
+
 ## Output
 
 観点ごとに、新規作成か更新か、パス、description。加えて、一般化できず捨てた候補も提示します — 捨てた分こそ、利用者が「拾われたはず」と誤解しうる部分だからです。

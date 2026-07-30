@@ -130,11 +130,32 @@ Free-form Markdown. What the description cannot carry:
 
 Keep it to what a reviewer needs at the moment of reviewing. A perspective that grows into an essay stops being read.
 
+## Companion template
+
+A copy-pastable template lives next to this skill at `templates/PERSPECTIVE_TEMPLATE.md`. Its frontmatter carries one placeholder per element the description rules require — When, What, Scope, Boundary — so an author who fills the template in cannot satisfy it while omitting one. Its body carries the sections that make a perspective usable at review time, including the false-positive discrimination that most affects whether a finding is worth raising.
+
+### Using it
+
+Copy the file to `~/.claude/review-perspectives/<name>/PERSPECTIVE.md`, rename the directory to match the `name` you choose, and replace every `<...>` placeholder. A remaining placeholder is a perspective that is not finished — the selector will match on the placeholder text.
+
+Unlike `soloscrum-define-issue-format`'s Issue template, there is no `.github/` adoption path: perspectives are machine-local and never live in a repository.
+
+### Self-marker
+
+The template body opens with the HTML comment `<!-- soloscrum-review-perspective -->` (greppable, invisible when rendered) and closes with a small italic footer. Together they make a template-derived perspective identifiable in a corpus that may also hold hand-written and collected ones.
+
+### Relationship to `/soloscrum:collect-perspective`
+
+The template is for **writing a perspective by hand**, when the user already knows the judgement they want to record and has no extraction step to run. `/soloscrum:collect-perspective` does **not** read it — that command generates from the format rules in this file. Edits to the template do not change what the command produces, and edits to these rules do not propagate into the template; keep them aligned by hand.
+
+The template exists because the alternative for a hand-written perspective is copying an existing one, which propagates whatever that one happened to get wrong.
+
 ## Consumers
 
 | Command | Reads | Behaviour |
 |---|---|---|
 | `/soloscrum:collect-perspective` | all descriptions (for deduplication) | Creates or updates a perspective from a PR's review comments or the current conversation |
+| a human, by hand | — | Copies `templates/PERSPECTIVE_TEMPLATE.md` and fills it in |
 | `/soloscrum:review` | all descriptions, then the bodies of the selected few | Applies the selected perspectives as additional review lenses per `soloscrum-define-code-review-process` |
 
 ## Depends On
