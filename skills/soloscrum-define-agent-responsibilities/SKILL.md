@@ -39,6 +39,7 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 | Commit | dev | — | review |
 | PR | dev (creates as draft) | review (promote to ready) — **user merges** | review |
 | Figma artifact | ui | ui | review (optional design fidelity check) |
+| Review perspective | the user, via `/soloscrum:collect-perspective` (which drafts and asks) | same — an overlapping candidate updates the existing perspective rather than adding a sibling | consumed by `review` at review time; no agent owns the corpus, which is machine-local and outlives every repository |
 | Code | dev | dev | review |
 | DoD self-check | dev/ui (own work) | — | review (final) |
 | Type label registration | dev (during breakdown) | — | — |
@@ -62,6 +63,10 @@ user                     user     → runs `gh pr merge` (the only irreversible 
                                      merge fires GH `Closes #` auto-close on referenced Issues
 /soloscrum:cleanup       (none)   → reclaims worktrees whose branch merged (mechanical test: PR state, then
                                      ancestry); never removes one holding uncommitted or unpushed work
+/soloscrum:collect-perspective
+                         (none)   → extracts review perspectives from an external PR's review comments or the
+                                     current conversation into ~/.claude/review-perspectives/; /soloscrum:review
+                                     selects among them on descriptions alone
 /soloscrum:refine        po       → janitor sweep at start: (a) closes parent Issues whose Sub-issue tree is fully closed
                                      (the only close path for parents, since per-Subtask PRs do not reference the parent
                                      via Closes #); (b) closes standalone Issues whose direct merged PR did not fire GH's

@@ -24,9 +24,15 @@ The sources fail differently, so they get different filters:
 - **CodeRabbit findings are already filtered by the tool.** Its severity classification is informational, and even its lowest tier corresponds to documented patterns. Re-filtering by severity silently drops legitimate signal.
 - **Multi-agent reviewers spawn fresh per PR.** They are prone to hallucinating constraints and flagging intentional changes. The 80-confidence pre-filter is the noise gate calibrated for that.
 
-- **Review perspectives were authored deliberately.** You wrote each one, and reviewed it when it was collected. Applying the agent confidence filter to them would discard exactly the judgements you collected them to preserve — so they sit on the CodeRabbit side of the line: no pre-filter.
+- **Review perspectives need a different guard entirely.** The perspective is trusted — you wrote it and confirmed it when it was collected. A *finding* it produces is not: that came from a model reading a diff, the same mechanism the confidence filter guards. "The rule is sound" and "this instance is real" are different claims.
 
-The pre-filter applies only to the multi-agent side. After it, every surviving finding goes through the same per-item decision. Perspective findings record which perspective produced them; a perspective whose findings are repeatedly skipped is miscalibrated, and that signal is only visible if the attribution is kept.
+  So perspective findings take no confidence score, but must be **grounded**: each one cites a location in this PR's diff and the specific check in the perspective body it instantiates. A finding that cannot cite both is discarded as unsupported. That targets hallucinated instances directly, where a score would also drop correct findings the scorer happened to be unsure about.
+
+The confidence pre-filter applies only to the multi-agent side. After it, every surviving finding goes through the same per-item decision.
+
+Perspective findings record which perspective produced them, and the review reports how many perspectives the corpus holds against how many were selected. Without that line, a perspective whose trigger is too narrow to ever fire again is indistinguishable from one that simply is not relevant today — the corpus rots silently and nothing surfaces it.
+
+The same defect can arrive from more than one source, since perspectives deliberately encode judgements some built-in lenses also cover. It is reported once, under the source that described it best, noting the others that raised it.
 
 Mixing the two — applying the agent confidence filter to CodeRabbit, or accepting agent findings below 80 because they "look plausible" — is a named anti-pattern.
 

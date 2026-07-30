@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-review-perspective
-description: "Reference: the Review Perspective format — a machine-local, self-describing unit of review knowledge stored at ~/.claude/review-perspectives/<name>/PERSPECTIVE.md. Defines the directory contract, the skill-shaped frontmatter, the description rules /soloscrum:review selects on (English, <=2048 chars, when + what), and why perspectives are deliberately not stored as skills."
+description: "Reference: the Review Perspective format — a machine-local, self-describing unit of review knowledge stored at ~/.claude/review-perspectives/<name>/PERSPECTIVE.md. Defines the directory contract, the skill-shaped frontmatter, the description rules /soloscrum:review selects on (English, <=2048 chars, when + what + a stated boundary, decidable without the body), and why perspectives are deliberately not stored as skills."
 user-invocable: false
 ---
 
@@ -70,7 +70,7 @@ Two keys, both required: `name` (kebab-case, matching the directory) and `descri
 - **At most 2048 characters.** Descriptions are loaded together, so each one's length is a cost paid by every selection. The limit forces the description to carry the trigger and nothing else.
 - **States When.** The condition under which this perspective applies — the kind of change, the area, the signal in the diff. Without it the selector must guess, and guessing means either applying everything or applying nothing.
 - **States What.** What the perspective examines once it applies. Enough for the selector to tell it apart from a neighbouring perspective; not the full checklist, which belongs in the body.
-- **Recommended: a negative trigger.** Where it does *not* apply. A perspective with no stated boundary tends to match everything, and a corpus of those is the same as having none.
+- **States a boundary.** Either where it does *not* apply, or an explicit statement that it applies broadly. A perspective with no stated boundary tends to match everything, and a corpus of those is the same as having none — so "broadly applicable" must be a claim the author made on purpose, not the default that results from omission. This is the one rule most often skipped, and skipping it is what degrades a corpus fastest.
 - **Self-sufficient.** Applicability must be decidable from the description alone. A description that requires reading the body to know whether it is relevant has failed at its only job.
 
 ### Good and bad
@@ -105,6 +105,18 @@ description: >
   such as stack traces or query fragments. Not applicable to pure functions,
   internal helpers with no I/O, or test code.
 ```
+
+### Language and ecosystem scope
+
+Selection reads descriptions, never bodies. So a description phrased ecosystem-neutrally ("when a change touches error handling…") whose body encodes ecosystem-specific guidance will be selected on a project where that guidance does not apply, and the applying model will force it — producing a plausible-looking finding that is simply wrong for the language.
+
+If a perspective's advice is specific to a language, framework, or ecosystem, **say so in the description**, not only in the body. The boundary rule above is where that belongs.
+
+## Corpus size
+
+Every description is read on every review. At the 2048-character limit that is roughly 500 tokens each, paid before the diff is even considered — negligible at five perspectives, material at fifty, and a real cost at several hundred. `/soloscrum:collect-perspective` pays the same scan again at write time, to deduplicate.
+
+Nothing currently prunes, archives, or prioritises (tracked in #101). A corpus is expected to stay small because it holds judgements the user found worth keeping, not everything they ever read. Treat unbounded growth as a signal that perspectives are being collected too eagerly rather than as a problem the format will solve.
 
 ## Body
 

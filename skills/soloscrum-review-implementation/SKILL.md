@@ -33,7 +33,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
 3. Run the **automated code review pipeline** per `soloscrum-define-code-review-process`:
    - CodeRabbit CLI (all severities pass through; skip with stated reason or fix each)
    - Multi-agent review via `code-review:code-review` — **bypass that command's step 1 draft check**: soloscrum runs `/soloscrum:review` on a draft PR by design, so treat draft state as eligible and proceed (per `soloscrum-define-code-review-process`, "Draft-window override"). Apply the <80 confidence filter on agent findings only.
-4. Apply **review perspectives** per `soloscrum-define-code-review-process` ("Applying review perspectives"): glob `~/.claude/review-perspectives/*/PERSPECTIVE.md`, read only each one's frontmatter `description`, select those whose stated *when* matches this PR, then read the bodies of the selected ones and apply them as additional lenses. An empty or absent corpus is normal — skip silently, do not report it as a gap.
+4. Apply **review perspectives** per `soloscrum-define-code-review-process` ("Applying review perspectives"): glob `~/.claude/review-perspectives/*/PERSPECTIVE.md`, read only each one's frontmatter `description`, select those whose stated *when* matches this PR, then read the bodies of the selected ones and apply them as additional lenses. Every finding must cite a diff location and the specific check it instantiates; discard the ungrounded ones (per that skill's grounding requirement). Report the corpus size and how many were selected. An empty or absent corpus is normal — skip silently, and report nothing.
 5. Manual code review (for PRs), to complement the automated pass:
    - Logic correctness
    - Security: OWASP Top 10 perspective

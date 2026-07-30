@@ -22,10 +22,11 @@ Turn review knowledge into something the next review can apply.
    - **A PR URL** — read its review comments: `gh pr view <url> --comments`, plus the inline comments (`gh api repos/{owner}/{repo}/pulls/{n}/comments`). Reviews of *other people's* projects are the richest source, because the reasoning is stated explicitly for a reader who lacks the author's context.
    - **No argument** — draw from the current conversation. Whatever the user has been working through with you is the source: a decision reached, a mistake diagnosed, a convention argued for.
 2. **Extract candidate judgements.** A candidate is a statement about what to look for that would still be true on a different change. Skip anything that only reports a fact about the specific diff.
-3. **Generalise.** Strip the originating case down to its transferable core — the framework, not the file; the class of mistake, not the instance. A perspective that only fires on the situation that produced it will never fire again. Keep the concrete example; move it to the body.
-4. **Reconcile against what exists.** Read the `description` of every perspective under `~/.claude/review-perspectives/*/PERSPECTIVE.md`. If a candidate overlaps one, propose an **update** to that perspective rather than a new sibling. Near-duplicates are the failure mode that makes a corpus unselectable — two perspectives with overlapping triggers force the selector to guess, and both get applied or neither does.
-5. **Draft the file** per `soloscrum-define-review-perspective`: kebab-case directory, `PERSPECTIVE.md`, `name` + `description` frontmatter. Hold the description to the rules that skill defines — English, ≤ 2048 characters, When and What, a negative trigger, decidable without the body.
-6. **Show the content and take one confirmation**, then write. See Autonomy below.
+3. **Assess whether the claim is actually right.** A reviewer can be wrong, or right only for their project's conventions, or right only for a library version. The user's interest in the source is not evidence the claim is correct, and the confirmation in step 7 reviews the *generalised* form — one step removed from the context that would make a bad claim obvious. Say plainly when a candidate looks project-specific or contestable, rather than laundering it into a rule.
+4. **Generalise.** Strip the originating case down to its transferable core — the framework, not the file; the class of mistake, not the instance. A perspective that only fires on the situation that produced it will never fire again. Keep the concrete example; move it to the body.
+5. **Reconcile against what exists.** Read the `description` of every perspective under `~/.claude/review-perspectives/*/PERSPECTIVE.md`. If a candidate overlaps one, propose an **update** to that perspective rather than a new sibling. Near-duplicates are the failure mode that makes a corpus unselectable — two perspectives with overlapping triggers force the selector to guess, and both get applied or neither does.
+6. **Draft the file** per `soloscrum-define-review-perspective`: kebab-case directory, `PERSPECTIVE.md`, `name` + `description` frontmatter. Hold the description to the rules that skill defines — English, ≤ 2048 characters, When and What, a stated boundary (either where it does not apply, or an explicit claim that it applies broadly), and decidable without the body. State any language or ecosystem scope in the description too, since selection never reads the body.
+7. **Show the content and take one confirmation**, then write. See Autonomy below.
 
 ## Autonomy
 
@@ -34,6 +35,12 @@ This command writes **outside the repository**, into the user's home directory. 
 So: present the full proposed file content, take **one** confirmation for the invocation, then write without further prompting. Do not ask per file when several perspectives come out of one source.
 
 An update to an existing perspective shows the diff, not just the new content — the user is being asked to approve a change to something they already accepted.
+
+### Do not carry the source's secrets across
+
+The corpus is machine-local and crosses into every project the user works on, indefinitely. Review comment threads routinely contain things that should not travel: credentials pasted into a repro, internal hostnames and paths in a stack trace, unreleased product detail, an unpatched vulnerability being discussed. A private repository the user has read access to — a client's, an employer's — is a legitimate source and the most likely one to carry such content.
+
+Generalisation removes most of this incidentally, since the transferable core of a judgement rarely needs the specifics. Make it deliberate: carry no identifier from the source that is not required for the perspective to be understood — no repository or organisation name, no host, no path outside the framework being discussed, no verbatim quote of a comment that includes any of these. Where a concrete example genuinely helps, rewrite it against a neutral placeholder rather than copying the original.
 
 ## Input
 
@@ -47,7 +54,7 @@ Per perspective: whether it was created or updated, its path, and its descriptio
 ## Notes
 
 - Perspectives are machine-local and cross-repository. They are never committed, and `/soloscrum:collect-perspective` never writes into the repository it is invoked from.
-- Adding `Write(~/.claude/review-perspectives/**)` to the user's own `~/.claude/settings.json` removes the harness prompt on each write. The confirmation in step 6 is soloscrum's own gate and stays regardless.
+- Adding `Write(~/.claude/review-perspectives/**)` to the user's own `~/.claude/settings.json` removes the harness prompt on each write. The confirmation in step 7 is soloscrum's own gate and stays regardless.
 - Collecting from a PR does not require any relationship to it. Reading a stranger's review is a legitimate and unusually good source.
 
 ## Resources
