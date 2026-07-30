@@ -43,9 +43,10 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
      ```bash
      skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number>
      ```
-     Then treat conclusions of `SUCCESS` / `SKIPPED` / `NEUTRAL` as acceptable. Anything else (`FAILURE` / `CANCELLED` / `TIMED_OUT` / `ERROR` / `ACTION_REQUIRED` / `STARTUP_FAILURE`) downgrades the verdict to **Fail**: post the failed conclusions on the PR, revert the Subtask to `in-progress`, and skip the remaining Pass actions. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).
+     That path is repo-root-relative — run it with the **main checkout** as the working directory, not a `/soloscrum:develop` worktree (see `soloscrum-define-worktree`, "Paths that stay anchored to the main checkout"). Then treat conclusions of `SUCCESS` / `SKIPPED` / `NEUTRAL` as acceptable. Anything else (`FAILURE` / `CANCELLED` / `TIMED_OUT` / `ERROR` / `ACTION_REQUIRED` / `STARTUP_FAILURE`) downgrades the verdict to **Fail**: post the failed conclusions on the PR, revert the Subtask to `in-progress`, and skip the remaining Pass actions. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).
    - Promote the PR to ready (`gh pr ready`) — reversible; runs without pre-confirm
    - **Hand the merge off to the user** — surface the exact `gh pr merge` command. Do not run `gh pr merge`; merge is the user's gate. Issue close is downstream of merge: GH auto-closes referenced Issues via the PR body's `Closes #` keyword. Parent Issues that GH does not auto-close are picked up by the next `/soloscrum:refine` janitor sweep.
+   - Alongside the merge command, surface `/soloscrum:cleanup` as the follow-up that reclaims this work unit's worktree. Do **not** run it here: the PR has not merged yet, so the worktree is correctly still in flight and a reclaim pass would report it as `kept` (per `soloscrum-define-worktree`'s merged test). `/soloscrum:develop` also runs the same pass at its start, so the worktree is reclaimed either way.
 6. On Fail:
    - Post specific feedback on PR
    - Invoke `soloscrum-tracker-{github|linear}-transition-state` to revert the Subtask to `in-progress`

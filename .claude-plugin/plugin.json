@@ -12,6 +12,12 @@
       "title": "Tracker Profile",
       "description": "Where SP, dependencies, and state are stored. Use 'github-only' (default) for repos restricted to GitHub Issues, or 'linear+github' for repos with Linear native sync configured.",
       "default": "github-only"
+    },
+    "worktree_root": {
+      "type": "string",
+      "title": "Worktree Root",
+      "description": "Repo-root-relative directory where /soloscrum:develop creates each work unit's git worktree. Must stay inside the repository. Override per-repo with worktree_root in .claude/rules/branch.md frontmatter.",
+      "default": ".soloscrum/worktrees"
     }
   }
 }

@@ -1,6 +1,9 @@
 # Claude Code per-user settings (committed: .claude/settings.json)
 .claude/settings.local.json
 
+# /soloscrum:develop worktree root (see skills/soloscrum-define-worktree)
+.soloscrum/
+
 # OS / editor scratch
 .DS_Store
 *.swp

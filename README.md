@@ -87,6 +87,7 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
 | `/soloscrum:review` | 実装・デザインをレビューしSubtaskをDoneに遷移する（Issueクローズはマージ時に発火） |
 | `/soloscrum:status` | 現在の作業状況を確認する |
 | `/soloscrum:next` | 次にやるべきことを提示する |
+| `/soloscrum:cleanup` | マージ済みブランチの worktree を回収する |
 
 ### コマンド名前空間
 
@@ -115,7 +116,8 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
 .claude/rules/
   tracker.md      profile上書き（任意）。frontmatter `profile: github-only|linear+github`
   stack.md        技術スタック・ディレクトリ構成・命名規約
-  branch.md       このリポジトリのブランチ戦略
+  branch.md       このリポジトリのブランチ戦略。worktree 置き場の上書きも任意で
+                  frontmatter `worktree_root: <repo相対パス>`
   dod-extra.md    リポジトリ固有のDoD追加条件
 ```
 
@@ -133,3 +135,13 @@ soloscrum/
   agents/           エージェント定義
   skills/           スキル定義（define-* / tracker-{profile}-* / その他）
 ```
+
+導入先リポジトリでは、これに加えて `/soloscrum:develop` が作業用の worktree を作る。
+
+```
+<リポジトリ>/
+  .soloscrum/worktrees/     worktree 置き場（gitignore 対象）
+    feat/123-some-slug/     ブランチ 1 本につき 1 worktree
+```
+
+メインのチェックアウトはデフォルトブランチのまま保たれ、feature ブランチに切り替わることはない。マージ済みの worktree は `/soloscrum:cleanup` が回収する。置き場は `.claude/rules/branch.md` の `worktree_root` で変更できる。詳細は `skills/soloscrum-define-worktree/SKILL.md` を参照。

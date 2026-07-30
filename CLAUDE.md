@@ -54,7 +54,7 @@ These are the specific failure modes this file exists to prevent. Each has been 
 
 Two layered files under `.claude/`:
 
-- **`.claude/settings.json`** — repo-shared, **committed**. Curated allowlist of safe / reversible operations (read-only `gh` queries, `gh pr create` / `gh pr ready` / `gh pr review` / `gh pr comment`, `gh issue create` / `gh issue edit` / `gh issue comment`, `gh api` / `gh label`, all `git` operations except force-push / hard-reset, `coderabbit review`, `find` / `grep` / `rg` / `ls` / `cat` / `jq`, `Write(/tmp/**)`, the `wait-for-pr-checks.sh` script). Plus a `deny` list for truly destructive ops (`rm`, force-push, `git reset --hard`, `gh repo delete`, `gh issue delete`).
+- **`.claude/settings.json`** — repo-shared, **committed**. Curated allowlist of safe / reversible operations (read-only `gh` queries, `gh pr create` / `gh pr ready` / `gh pr review` / `gh pr comment`, `gh issue create` / `gh issue edit` / `gh issue comment`, `gh api` / `gh label`, all `git` operations except force-push / hard-reset / force worktree removal, `coderabbit review`, `find` / `grep` / `rg` / `ls` / `cat` / `jq`, `Write(/tmp/**)`, the `wait-for-pr-checks.sh` and `reclaim-worktrees.sh` scripts). Plus a `deny` list for truly destructive ops (`rm`, force-push, `git reset --hard`, `gh repo delete`, `gh issue delete`).
 - **`.claude/settings.local.json`** — per-user, **gitignored**. Personal additions (e.g. paths to local plugin caches, ad-hoc `tee` patterns picked up during a session). Never committed.
 
 Operations **deliberately not pre-approved** (require per-invocation user prompt by design):
@@ -69,6 +69,7 @@ Operations **denied entirely** (cannot be approved without editing settings):
 - `git push --force` / `git push -f` / `git push --force-with-lease` — overwrites shared history
 - `git reset --hard` / `git clean -f` — discards uncommitted work
 - `git branch -D` — force-deletes branches without merge check
+- `git worktree remove --force` / `-f` — removes a worktree holding uncommitted work, defeating the safety conditions `/soloscrum:cleanup` relies on
 - `gh repo delete` / `gh issue delete` — irreversible
 - `gh api -X DELETE:*` / `gh api --method DELETE:*` — REST DELETE through the generic gh client (since `gh api:*` itself is allowed, the explicit deny is required to block destructive verbs)
 
@@ -95,6 +96,7 @@ Skills (the soloscrum spec — read these for the contract):
 - `skills/soloscrum-define-issue-format/SKILL.md` — Concept (Issue = intent), Issue body format, Issue-vs-Subtask discriminator, Subtask body contract, the two AC shapes (Shape A user-facing / Shape B structural)
 - `skills/soloscrum-define-issue-size/SKILL.md` — split criteria as mis-scope smells, `/soloscrum:breakdown` reviewability trigger, split axes (feature / phase — layer is NOT an Issue split axis)
 - `skills/soloscrum-define-branch-commit/SKILL.md` — branch-per-Subtask vs branch-per-Issue, Conventional Commits, parent Issue close (janitor-only)
+- `skills/soloscrum-define-worktree/SKILL.md` — worktree layout, `worktree_root` resolution, create/reuse rules, the merged test and safety conditions `/soloscrum:cleanup` applies
 - `skills/soloscrum-define-dod/SKILL.md` — DoD checklist with layered AC verification (Subtask PR / Issue-without-Subtasks / parent Issue sign-off)
 - `skills/soloscrum-define-story-points/SKILL.md` — SP scale (scope × uncertainty, 1/2/3/5; SP > 5 reads as mis-scope smell — routes back to `/soloscrum:refine`, not into `/soloscrum:breakdown`)
 - `skills/soloscrum-define-agent-responsibilities/SKILL.md` — concept ownership matrix (Creator / Mutator / Verifier per concept), Lifecycle Summary, role-gated state transitions
@@ -102,7 +104,7 @@ Skills (the soloscrum spec — read these for the contract):
 
 Commands the user invokes:
 
-- `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review` — see `commands/` (these ship in the plugin to consumer repos)
+- `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`, `/soloscrum:cleanup` — see `commands/` (these ship in the plugin to consumer repos)
 
 ## Local commands (this repo only)
 

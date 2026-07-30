@@ -14,7 +14,7 @@ Wait for all status checks on a GitHub PR to complete (success or failure), then
 
 The implementation is a single shell script colocated with this skill at `skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh`. The script encapsulates the polling loop, the `gh pr view` invocation, the rollup-normalisation `jq` filter, the empty-rollup guard, and the timeout logic. The skill itself is documentation; agents invoke the script directly.
 
-**Invocation is from the repository root, using the full path** (so a harness allowlist matches a single stable command-string surface):
+**Invocation is from the repository root, using the full path** (so a harness allowlist matches a single stable command-string surface). "Repository root" means the **main checkout's** root — `/soloscrum:develop` runs its implementation inside a worktree, where the same relative path resolves elsewhere. Run this before switching into the worktree, or with the main checkout as the working directory (see `soloscrum-define-worktree`, "Paths that stay anchored to the main checkout"):
 
 ```
 skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr_number> [poll_interval_sec] [timeout_sec]

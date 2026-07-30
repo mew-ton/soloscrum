@@ -27,8 +27,11 @@ Implements code for a develop work unit and generates a **draft** PR. The target
 
 1. Read target's reference material — **for a Subtask target**: its "what" + Checklist (slice scope per `soloscrum-define-issue-format`'s Subtask Body section) and the **parent Issue's AC** (what the slice must move closer to satisfying without regression); **for a no-Subtask Issue target** (per `soloscrum-define-branch-commit`'s branch-per-Issue case): the Issue's full AC directly. Arguments: $ARGUMENTS
 2. Check tech stack in `.claude/rules/stack.md`
-3. Create branch following `soloscrum-define-branch-commit` conventions:
-   - `{type}/{issue-id}-{slug}`
+3. Create the work unit's **worktree and branch** per `soloscrum-define-worktree`:
+   - Branch name `{type}/{issue-id}-{slug}` per `soloscrum-define-branch-commit`
+   - `git fetch origin`, resolve `worktree_root`, then `git worktree add -b <branch> <worktree_root>/<branch> origin/<default>`. If a worktree for the branch already exists, reuse it — and inspect it first, since it may hold work from an interrupted run.
+   - Every step below runs with that worktree as the working directory. The main checkout is never switched onto the branch.
+   - If `.gitignore` does not already cover `worktree_root`, add the entry here so it lands in this unit's PR. Never commit it directly to the default branch.
 4. Implement code to deliver the slice (and to move the parent Issue's AC closer to satisfied without regression):
    - Write tests (when applicable)
    - Confirm zero lint errors
@@ -53,7 +56,7 @@ Implements code for a develop work unit and generates a **draft** PR. The target
    ```bash
    skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number> 15 300
    ```
-   This is a startup-confirmation step, not a green-gate — surface non-`SUCCESS` conclusions if any but proceed to handoff regardless. The intent is to catch CI startup failures (workflow syntax errors, missing secrets) early. **Do not** write inline `until` loops over `gh pr view`; that pattern is the named anti-pattern in `CLAUDE.md` and the reason this skill exists (see `soloscrum-tracker-github-wait-for-pr-checks`).
+   That path is repo-root-relative, so run it with the **main checkout** as the working directory rather than the worktree — see `soloscrum-define-worktree`, "Paths that stay anchored to the main checkout". This is a startup-confirmation step, not a green-gate — surface non-`SUCCESS` conclusions if any but proceed to handoff regardless. The intent is to catch CI startup failures (workflow syntax errors, missing secrets) early. **Do not** write inline `until` loops over `gh pr view`; that pattern is the named anti-pattern in `CLAUDE.md` and the reason this skill exists (see `soloscrum-tracker-github-wait-for-pr-checks`).
 9. Verify DoD self-check with `soloscrum-define-dod` (every item except "Review has passed", which is owned by `soloscrum-review`).
 10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then invoke the matching `transition-state` operation skill to move the **target** (Subtask or no-Subtask Issue) to `in-review`:
     - `github-only` → `soloscrum-tracker-github-transition-state`
@@ -63,6 +66,7 @@ Implements code for a develop work unit and generates a **draft** PR. The target
 
 ## Depends On
 
+- `soloscrum-define-worktree` (where the work happens; worktree creation and reuse)
 - `soloscrum-define-branch-commit`
 - `soloscrum-define-dod`
 - `soloscrum-define-pr-lifecycle` (draft creation, autonomy of reversible transitions, handoff boundary)

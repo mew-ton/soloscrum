@@ -28,6 +28,8 @@
       "Bash(git restore:*)",
       "Bash(git rev-parse:*)",
       "Bash(git stash:*)",
+      "Bash(git worktree:*)",
+      "Bash(git merge-base:*)",
 
       "Bash(gh issue view:*)",
       "Bash(gh issue list:*)",
@@ -56,6 +58,7 @@
       "Bash(cr review:*)",
 
       "Bash(skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh:*)",
+      "Bash(skills/soloscrum-define-worktree/scripts/reclaim-worktrees.sh:*)",
 
       "Write(/tmp/**)",
       "Bash(tee /tmp/*)"
@@ -70,6 +73,8 @@
       "Bash(git reset --hard:*)",
       "Bash(git clean -f:*)",
       "Bash(git branch -D:*)",
+      "Bash(git worktree remove --force:*)",
+      "Bash(git worktree remove -f:*)",
       "Bash(gh repo delete:*)",
       "Bash(gh issue delete:*)",
       "Bash(gh api -X DELETE:*)",
