@@ -26,16 +26,19 @@ Implement a develop work unit (Subtask of type `develop`, or a no-Subtask Issue 
 1. Receive target work unit (`$ARGUMENTS`) — either:
    - a **Subtask** of type `develop` (when the parent Issue went through `/soloscrum:breakdown`), or
    - a **no-Subtask Issue** (when the Issue's intent fits a single reviewable PR per `soloscrum-define-issue-size` and skipped `/soloscrum:breakdown`). The Issue still needs `type:develop` semantically — design-ui work goes through `/soloscrum:design-ui` regardless of split.
-2. Reclaim merged worktrees before creating a new one, so the worktree root does not accumulate across work units:
+2. `git fetch origin`, then reclaim merged worktrees before creating a new one, so the worktree root does not accumulate across work units:
 
    ```bash
+   git fetch origin
    skills/soloscrum-define-worktree/scripts/reclaim-worktrees.sh <worktree_root>
    ```
 
+   The fetch matters: the reclaim pass falls back to ancestry against `origin/<default-branch>`, and a stale remote-tracking ref makes it report reclaimable worktrees as still in flight.
+
    Same pass `/soloscrum:cleanup` runs; safe and non-interactive per `soloscrum-define-worktree`. Report anything it `skipped` and continue — a worktree holding unsaved work never blocks new work.
 3. Launch `soloscrum-dev` to:
-   - Create the work unit's **worktree and branch** per `soloscrum-define-worktree` and `soloscrum-define-branch-commit`: resolve the main checkout root via `git rev-parse --path-format=absolute --git-common-dir`, fetch, resolve `worktree_root`, then `git worktree add -b {type}/{issue-id}-{slug} <main-root>/<worktree_root>/<branch> origin/<default>` (reusing an existing worktree for the same branch rather than creating a second). **Build that path from the main checkout root, never from the current directory** — an agent already sitting in a previous worktree would otherwise nest the new one inside it, which turns `git add -A` into a gitlink commit. Implementation, commits, and PR creation all run with the new worktree as the working directory; the main checkout is never switched onto the branch.
-   - Ensure the worktree root is ignored — write it to `.git/info/exclude` immediately (untracked, effective at once), and additionally append it to `.gitignore` inside the worktree if not already covered, so the durable entry lands in this unit's PR (never a direct commit to the default branch)
+   - Create the work unit's **worktree and branch** per `soloscrum-define-worktree` and `soloscrum-define-branch-commit`: resolve the main checkout root via `git rev-parse --path-format=absolute --git-common-dir`, fetch, resolve `worktree_root`, then `git worktree add -b {type}/{issue-id}-{slug} <main-root>/<worktree_root>/<branch> "$default_ref"` (`default_ref` comes from `git rev-parse --abbrev-ref origin/HEAD` and is already `origin/`-prefixed) (reusing an existing worktree for the same branch rather than creating a second). **Build that path from the main checkout root, never from the current directory** — an agent already sitting in a previous worktree would otherwise nest the new one inside it, which turns `git add -A` into a gitlink commit. Implementation, commits, and PR creation all run with the new worktree as the working directory; the main checkout is never switched onto the branch.
+   - Ensure the worktree root is ignored — write the resolved root as a repo-root-anchored pattern (`/<worktree_root>/`) to `.git/info/exclude` immediately (untracked, effective at once), and additionally append it to `.gitignore` inside the worktree if not already covered, so the durable entry lands in this unit's PR (never a direct commit to the default branch)
    - Implement code referencing `.claude/rules/stack.md`
    - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
    - Generate PR body (closing keyword: `Closes #<subtask>` for a Subtask target, `Closes #<issue>` for a no-Subtask Issue target — per `soloscrum-define-branch-commit`'s parent-close contract, never `Closes #<parent>` for a Subtask PR; plus change summary and test instructions)

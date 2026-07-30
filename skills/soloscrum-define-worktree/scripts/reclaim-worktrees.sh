@@ -70,10 +70,14 @@ case "$worktree_root" in
   "")    echo "worktree_root must not be empty" >&2; exit 2 ;;
 esac
 
-# Strip trailing slashes. Without this, a configured root of "a/b/" builds a
-# prefix ending in "//", which matches no real worktree path — every worktree
-# under a slightly-misconfigured root would silently vanish from the report
-# rather than being reclaimed or flagged.
+# Normalise before building the prefix. `git worktree list --porcelain` reports
+# canonical paths, so any un-normalised form here fails the containment test at
+# process_record and every worktree under a slightly-misconfigured root vanishes
+# from the report entirely — neither reclaimed nor flagged. Trailing slashes
+# would build a "//" prefix; a leading "./" would build a "/./" segment.
+while [ "${worktree_root#./}" != "$worktree_root" ]; do
+  worktree_root="${worktree_root#./}"
+done
 while [ "${worktree_root%/}" != "$worktree_root" ]; do
   worktree_root="${worktree_root%/}"
 done

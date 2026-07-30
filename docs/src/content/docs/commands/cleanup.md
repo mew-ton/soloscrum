@@ -39,7 +39,9 @@ Removal itself uses `git worktree remove` and `git branch -d` — the forms that
 
 ## Autonomy
 
-Reclamation runs without asking. A worktree that passes both the merged test and the safety conditions holds nothing that is not already on the default branch or inside a merged PR, so removing it destroys no work — and the branch can be checked out again from the remote at any time.
+Reclamation runs without asking. A worktree that passes both the merged test and the safety conditions holds nothing that is not already on the default branch or inside a merged PR, so removing it destroys no work.
+
+The recovery path is those two places, **not** the remote branch: `gh pr merge --delete-branch` removes the remote ref, and a squash merge means the original branch tip is not an ancestor of the default branch either. What survives is the merged content — on the default branch, and in the PR's own record.
 
 ## When it runs
 

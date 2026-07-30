@@ -61,6 +61,8 @@ The worktree root must be ignored, and it must be ignored **immediately** — no
 1. **`.git/info/exclude`, at creation time.** Takes effect the instant the worktree exists, is not tracked, needs no commit, and is shared by every worktree of the repository because it lives in the common directory. This is what closes the window.
 2. **`.gitignore`, if not already covered** — appended **inside the work unit's worktree, on its branch**, so it lands in that unit's PR. Never commit it directly to the default branch; `soloscrum-define-branch-commit` forbids that, and the ignore entry is not special. This is what makes the ignore durable and visible to collaborators and to fresh clones.
 
+Both entries use the **resolved root anchored to the repository root**, with a leading and trailing slash — `/.soloscrum/worktrees/` for the default, `/build/worktrees/` for a `build/worktrees` override. Do not ignore the root's top-level segment: a `build/worktrees` override would then hide all of `build/` from `git status`, including files that have nothing to do with worktrees.
+
 The `.git/info/exclude` entry is what makes step 2's delay safe. Without it, every worktree cut before the ignore-bearing PR merged would be exposed for its entire lifetime, not just during a first-run bootstrap.
 
 ### What ignoring does not cover
@@ -80,12 +82,18 @@ A repository whose tooling globs broadly should add the worktree root to those t
    Never compute the worktree path relative to the current working directory. An agent's working directory persists across steps and sessions, so after one `/soloscrum:develop` it is already *inside* a worktree — and a relative `git worktree add .soloscrum/worktrees/<branch>` from there creates the new worktree **nested inside the previous one**. That nesting is not cosmetic: the inner worktree's `.git` file makes `git add -A` in the outer one stage it as a gitlink (`warning: adding embedded git repository`), and if that commit merges, the default branch permanently carries a broken submodule reference. `--git-common-dir` resolves to the shared directory from any worktree, so this form is correct wherever it runs.
 
 2. `git fetch origin` — the branch must be cut from current upstream state, not from whatever the main checkout last pulled.
-3. Resolve the default branch: `git rev-parse --abbrev-ref origin/HEAD` (e.g. `origin/main`). `origin/HEAD` is unset on some clones; fall back to the remote's advertised default (`gh repo view --json defaultBranchRef`), then to `origin/main`.
+3. Resolve the default branch into `default_ref`, a **fully-qualified remote-tracking ref**:
+
+   ```bash
+   default_ref=$(git rev-parse --abbrev-ref origin/HEAD)   # already yields e.g. origin/main
+   ```
+
+   Note the value is *already* `origin/`-prefixed. Use `${default_ref}` verbatim everywhere below — prefixing it again produces `origin/origin/main`, which fails both worktree creation and the merged test. `origin/HEAD` is unset on some clones; fall back to `origin/$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)`, then to `origin/main`.
 4. Resolve `worktree_root` and compute `${main_root}/<worktree_root>/<branch>`.
 5. Create or reuse:
    - **A worktree for this branch already exists** (`git worktree list --porcelain` reports it) → **reuse it**. Do not create a second one; git refuses to check the same branch out twice anyway. A reused worktree may hold work from an interrupted run — inspect it before continuing rather than assuming a clean slate.
    - **The branch exists but has no worktree** → `git worktree add <path> <branch>`
-   - **Neither exists** → `git worktree add -b <branch> <path> origin/<default>`
+   - **Neither exists** → `git worktree add -b <branch> <path> "$default_ref"`
 6. Everything downstream — reading files, editing, `git add` / `git commit`, `gh pr create` — runs with the worktree as the working directory.
 
 ### Paths that stay anchored to the main checkout
@@ -101,7 +109,7 @@ A worktree is reclaimable when its branch is **merged** and it holds **nothing u
 ### Merged test
 
 1. **Primary — PR state.** `gh pr list --head <branch> --state merged` returns a non-empty set → merged.
-2. **Secondary — ancestry.** `git merge-base --is-ancestor <branch> origin/<default>` succeeds → merged.
+2. **Secondary — ancestry.** `git merge-base --is-ancestor <branch> "$default_ref"` succeeds → merged.
 
 The PR check leads because it is the one that survives a squash merge. Squashing rewrites the commits, so the branch tip is not an ancestor of the default branch afterwards and the ancestry test alone reports "not merged" for work that shipped. The ancestry test still earns its place: it covers branches merged without a PR, and repositories where `gh` is unavailable.
 

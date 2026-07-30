@@ -36,7 +36,9 @@ Reclaim the worktrees `/soloscrum:develop` left behind once their work has merge
 
 ## Autonomy
 
-Removal runs **without pre-confirm**. A worktree that passes the merged test and the safety conditions in `soloscrum-define-worktree` holds nothing that is not already on the default branch or in a merged PR, so reclaiming it destroys no work — it is reversible in the only sense that matters, since the branch can be checked out again from the remote at any time.
+Removal runs **without pre-confirm**. A worktree that passes the merged test and the safety conditions in `soloscrum-define-worktree` holds nothing that is not already on the default branch or in a merged PR, so reclaiming it destroys no work.
+
+The recovery path is those two places, not the remote branch — `gh pr merge --delete-branch` deletes the remote ref, and after a squash merge the original branch tip is not an ancestor of the default branch either. Do not justify the autonomy by "the branch can be re-fetched"; justify it by "the content already merged".
 
 That autonomy depends entirely on the safety conditions holding. `git worktree remove --force` and `git branch -D` bypass them and are **never** used, by this command or any agent acting for it; both are denied in this repository's permission settings. When plain `git worktree remove` or `git branch -d` refuses, that refusal is the answer — report it, do not escalate to the forcing variant.
 
