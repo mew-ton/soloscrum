@@ -63,7 +63,7 @@ The full contract, with worked good and bad examples, is in [`skills/soloscrum-d
 
 You do not have to route a perspective through this command. When you already know the judgement you want to record, copy [`templates/PERSPECTIVE_TEMPLATE.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-review-perspective/templates/PERSPECTIVE_TEMPLATE.md) to `~/.claude/review-perspectives/<name>/PERSPECTIVE.md` and fill in the placeholders.
 
-The template's frontmatter has one placeholder per element the description rules require, so filling it in gets you a conforming description without re-deriving the shape. The alternative — copying an existing perspective — propagates whatever that one happened to get wrong.
+The template's frontmatter has one placeholder per **structural** element the rules require — When, What, Scope, Boundary — so you do not have to re-derive the shape. The three rules that constrain the description as a whole (English, the 2048-character cap, self-sufficiency) are stated in the template as a note rather than a placeholder: filling it in prompts the structure, it does not by itself guarantee those three. The alternative — copying an existing perspective — propagates whatever that one happened to get wrong.
 
 `/soloscrum:collect-perspective` does not read the template; it generates from the format rules directly.
 

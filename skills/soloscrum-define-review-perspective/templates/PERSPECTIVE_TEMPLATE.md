@@ -12,11 +12,11 @@ description: >
   distinguish a genuinely universal perspective from one whose author forgot.>
   <BOUNDARY — where this does not apply, or an explicit statement that it
   applies broadly. A perspective with no boundary matches everything.>
-  <Two rules have no placeholder because they constrain the whole description
-  rather than a part of it: keep the finished text under 2048 characters, and
-  make it decidable on its own — a reader must be able to tell whether this
-  perspective applies without opening the body. Delete this note once the four
-  elements above are written.>
+  <Three rules have no placeholder because they constrain the whole
+  description rather than a part of it: write it in English, keep the finished
+  text under 2048 characters, and make it decidable on its own — a reader must
+  be able to tell whether this perspective applies without opening the body.
+  Delete this note once the four elements above are written.>
 ---
 
 <!-- soloscrum-review-perspective -->
@@ -51,8 +51,12 @@ This is what stops the perspective from firing on everything adjacent.>
 
 ## Where this came from
 
-<Optional. The case that produced this judgement, written so a reader can decide
-whether it still applies. Carry no identifier from the source that is not needed
+<Optional — delete this whole section, heading included, when there is nothing
+to record. A leftover placeholder is worse than an absent section: it reads as
+content to anyone skimming the perspective later.
+
+The case that produced this judgement, written so a reader can decide whether it
+still applies. Carry no identifier from the source that is not needed
 to understand the perspective — no repository or organisation name, no host, no
 internal path.>
 

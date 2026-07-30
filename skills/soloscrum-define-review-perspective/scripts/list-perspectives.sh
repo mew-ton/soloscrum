@@ -125,7 +125,7 @@ function append_block(line) {
 BEGIN {
   SEP_UNIT = sprintf("%c", 31)
   SEP_REC  = sprintf("%c", 30)
-  name = ""; desc = ""; err = ""; inblock = 0; blockfold = 1
+  name = ""; desc = ""; err = ""; inblock = 0; blockfold = 1; closed = 0
 }
 
 {
@@ -156,7 +156,7 @@ NR == 1 {
     inblock = 0
   }
 
-  if ($0 ~ /^---[[:space:]]*$/) exit
+  if ($0 ~ /^---[[:space:]]*$/) { closed = 1; exit }
 
   if ($0 ~ /^name:[[:space:]]*/) {
     v = $0; sub(/^name:[[:space:]]*/, "", v)
@@ -189,8 +189,13 @@ NR == 1 {
 
 END {
   if (err == "") {
-    if (name == "")      err = "frontmatter has no name"
-    else if (desc == "") err = "frontmatter has no description"
+    # Without a closing ---, awk has just scanned the entire file and whatever
+    # it found is not frontmatter. Reporting it as a valid entry would both
+    # break the never-read-the-body contract and hand the selector a
+    # description assembled out of body text.
+    if (!closed && NR > 1) err = "frontmatter is not terminated (no closing ---)"
+    else if (name == "")   err = "frontmatter has no name"
+    else if (desc == "")   err = "frontmatter has no description"
   }
   printf "%s%c%s%c%s", name, 31, desc, 31, err
 }

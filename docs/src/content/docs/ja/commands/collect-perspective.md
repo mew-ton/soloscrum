@@ -63,7 +63,7 @@ frontmatter は skill と同型（`name` と `description`）ですが、観点�
 
 観点は必ずしもこのコマンドを通す必要はありません。記録したい判断がすでに分かっているなら、[`templates/PERSPECTIVE_TEMPLATE.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-review-perspective/templates/PERSPECTIVE_TEMPLATE.md) を `~/.claude/review-perspectives/<name>/PERSPECTIVE.md` にコピーし、プレースホルダを埋めてください。
 
-テンプレートの frontmatter には description のルールが要求する要素ごとにプレースホルダが 1 つずつ置かれているので、形を毎回導き直さなくても適合する description になります。代替手段である「既存の観点をコピーして編集する」は、その観点がたまたま間違えていた点をそのまま複製してしまいます。
+テンプレートの frontmatter には、ルールが要求する**構造**要素（When / What / Scope / Boundary）ごとにプレースホルダが 1 つずつ置かれているので、形を毎回導き直す必要はありません。description 全体にかかる 3 つのルール（英語 / 2048 文字以内 / 本文なしで判断できること）はプレースホルダではなく注記として書かれています。テンプレートを埋めることは構造を促すだけで、この 3 つを満たすことまでは保証しません。代替手段である「既存の観点をコピーして編集する」は、その観点がたまたま間違えていた点をそのまま複製してしまいます。
 
 `/soloscrum:collect-perspective` はこのテンプレートを読みません。フォーマット規則から直接生成します。
 

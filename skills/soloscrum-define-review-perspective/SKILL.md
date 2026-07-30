@@ -132,11 +132,11 @@ Keep it to what a reviewer needs at the moment of reviewing. A perspective that 
 
 ## Companion template
 
-A copy-pastable template lives next to this skill at `templates/PERSPECTIVE_TEMPLATE.md`. Its frontmatter carries one placeholder per **content** element the description rules require — When, What, Scope, Boundary — so an author cannot fill the template in while omitting one. The two remaining rules constrain the whole description rather than a part of it (the 2048-character cap and self-sufficiency), so the template states them as a note to delete rather than a placeholder to replace. Its body carries the sections that make a perspective usable at review time, including the false-positive discrimination that most affects whether a finding is worth raising.
+A copy-pastable template lives next to this skill at `templates/PERSPECTIVE_TEMPLATE.md`. Its frontmatter carries one placeholder per **content** element the description rules require — When, What, Scope, Boundary — so an author cannot fill the template in while omitting one. The three remaining rules constrain the whole description rather than a part of it (English, the 2048-character cap, and self-sufficiency), so the template states them as a note to delete rather than a placeholder to replace. Filling the template in prompts the structure; it does not by itself guarantee the finished description satisfies those three. Its body carries the sections that make a perspective usable at review time, including the false-positive discrimination that most affects whether a finding is worth raising.
 
 ### Using it
 
-Copy the file to `~/.claude/review-perspectives/<name>/PERSPECTIVE.md`, where `<name>` is the kebab-case name you set in the frontmatter — the directory name and the `name` key must match, per Storage above. Then replace every `<...>` placeholder. A remaining placeholder is a perspective that is not finished — the selector will match on the placeholder text.
+Copy the file to `~/.claude/review-perspectives/<name>/PERSPECTIVE.md`, where `<name>` is the kebab-case name you set in the frontmatter — the directory name and the `name` key must match, per Storage above. Then replace every `<...>` placeholder — and delete the optional sections you have nothing to put in, heading and all, rather than leaving their placeholders behind. A remaining placeholder is a perspective that is not finished — the selector will match on the placeholder text.
 
 Unlike `soloscrum-define-issue-format`'s Issue template, there is no `.github/` adoption path: perspectives are machine-local and never live in a repository.
 
