@@ -94,7 +94,7 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
 
 `/soloscrum:review` は、利用者が蓄積したレビュー観点を追加のレンズとして適用する。観点はマシンローカルの `~/.claude/review-perspectives/<name>/PERSPECTIVE.md` に置かれ、git 管理外で、全リポジトリ共通で参照される。
 
-```
+```text
 ~/.claude/review-perspectives/
   canonical-first/
     PERSPECTIVE.md     frontmatter は skill と同型（name / description）

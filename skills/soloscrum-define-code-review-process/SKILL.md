@@ -10,7 +10,7 @@ Defines the standard code review pipeline run during `/soloscrum:review`, plus t
 
 ## Pipeline
 
-A code review combines three complementary sources, run in parallel:
+A code review combines three complementary sources. The first two run **in parallel**; the third is a selection step that runs **after** them, because which perspectives apply depends on what the change turned out to be:
 
 1. **CodeRabbit** (`coderabbit review --plain --base main`) — produces findings with its own severity classification: `critical` / `major` / `minor` / `nitpick`.
 2. **Multi-agent review** — implemented via the `code-review:code-review` slash command (N parallel Sonnet agents, each with a focused lens: security, architecture, bug scan, history, in-file rules, coverage gap). Produces free-text findings, scored 0–100 by a Haiku agent per the rubric in that command.
@@ -106,7 +106,7 @@ For every surfaced finding, choose one:
 
 ## PR Comment Format
 
-A single comment combining both sources. Every surfaced finding records the action taken (fix or skip + reason) — agent and CodeRabbit rows use the same shape.
+A single comment combining all three sources. Every surfaced finding records the action taken (fix or skip + reason) — agent and CodeRabbit rows use the same shape.
 
 ```
 ### Code review

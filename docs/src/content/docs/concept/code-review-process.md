@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-`/soloscrum:review` runs three reviewers in parallel and consolidates their output into a single PR comment. Every finding, from either source, ends at one of two outcomes: **fix it**, or **skip it with a stated reason**. There is no third "ignore because severity is low" path.
+`/soloscrum:review` draws on three sources and consolidates their output into a single PR comment. CodeRabbit and the multi-agent review run in parallel; your stored review perspectives are then selected and applied as a further step. Every finding, whatever its source, ends at one of two outcomes: **fix it**, or **skip it with a stated reason**. There is no third "ignore because severity is low" path.
 
 ## The three review sources
 

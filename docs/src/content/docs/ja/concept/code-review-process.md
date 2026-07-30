@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-`/soloscrum:review` は 3 つの reviewer を並列に走らせ、その出力を 1 つの PR コメントにまとめます。どちらの reviewer から出てきた finding も、最終的に **修正する** か **理由を明記して skip する** のどちらかに収束します。「severity が低いから無視」という 3 つ目の選択肢はありません。
+`/soloscrum:review` は 3 つの source を使い、その出力を 1 つの PR コメントにまとめます。CodeRabbit と multi-agent review は並列に走り、蓄積したレビュー観点はそのあとに選択・適用されます。どの source から出てきた finding も、最終的に **修正する** か **理由を明記して skip する** のどちらかに落ちます。「severity が低いので無視する」という第三の道はありません。
 
 ## 3 つの review source
 
