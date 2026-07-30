@@ -50,12 +50,12 @@ Review is also the verifier for every other concept on the board. Any flip to a 
 /soloscrum:refine        po       → Issue (size-check SP, priority, AC, dependencies)
 /soloscrum:validate      design   → reads Issue, asks for refinement if invalid
 /soloscrum:breakdown     design   → proposes subtasks (type, Checklist / slice scope — Subtasks have no AC)
-               dev      → registers subtasks (SP, type label)
+                         dev      → registers subtasks (SP, type label)
 /soloscrum:develop       dev      → branch + code + draft PR; subtask → in-review
 /soloscrum:design-ui     ui       → Figma + tokens + states; subtask → in-review
 /soloscrum:review        review   → DoD + AC + code; promote PR to ready;
                           subtask → done; surface merge command to user
-user           user     → runs `gh pr merge` (irreversible, user-gated)
+user                     user     → runs `gh pr merge` (irreversible, user-gated)
 /soloscrum:refine        po       → janitor closes any parent Issues GH missed
 ```
 

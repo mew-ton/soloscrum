@@ -1,6 +1,6 @@
 ---
 title: Getting started
-description: Adopt soloscrum into a new repository — install the plugin, choose a tracker profile, configure repo rules, and file your first Issue with /refine.
+description: Adopt soloscrum into a new repository — install the plugin, choose a tracker profile, configure repo rules, and file your first Issue with /soloscrum:refine.
 sidebar:
   order: 1
 ---

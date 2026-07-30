@@ -48,19 +48,19 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 /soloscrum:refine        po       → Issue (with size-check SP, priority, AC, dependencies)
 /soloscrum:validate      design   → reads Issue, asks for refinement if invalid
 /soloscrum:breakdown     design   → proposes subtasks (with type, Checklist / slice scope — Subtasks have no AC per soloscrum-define-issue-format)
-               dev      → registers subtasks (with SP, type label)
+                         dev      → registers subtasks (with SP, type label)
 /soloscrum:develop       dev      → branch + code + draft PR; transitions target (Subtask or no-Subtask Issue per
-                           soloscrum-define-branch-commit) to In Review
+                                     soloscrum-define-branch-commit) to In Review
 /soloscrum:design-ui     ui       → Figma + tokens + states; transitions Subtask to In Review
 /soloscrum:review        review   → DoD + AC + code; promotes PR to ready; transitions Subtask to Done;
-                           surfaces merge command to user (Issue close happens at merge,
-                           not at verdict — see soloscrum-define-pr-lifecycle)
-user           user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate);
-                           merge fires GH `Closes #` auto-close on referenced Issues
+                                     surfaces merge command to user (Issue close happens at merge,
+                                     not at verdict — see soloscrum-define-pr-lifecycle)
+user                     user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate);
+                                     merge fires GH `Closes #` auto-close on referenced Issues
 /soloscrum:refine        po       → janitor sweep at start: (a) closes parent Issues whose Sub-issue tree is fully closed
-                           (the only close path for parents, since per-Subtask PRs do not reference the parent
-                           via Closes #); (b) closes standalone Issues whose direct merged PR did not fire GH's
-                           auto-close (safety-net case)
+                                     (the only close path for parents, since per-Subtask PRs do not reference the parent
+                                     via Closes #); (b) closes standalone Issues whose direct merged PR did not fire GH's
+                                     auto-close (safety-net case)
 ```
 
 ## Cross-cutting Rules
