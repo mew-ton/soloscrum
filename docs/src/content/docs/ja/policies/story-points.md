@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Story points (SP) は scope と uncertainty を表す指標で、時間ではありません。soloscrum は 1 / 2 / 3 / 5 の 4 段階スケールを使います。SP > 5 は **mis-scope の臭い**で、Issue が複数の intent を束ねている可能性が高いことを意味します — `/soloscrum:develop` に進む前に `/soloscrum:refine` で Issue を分割してください（[`issue-size`](/ja/policies/issue-size/) のとおり、大きいが一貫している単一 intent は分割せず、`/soloscrum:breakdown` で Subtask に切って配信します）。
+Story points (SP) は scope と uncertainty を表す指標で、時間ではありません。soloscrum は 1 / 2 / 3 / 5 の 4 段階スケールを使います。SP > 5 は **mis-scope の臭い**であって、自動的な分割条件ではありません。AC を読み直し、その Issue が複数の intent を束ねていないかを確認してください。束ねている場合は `/soloscrum:develop` に進む前に `/soloscrum:refine` で Issue を分割します。大きいが一貫している単一 intent なら Issue はそのままにし、`/soloscrum:breakdown` で Subtask に切って配信します（[`issue-size`](/ja/policies/issue-size/) のとおり）。
 
 ## スケール
 

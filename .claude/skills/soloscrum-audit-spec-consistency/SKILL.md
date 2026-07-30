@@ -142,7 +142,7 @@ Required substitutions per finding:
 
 Sections for rules with zero findings MUST still appear, with the finding list replaced by `(no findings)`. The Summary line totals MUST agree with the per-rule section counts.
 
-The auditor is read-only; **all fixes go through normal `/soloscrum:develop` cycles**. The report is the artifact, not file edits.
+The auditor is read-only; **all fixes go through the normal `/soloscrum:refine` → `/soloscrum:develop` cycle**. The report is the artifact, not file edits.
 
 ## Notes
 

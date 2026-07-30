@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Story points (SP) measure scope × uncertainty — not time. soloscrum uses a 1/2/3/5 scale. SP > 5 is a **mis-scope smell**: the Issue likely bundles more than one intent and should be split via `/soloscrum:refine` before `/soloscrum:develop` runs. (Per [`issue-size`](/policies/issue-size/), large but coherent single intents are not split — they are delivered through `/soloscrum:breakdown` Subtask slices.)
+Story points (SP) measure scope × uncertainty — not time. soloscrum uses a 1/2/3/5 scale. SP > 5 is a **mis-scope smell**, not an automatic split condition: re-read the AC and ask whether the Issue bundles more than one intent. If it does, split it via `/soloscrum:refine` before `/soloscrum:develop` runs. If it is one coherent intent that is simply large, the Issue stays and its delivery is sliced into `/soloscrum:breakdown` Subtasks instead (per [`issue-size`](/policies/issue-size/)).
 
 ## The scale
 

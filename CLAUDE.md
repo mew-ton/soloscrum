@@ -74,7 +74,7 @@ Operations **denied entirely** (cannot be approved without editing settings):
 
 **Caveat about `gh api`**: the allow entry `Bash(gh api:*)` covers read-mostly use (REST queries, GraphQL queries-and-mutations) but inherently includes writes via `--method PUT/POST/PATCH`. The deny rules above cover DELETE; PUT/POST/PATCH writes are left to per-call user judgment because some are routine (e.g. dismissing reviews) and some are not (e.g. modifying repo settings). When unsure, prefer specific `gh issue …` / `gh pr …` subcommands over generic `gh api`.
 
-When the user accepts an unfamiliar command at the harness prompt, that decision applies to that invocation only — it does not persist to `settings.json` automatically. Patterns observed across multiple sessions and judged universally safe should be promoted from `settings.local.json` (or per-prompt acceptance) into the committed `settings.json` via a `/soloscrum:develop` flow that explains the addition.
+When the user accepts an unfamiliar command at the harness prompt, that decision applies to that invocation only — it does not persist to `settings.json` automatically. Patterns observed across multiple sessions and judged universally safe should be promoted from `settings.local.json` (or per-prompt acceptance) into the committed `settings.json` via a `/soloscrum:refine` → `/soloscrum:develop` flow that explains the addition.
 
 ## When the flow does NOT apply
 
