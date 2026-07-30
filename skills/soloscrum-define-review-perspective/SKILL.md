@@ -54,9 +54,10 @@ description: >
   generator, a web framework, an ORM — check whether the framework already
   provides the behaviour. Look for a hand-rolled implementation of something
   the framework documents, and for the absence of any note explaining why the
-  built-in option was rejected. Not applicable when the change modifies an
-  existing custom implementation without expanding its scope, or when the
-  project has no framework in the affected area.
+  built-in option was rejected. Applies to any language or framework. Not
+  applicable when the change modifies an existing custom implementation
+  without expanding its scope, or when the project has no framework in the
+  affected area.
 ---
 ```
 
@@ -70,7 +71,7 @@ Two keys, both required: `name` (kebab-case, matching the directory) and `descri
 - **At most 2048 characters.** Descriptions are loaded together, so each one's length is a cost paid by every selection. The limit forces the description to carry the trigger and nothing else.
 - **States When.** The condition under which this perspective applies — the kind of change, the area, the signal in the diff. Without it the selector must guess, and guessing means either applying everything or applying nothing.
 - **States What.** What the perspective examines once it applies. Enough for the selector to tell it apart from a neighbouring perspective; not the full checklist, which belongs in the body.
-- **States a boundary.** Either where it does *not* apply, or an explicit statement that it applies broadly. A perspective with no stated boundary tends to match everything, and a corpus of those is the same as having none — so "broadly applicable" must be a claim the author made on purpose, not the default that results from omission. This is the one rule most often skipped, and skipping it is what degrades a corpus fastest.
+- **States a boundary and a scope.** Where it does *not* apply, or an explicit statement that it applies broadly; and the language / framework / ecosystem it targets, or an explicit statement that it is agnostic. A perspective with no stated boundary tends to match everything, and a corpus of those is the same as having none — so "broadly applicable" must be a claim the author made on purpose, not the default that results from omission. This is the one rule most often skipped, and skipping it is what degrades a corpus fastest.
 - **Self-sufficient.** Applicability must be decidable from the description alone. A description that requires reading the body to know whether it is relevant has failed at its only job.
 
 ### Good and bad
@@ -94,7 +95,7 @@ description: >
 
 Accurate and useless for selection. It describes the *document*; the selector needs to know about the *change*.
 
-**Good** — trigger, scope, boundary:
+**Good** — trigger, what, ecosystem scope, boundary:
 
 ```yaml
 description: >
@@ -102,15 +103,15 @@ description: >
   (database, network, filesystem), check that every failure mode of that I/O
   has a defined response — not just the success path. Look for unhandled
   rejections, swallowed errors, and error responses that leak internal detail
-  such as stack traces or query fragments. Not applicable to pure functions,
-  internal helpers with no I/O, or test code.
+  such as stack traces or query fragments. Applies to any language. Not
+  applicable to pure functions, internal helpers with no I/O, or test code.
 ```
 
 ### Language and ecosystem scope
 
 Selection reads descriptions, never bodies. So a description phrased ecosystem-neutrally ("when a change touches error handling…") whose body encodes ecosystem-specific guidance will be selected on a project where that guidance does not apply, and the applying model will force it — producing a plausible-looking finding that is simply wrong for the language.
 
-If a perspective's advice is specific to a language, framework, or ecosystem, **say so in the description**, not only in the body. The boundary rule above is where that belongs.
+So **every** description declares its scope — including an explicit "applies to any language / framework" when that is the case. Stating it only for the ecosystem-specific ones leaves the selector unable to tell a genuinely universal perspective from one whose author forgot, which is the same failure the boundary rule above exists to prevent. Scope belongs in the description, never only in the body.
 
 ## Corpus size
 
