@@ -33,15 +33,16 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
 3. Run the **automated code review pipeline** per `soloscrum-define-code-review-process`:
    - CodeRabbit CLI (all severities pass through; skip with stated reason or fix each)
    - Multi-agent review via `code-review:code-review` — **bypass that command's step 1 draft check**: soloscrum runs `/soloscrum:review` on a draft PR by design, so treat draft state as eligible and proceed (per `soloscrum-define-code-review-process`, "Draft-window override"). Apply the <80 confidence filter on agent findings only.
-4. Manual code review (for PRs), to complement the automated pass:
+4. Apply **review perspectives** per `soloscrum-define-code-review-process` ("Applying review perspectives"): glob `~/.claude/review-perspectives/*/PERSPECTIVE.md`, read only each one's frontmatter `description`, select those whose stated *when* matches this PR, then read the bodies of the selected ones and apply them as additional lenses. Every finding must cite a diff location and the specific check it instantiates; discard the ungrounded ones (per that skill's grounding requirement). Report the corpus size and how many were selected. An empty or absent corpus is normal — skip silently, and report nothing.
+5. Manual code review (for PRs), to complement the automated pass:
    - Logic correctness
    - Security: OWASP Top 10 perspective
    - Performance: no obvious bottlenecks
    - Readability and maintainability
-5. Compile all evaluation results into a single report following the format in `soloscrum-define-code-review-process`
-6. **On Pass / Pass with follow-ups** — run **all sub-steps below end-to-end without pausing**; the only stop in this entire sequence is at `gh pr merge`. Transition state first, then promote to ready so a tracker failure does not leave a ready PR with stale state:
+6. Compile all evaluation results into a single report following the format in `soloscrum-define-code-review-process`
+7. **On Pass / Pass with follow-ups** — run **all sub-steps below end-to-end without pausing**; the only stop in this entire sequence is at `gh pr merge`. Transition state first, then promote to ready so a tracker failure does not leave a ready PR with stale state:
    - For Pass with follow-ups only: programmatically check whether a follow-up Issue exists for each out-of-scope skip; create any missing Issue autonomously and record its number in the skip note before proceeding (no user prompt)
-   - Approve PR review — reversible. In solo-dev contexts this call fails with "Can not approve your own pull request" by design; the verdict comment posted in step 5 is the formal Pass record and steps below still run. Use try-and-fall-through (no probe call):
+   - Approve PR review — reversible. In solo-dev contexts this call fails with "Can not approve your own pull request" by design; the verdict comment posted in step 6 is the formal Pass record and steps below still run. Use try-and-fall-through (no probe call):
      ```bash
      gh pr review --approve "$PR_URL" \
        || echo "approve skipped (likely self-approve refusal); verdict comment is the formal Pass record"
@@ -60,7 +61,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
    - Promote the PR to ready (`gh pr ready`) — reversible (`gh pr ready --undo`); per `soloscrum-define-pr-lifecycle` this runs without pre-confirm
    - **Stop here.** Surface the exact `gh pr merge` command for the user to run; merge is irreversible and is the user's gate. Do not run `gh pr merge`.
    - If `transition-state` fails after `gh pr ready` has happened (rare race), surface a clear notice and prompt the user to manually transition before they merge
-7. **On Fail:**
+8. **On Fail:**
    - Comment specific issues and improvement suggestions on PR
    - Invoke the matching `transition-state` operation skill to revert the Subtask to `in-progress`
    - **Leave the PR in draft** — do not call `gh pr ready`. The draft state keeps GitHub-side auto-reviewers suppressed during rework and makes the "needs more work" state externally visible.
@@ -84,6 +85,9 @@ Follow the comment template defined in `soloscrum-define-code-review-process` (C
 ### Agent findings (≥80 confidence)
 - (per soloscrum-define-code-review-process)
 
+### Review-perspective findings
+- (per soloscrum-define-code-review-process; omitted when the corpus is empty)
+
 ### Verdict: Pass / Pass with follow-ups / Fail
 ```
 
@@ -93,6 +97,7 @@ Follow the comment template defined in `soloscrum-define-code-review-process` (C
 - `soloscrum-define-code-review-process` (verdict + post-action mapping)
 - `soloscrum-define-pr-lifecycle` (draft premise, `gh pr ready` autonomy, merge user-gate)
 - `soloscrum-define-worktree` (which checkout each step runs against)
+- `soloscrum-define-review-perspective` (the corpus selected from in step 4)
 - `soloscrum-define-tracker-profile` (routing)
 - `soloscrum-tracker-{github|linear}-transition-state` (delegated)
 - `soloscrum-tracker-github-wait-for-pr-checks` (CI gate before `gh pr ready`)

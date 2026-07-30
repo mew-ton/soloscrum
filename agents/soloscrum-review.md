@@ -7,6 +7,7 @@ skills:
   - soloscrum-review-implementation
   - soloscrum-define-dod
   - soloscrum-define-code-review-process
+  - soloscrum-define-review-perspective
   - soloscrum-define-pr-lifecycle
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
@@ -41,17 +42,19 @@ PR merge itself is **not** an agent action — it is the user's gate, per `solos
 1. Confirm DoD criteria with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`
 2. Check every DoD item without exception and state results explicitly
 3. Verify AC at the appropriate layer per `soloscrum-define-dod`'s "AC verification" section: Subtask PR (slice delivered + no regression on parent AC); Issue-without-Subtasks PR (full Issue AC satisfied); parent Issue intent-level sign-off (when all Subtasks close, **not** at any single Subtask PR). Mark as Fail if the layer-appropriate check fails.
-4. Run the automated code review pipeline per `soloscrum-define-code-review-process` (CodeRabbit + multi-agent), apply the per-item decision (fix / skip with stated reason) to every surviving finding, and consolidate into the PR comment using the canonical template
-5. Complement the automated pipeline with a manual code review for items the tools cannot judge:
+4. Run the automated code review pipeline per `soloscrum-define-code-review-process` (CodeRabbit + multi-agent) and apply the per-item decision (fix / skip with stated reason) to every surviving finding. Do **not** post yet — consolidation is a single step after every source has run.
+5. Apply the user's **review perspectives** (`soloscrum-define-review-perspective`): select from `~/.claude/review-perspectives/` on descriptions alone, then apply the selected bodies as additional lenses. The perspective is trusted; a finding it produces is not — every finding must cite a diff location and the specific check it instantiates, and ungrounded ones are discarded rather than scored. Report the corpus size and the number selected. An empty corpus is normal and is not reported.
+6. Complement the automated pipeline with a manual code review for items the tools cannot judge:
    - Logic correctness
    - Security (OWASP Top 10 perspective)
    - Performance concerns
    - Readability and maintainability
-6. Make feedback specific and include improvement suggestions
-7. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. **Wait for CI green** via `soloscrum-tracker-github-wait-for-pr-checks` before `gh pr ready`; if any conclusion is not `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as Fail and revert the Subtask to `in-progress`. Inline `until` loops over `gh pr view` are an anti-pattern (per `CLAUDE.md`). On Fail, leave the PR in draft.
-8. Never run `gh pr merge`. Surface the exact merge command to the user; merge is the user's gate.
-9. Do **not** close any Issue (Subtask or parent) as part of `/soloscrum:review`. Closure happens at merge via the PR body's `Closes #` keyword; missed parents are picked up by the `/soloscrum:refine` janitor. Per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
-10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
+7. Consolidate **once**, after the automated pipeline, the perspectives, and the manual pass have all run, into the PR comment using the canonical template. A defect raised by more than one source is reported once, under the source that described it best, noting the others — per `soloscrum-define-code-review-process`, "Consolidate across sources before posting". Posting before the later sources have run would either omit their findings from the canonical comment or split the review across inconsistent comments.
+8. Make feedback specific and include improvement suggestions
+9. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. **Wait for CI green** via `soloscrum-tracker-github-wait-for-pr-checks` before `gh pr ready`; if any conclusion is not `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as Fail and revert the Subtask to `in-progress`. Inline `until` loops over `gh pr view` are an anti-pattern (per `CLAUDE.md`). On Fail, leave the PR in draft.
+10. Never run `gh pr merge`. Surface the exact merge command to the user; merge is the user's gate.
+11. Do **not** close any Issue (Subtask or parent) as part of `/soloscrum:review`. Closure happens at merge via the PR body's `Closes #` keyword; missed parents are picked up by the `/soloscrum:refine` janitor. Per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
+12. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
 
 ## External Access
 
