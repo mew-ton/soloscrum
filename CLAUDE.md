@@ -54,7 +54,7 @@ These are the specific failure modes this file exists to prevent. Each has been 
 
 Two layered files under `.claude/`:
 
-- **`.claude/settings.json`** — repo-shared, **committed**. Curated allowlist of safe / reversible operations (read-only `gh` queries, `gh pr create` / `gh pr ready` / `gh pr review` / `gh pr comment`, `gh issue create` / `gh issue edit` / `gh issue comment`, `gh api` / `gh label`, all `git` operations except force-push / hard-reset / force worktree removal, `coderabbit review`, `find` / `grep` / `rg` / `ls` / `cat` / `jq`, `Write(/tmp/**)`, the `wait-for-pr-checks.sh` and `reclaim-worktrees.sh` scripts). Plus a `deny` list for truly destructive ops (`rm`, force-push, `git reset --hard`, `gh repo delete`, `gh issue delete`).
+- **`.claude/settings.json`** — repo-shared, **committed**. Curated allowlist of safe / reversible operations (read-only `gh` queries, `gh pr create` / `gh pr ready` / `gh pr review` / `gh pr comment`, `gh issue create` / `gh issue edit` / `gh issue comment`, `gh api` / `gh label`, all `git` operations except force-push / hard-reset / force worktree removal, `coderabbit review`, `find` / `grep` / `rg` / `ls` / `cat` / `jq`, `Write(/tmp/**)`, the `wait-for-pr-checks.sh`, `reclaim-worktrees.sh`, and `list-perspectives.sh` scripts). Plus a `deny` list for truly destructive ops (`rm`, force-push, `git reset --hard`, `gh repo delete`, `gh issue delete`).
 - **`.claude/settings.local.json`** — per-user, **gitignored**. Personal additions (e.g. paths to local plugin caches, ad-hoc `tee` patterns picked up during a session). Never committed.
 
 Operations **deliberately not pre-approved** (require per-invocation user prompt by design):

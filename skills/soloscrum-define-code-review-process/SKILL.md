@@ -22,7 +22,15 @@ All three sources' findings are then consolidated into a single PR comment.
 
 Perspectives live at `~/.claude/review-perspectives/*/PERSPECTIVE.md` and are selected, not loaded wholesale:
 
-1. Glob the corpus and read **only the frontmatter `description`** of each. Descriptions are written to be decidable on their own (that skill's description rules exist for this step).
+1. List the corpus's `name` + `description` pairs:
+
+   ```bash
+   skills/soloscrum-define-review-perspective/scripts/list-perspectives.sh
+   ```
+
+   The script reads only each file's frontmatter, so bodies are never loaded for perspectives that are not selected. Descriptions are written to be decidable on their own — that skill's description rules exist for this step.
+
+   **Fallback:** where no Bash surface is available, glob `~/.claude/review-perspectives/*/PERSPECTIVE.md` and read the frontmatter directly. This is the same selection on more expensive input, not a degraded one — `agents/soloscrum-review.md` declares `tools: Read, Glob, Grep`, so the fallback is currently the live path for that agent.
 2. Select the ones whose stated *when* matches this PR — its diff, the areas it touches, the kind of change it is. Respect a stated negative trigger.
 3. Read the **body** of the selected perspectives only, and apply each as an additional review lens.
 

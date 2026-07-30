@@ -59,6 +59,7 @@
 
       "Bash(skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh:*)",
       "Bash(skills/soloscrum-define-worktree/scripts/reclaim-worktrees.sh:*)",
+      "Bash(skills/soloscrum-define-review-perspective/scripts/list-perspectives.sh:*)",
 
       "Write(/tmp/**)",
       "Bash(tee /tmp/*)"

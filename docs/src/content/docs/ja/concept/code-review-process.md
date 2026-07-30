@@ -13,7 +13,7 @@ sidebar:
 
 **multi-agent review** は `code-review:code-review` slash command で実行します。このコマンドは複数の Sonnet agent を並列起動し、security / architecture / bug scan / history / in-file rules / coverage gaps といった観点ごとに review させます。別途 Haiku agent が各 finding に 0-100 のスコアを付けます。スコアは新規 agent が制約を捏造したりルールを誤って引用したりするノイズ傾向を踏まえて調整されています。
 
-**レビュー観点 (review perspectives)** は、利用者自身が蓄積した判断です。マシンローカルの `~/.claude/review-perspectives/` に置かれ、[`/soloscrum:collect-perspective`](/ja/commands/collect-perspective/) で収集します。前の 2 つが一般的なレビューであるのに対し、これは**その利用者が具体的に学んだこと**であり、二度と学び直したくないものです。レビューは各観点の `description` だけを読んで適用対象を決め、選ばれたものの本文だけを読みます。観点が 1 件も無い状態は正常な初期状態で、その場合このステップは黙ってスキップされ、不足として報告されることはありません。
+**レビュー観点 (review perspectives)** は、利用者自身が蓄積した判断です。マシンローカルの `~/.claude/review-perspectives/` に置かれ、[`/soloscrum:collect-perspective`](/ja/commands/collect-perspective/) で収集します。前の 2 つが一般的なレビューであるのに対し、これは**その利用者が具体的に学んだこと**であり、二度と学び直したくないものです。レビューは `list-perspectives.sh` でコーパスの description 一覧を取得し（各ファイルの frontmatter だけを読みます）、適用対象を決めてから、選ばれたものの本文だけを読みます。選ばれなかった観点の本文が読み込まれることはありません。観点が 1 件も無い状態は正常な初期状態で、その場合このステップは黙ってスキップされ、不足として報告されることはありません。
 
 3 つの source の finding は集約され、末尾に 1 行の verdict を持つ単一の PR コメントとして投稿されます。
 
