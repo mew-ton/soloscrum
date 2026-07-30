@@ -46,7 +46,7 @@ The same conventions apply to **Subtask** titles. A Subtask title describes what
 
 ## Body Structure (Issue / intent)
 
-The four sections below are the **intent body** — the durable record described in the Concept section. Use this format for parent Issues created via `/refine` (or human-direct via the companion template). Subtasks use the lighter format under `## Subtask Body (work)` below.
+The four sections below are the **intent body** — the durable record described in the Concept section. Use this format for parent Issues created via `/soloscrum:refine` (or human-direct via the companion template). Subtasks use the lighter format under `## Subtask Body (work)` below.
 
 ```markdown
 ## Background
@@ -124,7 +124,7 @@ The intent-level AC sign-off itself happens at the **parent Issue** when **all o
 
 A copy-pastable template for the **intent body** lives next to this skill at `templates/ISSUE_TEMPLATE.md`. It mirrors the Body Structure above and carries a self-marker so soloscrum-format Issues are recognisable in mixed setups.
 
-Subtasks do not use this template — they are created via `/breakdown` and follow the lighter Subtask Body (work) format defined above.
+Subtasks do not use this template — they are created via `/soloscrum:breakdown` and follow the lighter Subtask Body (work) format defined above.
 
 ### Self-marker
 
@@ -137,9 +137,9 @@ Consumer projects can adopt the companion in two ways:
 - **Drop into `.github/ISSUE_TEMPLATE/`** — copy the file to `.github/ISSUE_TEMPLATE/soloscrum.md` (or any name your project prefers). GitHub's "New Issue" UI will then offer it as a chooser entry. Co-existing with project-specific templates is supported because the self-marker keeps soloscrum-format Issues distinguishable.
 - **Manual copy-paste** — open `templates/ISSUE_TEMPLATE.md`, copy the contents, and paste into a fresh Issue body via the GitHub web UI when no `.github/ISSUE_TEMPLATE/` setup is desired.
 
-### Relationship to `/refine`
+### Relationship to `/soloscrum:refine`
 
-The template is for **human-direct Issue creation via the GitHub UI**. The `/refine` command does **not** read this file — it generates Issue bodies from the Body Structure spec text in this SKILL.md. Edits to the template do not affect `/refine` output, and edits to the spec do not auto-propagate to the template; keep them aligned manually.
+The template is for **human-direct Issue creation via the GitHub UI**. The `/soloscrum:refine` command does **not** read this file — it generates Issue bodies from the Body Structure spec text in this SKILL.md. Edits to the template do not affect `/soloscrum:refine` output, and edits to the spec do not auto-propagate to the template; keep them aligned manually.
 
 ### Canonical language
 

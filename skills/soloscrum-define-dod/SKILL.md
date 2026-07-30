@@ -24,8 +24,8 @@ Definition of Done (generic).
 soloscrum's AC verification operates at two layers because Subtasks slice work, not intent (per `soloscrum-define-issue-format`'s Subtask Body section). Where to verify depends on the PR's relation to the parent Issue:
 
 - **Subtask PR.** Verify the slice was delivered (its "what" + Checklist items, if any) and that there is no regression — no parent AC item that was previously satisfied is now broken. The parent Issue's AC is **not** required to be fully satisfied at this PR; only the slice's own delivery + no-regression.
-- **Issue without Subtasks** (a single-`/develop`-unit Issue per `soloscrum-define-issue-size`). Verify **all** of the Issue's AC are met, with evidence (screenshots, test results, etc.). The PR closes the Issue directly via `Closes #<issue>`.
-- **Parent Issue (with Subtasks) — intent-level AC sign-off.** The parent's full AC is verified when **all of its Subtasks are closed** (per `soloscrum-define-issue-format`), not at any individual Subtask PR. The last Subtask PR's merge triggers the parent's close via the `/refine` janitor; at that point the parent's AC must be satisfiable from the union of the Subtasks' deliveries. `soloscrum-review` does this sign-off on the parent Issue, not as part of any individual Subtask PR review.
+- **Issue without Subtasks** (a single-`/soloscrum:develop`-unit Issue per `soloscrum-define-issue-size`). Verify **all** of the Issue's AC are met, with evidence (screenshots, test results, etc.). The PR closes the Issue directly via `Closes #<issue>`.
+- **Parent Issue (with Subtasks) — intent-level AC sign-off.** The parent's full AC is verified when **all of its Subtasks are closed** (per `soloscrum-define-issue-format`), not at any individual Subtask PR. The last Subtask PR's merge triggers the parent's close via the `/soloscrum:refine` janitor; at that point the parent's AC must be satisfiable from the union of the Subtasks' deliveries. `soloscrum-review` does this sign-off on the parent Issue, not as part of any individual Subtask PR review.
 
 ### Tests exist (when applicable)
 - Not applicable: configuration changes with no logic, documentation updates, etc.

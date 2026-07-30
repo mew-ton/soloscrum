@@ -1,16 +1,16 @@
 ---
-title: /review
+title: "/soloscrum:review"
 description: Verifies DoD and AC, runs CodeRabbit + multi-agent review, decides each finding, posts a verdict, and on Pass promotes the PR to ready and surfaces the merge command.
 sidebar:
   order: 4
 ---
 
-`/review` is the quality gate. It reads the draft PR opened by `/develop`, verifies the [DoD](/policies/dod/) and every Issue AC, runs CodeRabbit and a multi-agent review pipeline, decides each finding individually, and posts a Pass / Pass with follow-ups / Fail verdict. On Pass it transitions the Subtask to `done`, waits for CI green, promotes the PR to ready, and surfaces the exact `gh pr merge` command. The merge itself is **always** your gate.
+`/soloscrum:review` is the quality gate. It reads the draft PR opened by `/soloscrum:develop`, verifies the [DoD](/policies/dod/) and every Issue AC, runs CodeRabbit and a multi-agent review pipeline, decides each finding individually, and posts a Pass / Pass with follow-ups / Fail verdict. On Pass it transitions the Subtask to `done`, waits for CI green, promotes the PR to ready, and surfaces the exact `gh pr merge` command. The merge itself is **always** your gate.
 
 ## Usage
 
 ```bash
-/review <pr-url|pr-number or figma-url>
+/soloscrum:review <pr-url|pr-number or figma-url>
 ```
 
 - For PR review, pass the PR URL or number.
@@ -28,11 +28,11 @@ sidebar:
 
 ## Typical flow
 
-You finished `/develop` and have a draft PR URL like `https://github.com/<owner>/<repo>/pull/123`. You run `/review https://github.com/<owner>/<repo>/pull/123`. The Review agent walks the DoD checklist, ticks AC against the diff, runs CodeRabbit, runs the multi-agent pipeline, and decides every flagged finding. Each ends as either "fixed in commit X" or "skipped because <reason>". There is no "I'll think about this later" path — the verdict resolves every finding.
+You finished `/soloscrum:develop` and have a draft PR URL like `https://github.com/<owner>/<repo>/pull/123`. You run `/soloscrum:review https://github.com/<owner>/<repo>/pull/123`. The Review agent walks the DoD checklist, ticks AC against the diff, runs CodeRabbit, runs the multi-agent pipeline, and decides every flagged finding. Each ends as either "fixed in commit X" or "skipped because <reason>". There is no "I'll think about this later" path — the verdict resolves every finding.
 
 On Pass, the agent runs `gh pr review --approve` (fails with a self-approve refusal in solo-dev — expected). It transitions the Subtask to `done`, waits for CI via `skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr>`, and runs `gh pr ready`. If CI goes red during the wait, the Pass retroactively downgrades to Fail. Finally, the agent surfaces the merge command — `gh pr merge <pr-number> --squash` or whatever the repo prefers — and stops. **Running `gh pr merge` is your job, not the agent's**, regardless of how clean the verdict was.
 
-On Fail, the agent posts per-finding feedback to the PR, reverts the Subtask state to `in-progress`, and leaves the PR in draft so the "needs more work" signal is externally visible. You run `/develop` again to address the findings, then re-run `/review`.
+On Fail, the agent posts per-finding feedback to the PR, reverts the Subtask state to `in-progress`, and leaves the PR in draft so the "needs more work" signal is externally visible. You run `/soloscrum:develop` again to address the findings, then re-run `/soloscrum:review`.
 
 ### Self-approve refusal
 
@@ -51,13 +51,13 @@ The post-verdict sequence — tracker `→ done`, CI wait, `gh pr ready`, surfac
 - On Pass: Subtask state advanced to `done`, PR promoted to ready, the `gh pr merge` command surfaced.
 - On Fail: per-finding feedback posted to the PR, Subtask reverted to `in-progress`, PR left in draft.
 
-The Issue itself is **not** closed by `/review`. Closure happens at merge time via the PR body's `Closes #N` keyword and GitHub's auto-close. See [PR lifecycle](/concept/pr-lifecycle/).
+The Issue itself is **not** closed by `/soloscrum:review`. Closure happens at merge time via the PR body's `Closes #N` keyword and GitHub's auto-close. See [PR lifecycle](/concept/pr-lifecycle/).
 
 ## See also
 
 - [Agents and responsibilities](/concept/agent-responsibilities/) — Review is the only role that issues a Pass.
 - [PR lifecycle](/concept/pr-lifecycle/) — autonomy contract, reversible vs irreversible, why merge is always your gate.
 - [Code review process](/concept/code-review-process/) — the per-finding decision rules and verdict mapping.
-- [DoD](/policies/dod/) — the checklist `/review` decides against.
-- Previous: [`/develop`](/commands/develop/).
+- [DoD](/policies/dod/) — the checklist `/soloscrum:review` decides against.
+- Previous: [`/soloscrum:develop`](/commands/develop/).
 - Canonical contract: [`commands/review.md`](https://github.com/mew-ton/soloscrum/blob/main/commands/review.md).

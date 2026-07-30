@@ -45,5 +45,5 @@ Records a Subtask's SP value in a GitHub Projects v2 custom field named `SP` (Nu
 ## Notes
 
 - The Project must have a `SP` field of type Number — if absent, prompt the user to add it once
-- Issue-level SP (size-check from `/refine`) is **not** stored anywhere; only Subtask SP is registered (per `soloscrum-define-story-points`)
+- Issue-level SP (size-check from `/soloscrum:refine`) is **not** stored anywhere; only Subtask SP is registered (per `soloscrum-define-story-points`)
 - Project ID and field ID can be cached in `.claude/rules/tracker.md` after first resolution to skip the lookup

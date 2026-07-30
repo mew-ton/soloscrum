@@ -6,7 +6,7 @@ user-invocable: false
 
 # soloscrum-define-code-review-process
 
-Defines the standard code review pipeline run during `/review`, plus the rules for handling findings from each source.
+Defines the standard code review pipeline run during `/soloscrum:review`, plus the rules for handling findings from each source.
 
 ## Pipeline
 
@@ -19,14 +19,14 @@ Both sources' findings are then consolidated into a single PR comment.
 
 ### Draft-window override for `code-review:code-review`
 
-`code-review:code-review` ships with an eligibility check (its step 1) that **skips PRs still in draft**. In soloscrum, that check MUST be bypassed: the PR is *intentionally* in draft when `/review` runs, because the draft window is where the local quality gate fires (see `soloscrum-define-pr-lifecycle`, "Why a draft window exists"). Honouring the upstream skip here silently drops half the review pipeline and defeats the draft-window design.
+`code-review:code-review` ships with an eligibility check (its step 1) that **skips PRs still in draft**. In soloscrum, that check MUST be bypassed: the PR is *intentionally* in draft when `/soloscrum:review` runs, because the draft window is where the local quality gate fires (see `soloscrum-define-pr-lifecycle`, "Why a draft window exists"). Honouring the upstream skip here silently drops half the review pipeline and defeats the draft-window design.
 
 When invoking `code-review:code-review` from the soloscrum review pipeline (i.e. from `soloscrum-review-implementation` step 3 or any caller of this skill):
 
 - **Treat `draft` as eligible** — proceed past step 1 as if the PR were ready.
 - All other eligibility checks (closed, automated, already reviewed by you) still apply.
 
-If `code-review:code-review` later exposes an explicit override argument, prefer that argument; until then, this directive is the authoritative override for soloscrum's `/review`.
+If `code-review:code-review` later exposes an explicit override argument, prefer that argument; until then, this directive is the authoritative override for soloscrum's `/soloscrum:review`.
 
 ## Finding Handling Rules
 
@@ -120,12 +120,12 @@ Notes on autonomy:
 - `gh pr merge` is **not** in the table above. Merge is always user-gated; the agent stops after the last Pass step and surfaces the merge command for the user to run.
 - On Fail, the PR is intentionally left in draft so that the "needs more work" state is externally visible and GitHub-side auto-reviewers stay suppressed during rework.
 - Step 1 (`gh pr review --approve`) is **expected to fail in solo-dev** with "Can not approve your own pull request"; this is the default state, not an error condition. The verdict comment posted per "PR Comment Format" above is the formal Pass record, and the remaining Pass steps still run. See `soloscrum-define-pr-lifecycle`, "Self-approve refusal in solo-dev contexts" for the full contract and the try-and-fall-through implementation pattern.
-- **Issue close is not in the table.** The post-verdict sequence transitions the Subtask state to `done` but does **not** close any Issue. Closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close; parent Issues whose closing event is missed are cleaned up by the `/refine` janitor. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
+- **Issue close is not in the table.** The post-verdict sequence transitions the Subtask state to `done` but does **not** close any Issue. Closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close; parent Issues whose closing event is missed are cleaned up by the `/soloscrum:refine` janitor. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
 - **CI red retroactively downgrades Pass to Fail.** Step 3 of the Pass row (CI-green wait via `soloscrum-tracker-github-wait-for-pr-checks`) is part of the Pass contract — promoting a ready PR with red checks is the failure mode that step exists to prevent. When the wait surfaces a non-`SUCCESS`/`SKIPPED`/`NEUTRAL` conclusion, the agent posts the failed conclusions on the PR, reverts the Subtask to `in-progress`, and follows the Fail row from that point on — no `gh pr ready`, no merge-command surface. The verdict comment posted under "Pass" is followed by a follow-up comment recording the CI-driven downgrade.
 
 ## When to run
 
-- Triggered by `/review` after the PR has been created and the `soloscrum-review` agent has completed DoD/AC verification.
+- Triggered by `/soloscrum:review` after the PR has been created and the `soloscrum-review` agent has completed DoD/AC verification.
 - May also be invoked ad-hoc on any branch via the `code-review:code-review` skill — the same handling rules apply.
 
 ## Skipping CodeRabbit

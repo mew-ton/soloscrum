@@ -1,6 +1,6 @@
 ---
 name: soloscrum-ui
-description: UI agent. Creates Figma components, applies design tokens, maintains UI pattern consistency. Use during /design-ui command.
+description: UI agent. Creates Figma components, applies design tokens, maintains UI pattern consistency. Use during /soloscrum:design-ui command.
 tools: Read, Glob, Grep, Bash
 model: inherit
 skills:
@@ -41,5 +41,5 @@ Per `soloscrum-define-agent-responsibilities`:
 
 ## Invoked by
 
-- `/design-ui`
-- `/review` (optional: design fidelity check)
+- `/soloscrum:design-ui`
+- `/soloscrum:review` (optional: design fidelity check)

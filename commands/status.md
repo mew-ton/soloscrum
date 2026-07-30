@@ -13,7 +13,7 @@ allowed-tools:
   - Bash(gh project:*)
 ---
 
-# /status
+# /soloscrum:status
 
 Show current work status.
 

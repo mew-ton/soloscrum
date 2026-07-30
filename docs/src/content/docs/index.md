@@ -17,16 +17,16 @@ soloscrum has four parts:
 
 - **skills** — machine-readable specs the framework reads as its contract. `-define-*` for shared definitions, `-tracker-*` for tracker-profile-specific operations, plus operation-level skills. Stored under `skills/`.
 - **agents** — five role definitions: `soloscrum-po` (Product Owner), `soloscrum-design` (Design), `soloscrum-dev` (Dev), `soloscrum-ui` (UI), `soloscrum-review` (Review). Each agent only mutates the concepts it owns.
-- **commands** — the entry points: `/refine`, `/breakdown`, `/develop`, `/review`.
+- **commands** — the entry points: `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`.
 - **tracker profile** — `github-only` (default) or `linear+github`. Selects where Subtasks, SP, and state live. The rest of the framework is profile-agnostic. See [tracker profile](/concept/tracker-profile/).
 
 ## The flow
 
 ```text
-/refine     → idea becomes a GitHub Issue with Background / Goal / AC / Out of Scope
-/breakdown  → Issue's delivery slices into reviewable Subtask PRs when one PR would be unreviewable
-/develop    → branch, implement, open a draft PR with `Closes #N`
-/review     → DoD + AC + CodeRabbit + multi-agent review; verdict; ready handoff
+/soloscrum:refine     → idea becomes a GitHub Issue with Background / Goal / AC / Out of Scope
+/soloscrum:breakdown  → Issue's delivery slices into reviewable Subtask PRs when one PR would be unreviewable
+/soloscrum:develop    → branch, implement, open a draft PR with `Closes #N`
+/soloscrum:review     → DoD + AC + CodeRabbit + multi-agent review; verdict; ready handoff
 ```
 
 You run `gh pr merge` at the end — the only irreversible step kept on the human side. Everything before it runs autonomously inside the commands: creating the PR, posting the verdict, promoting draft to ready, transitioning state.
@@ -50,8 +50,8 @@ soloscrum is not a fit when:
 
 - [Getting started](/onboarding/) — install the plugin, pick a tracker profile, file your first Issue.
 - [Concept](/concept/tracker-profile/) — tracker profiles, agent responsibilities, PR lifecycle, code review process.
-- [Policies](/policies/issue-format/) — the rules `/refine` and `/review` decide against (Issue format, size, SP, priority, DoD).
-- [Commands](/commands/refine/) — `/refine`, `/breakdown`, `/develop`, `/review` in lifecycle order.
+- [Policies](/policies/issue-format/) — the rules `/soloscrum:refine` and `/soloscrum:review` decide against (Issue format, size, SP, priority, DoD).
+- [Commands](/commands/refine/) — `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review` in lifecycle order.
 
 ## Where the AI contract lives
 

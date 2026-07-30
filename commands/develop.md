@@ -17,15 +17,15 @@ allowed-tools:
   - Bash(gh label:*)
 ---
 
-# /develop
+# /soloscrum:develop
 
 Implement a develop work unit (Subtask of type `develop`, or a no-Subtask Issue going through branch-per-Issue mode per `soloscrum-define-branch-commit`).
 
 ## Behavior
 
 1. Receive target work unit (`$ARGUMENTS`) — either:
-   - a **Subtask** of type `develop` (when the parent Issue went through `/breakdown`), or
-   - a **no-Subtask Issue** (when the Issue's intent fits a single reviewable PR per `soloscrum-define-issue-size` and skipped `/breakdown`). The Issue still needs `type:develop` semantically — design-ui work goes through `/design-ui` regardless of split.
+   - a **Subtask** of type `develop` (when the parent Issue went through `/soloscrum:breakdown`), or
+   - a **no-Subtask Issue** (when the Issue's intent fits a single reviewable PR per `soloscrum-define-issue-size` and skipped `/soloscrum:breakdown`). The Issue still needs `type:develop` semantically — design-ui work goes through `/soloscrum:design-ui` regardless of split.
 2. Launch `soloscrum-dev` to:
    - Create branch following `soloscrum-define-branch-commit` conventions
    - Implement code referencing `.claude/rules/stack.md`
@@ -36,9 +36,9 @@ Implement a develop work unit (Subtask of type `develop`, or a no-Subtask Issue 
      ```bash
      skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number> 15 300
      ```
-     This is a confirmation step, not a green-gate — the `/develop` handoff does not block on `SUCCESS`. The intent is to surface CI startup failures (workflow file syntax errors, missing secrets) here rather than at `/review`. If the script returns non-zero (timeout), surface the in-flight names and proceed; if it returns zero with non-`SUCCESS` conclusions, surface the conclusions and proceed. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).
+     This is a confirmation step, not a green-gate — the `/soloscrum:develop` handoff does not block on `SUCCESS`. The intent is to surface CI startup failures (workflow file syntax errors, missing secrets) here rather than at `/soloscrum:review`. If the script returns non-zero (timeout), surface the in-flight names and proceed; if it returns zero with non-`SUCCESS` conclusions, surface the conclusions and proceed. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).
    - Resolve the active tracker profile and invoke `soloscrum-tracker-{github|linear}-transition-state` to move the **target** (Subtask or no-Subtask Issue) to `in-review` (owned by `soloscrum-implement-task` step 10; reversible per `soloscrum-define-pr-lifecycle`)
-3. Present draft PR URL to user and recommend `/review <pr-url>` as the next step. Promotion to ready is owned by `soloscrum-review`, not by this command.
+3. Present draft PR URL to user and recommend `/soloscrum:review <pr-url>` as the next step. Promotion to ready is owned by `soloscrum-review`, not by this command.
 
 ## Input
 

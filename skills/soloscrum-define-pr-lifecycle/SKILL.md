@@ -10,7 +10,7 @@ Defines how a PR moves from creation to merge handoff, and which transitions an 
 
 ## Contract (read this first)
 
-This skill establishes a project-specific autonomy contract that **overrides** any general default of "ask before doing anything PR-related." When the agent executes a soloscrum command (`/develop`, `/review`), the user has already authorised the full action sequence the command implies. Re-prompting for individual reversible steps inside that sequence is the failure mode this skill exists to prevent.
+This skill establishes a project-specific autonomy contract that **overrides** any general default of "ask before doing anything PR-related." When the agent executes a soloscrum command (`/soloscrum:develop`, `/soloscrum:review`), the user has already authorised the full action sequence the command implies. Re-prompting for individual reversible steps inside that sequence is the failure mode this skill exists to prevent.
 
 The contract has three rules:
 
@@ -26,7 +26,7 @@ A PR moves through four phases. Each phase has a single owner role and a defined
 
 | Phase | State on GitHub | Owner role | Purpose | Exit transition |
 |---|---|---|---|---|
-| `draft` | PR open, marked draft | `soloscrum-dev` | Implementation lands; GitHub-side auto-reviewers are suppressed; local quality gate runs in this window | `/review` is launched |
+| `draft` | PR open, marked draft | `soloscrum-dev` | Implementation lands; GitHub-side auto-reviewers are suppressed; local quality gate runs in this window | `/soloscrum:review` is launched |
 | `review` | PR open, draft (still) | `soloscrum-review` | DoD + AC verification; CodeRabbit CLI + multi-agent pipeline; per-finding decisions | Verdict reached |
 | `ready` | PR open, ready (non-draft) | `soloscrum-review` | Verdict was Pass / Pass with follow-ups; PR is mergeable; tracker state is `done` | `gh pr ready` lands |
 | `merge-handoff` | PR open, ready, approved | **user** | Final human gate before merge — agent does not run `gh pr merge` | User runs `gh pr merge` |
@@ -83,13 +83,13 @@ A transition is irreversible when undoing it is impossible, requires admin inter
 
 ### Self-approve refusal in solo-dev contexts
 
-GitHub does not allow a PR's author to approve their own PR. When the same human (or token) authored the PR and is now running `/review`, `gh pr review --approve` fails with:
+GitHub does not allow a PR's author to approve their own PR. When the same human (or token) authored the PR and is now running `/soloscrum:review`, `gh pr review --approve` fails with:
 
 ```
 failed to create review: GraphQL: Review Can not approve your own pull request (addPullRequestReview)
 ```
 
-This is the default state in solo-dev — the design point soloscrum's `/review` is built around. The post-verdict sequence is built so a self-approve refusal does **not** abort it:
+This is the default state in solo-dev — the design point soloscrum's `/soloscrum:review` is built around. The post-verdict sequence is built so a self-approve refusal does **not** abort it:
 
 - **The verdict comment IS the formal Pass record.** The PR comment posted per `soloscrum-define-code-review-process` "PR Comment Format" is the canonical record of the verdict; an approving review from GitHub's API on top of it is a duplicate signal that solo-dev cannot produce by design. When `gh pr review --approve` fails with self-approve refusal, the verdict comment already carries the Pass; subsequent steps (tracker `→ done`, `gh pr ready`) MUST still run.
 - **Self-approve refusal is not Fail.** The verdict was already decided before the approve call; the API-side acknowledgement is a follow-up that is structurally unavailable here. Do not flip the verdict.
@@ -100,7 +100,7 @@ This is the default state in solo-dev — the design point soloscrum's `/review`
     || echo "approve skipped (likely self-approve refusal); verdict comment is the formal Pass record"
   ```
 
-- **Branch-protection requiring an approving review from another account is out of scope.** Repos that enforce such a rule cannot merge under solo-dev `/review`. Either disable that branch-protection rule for the owner, add a separate human reviewer, or configure CodeRabbit to leave the approving review. soloscrum does not paper over this with bot accounts.
+- **Branch-protection requiring an approving review from another account is out of scope.** Repos that enforce such a rule cannot merge under solo-dev `/soloscrum:review`. Either disable that branch-protection rule for the owner, add a separate human reviewer, or configure CodeRabbit to leave the approving review. soloscrum does not paper over this with bot accounts.
 
 ### How agents apply this
 
@@ -127,8 +127,8 @@ The Subtask state machine and the GH Issue closed/open dimension are **decoupled
 | Subtask state | GH Issue state (github-only) | Meaning |
 |---|---|---|
 | `in-progress` | open + `state:in-progress` label | Implementation in progress |
-| `in-review` | open + `state:in-review` label | Draft PR exists, `/review` in flight |
-| `done` (pre-merge) | open + `state:done` label | `/review` Pass verdict reached, awaiting `gh pr merge` |
+| `in-review` | open + `state:in-review` label | Draft PR exists, `/soloscrum:review` in flight |
+| `done` (pre-merge) | open + `state:done` label | `/soloscrum:review` Pass verdict reached, awaiting `gh pr merge` |
 | `done` (post-merge) | closed + `state:done` label retained | The PR merged; GH auto-close fired via `Closes #N` (this is **not** an agent transition — it is a side-effect of `gh pr merge`) |
 
 The `state:done` label is what `soloscrum-tracker-github-transition-state` writes at verdict time. The transition skill **never** calls `gh issue close` — that is the merge consequence. See `soloscrum-tracker-github-transition-state` for the GH mapping.
@@ -139,11 +139,11 @@ For `linear+github`: Subtask state is on Linear (via `soloscrum-tracker-linear-t
 
 | Concept | When closed | By what |
 |---|---|---|
-| Subtask Issue | At merge of its `/develop` PR | GH auto-close on `Closes #subtask` in PR body |
-| Parent Issue (with sub-issues) | Next `/refine` backlog janitor sweep once all Subtasks are closed | `/refine` janitor (per `soloscrum-define-branch-commit`, per-Subtask PRs do **not** include `Closes #<parent>` — premature close on the first Subtask merge is the failure mode this contract prevents) |
-| Standalone Issue (no sub-issues, single PR) | At merge of its PR | GH auto-close on `Closes #issue` in PR body, with the `/refine` janitor as a safety net when auto-close does not fire |
+| Subtask Issue | At merge of its `/soloscrum:develop` PR | GH auto-close on `Closes #subtask` in PR body |
+| Parent Issue (with sub-issues) | Next `/soloscrum:refine` backlog janitor sweep once all Subtasks are closed | `/soloscrum:refine` janitor (per `soloscrum-define-branch-commit`, per-Subtask PRs do **not** include `Closes #<parent>` — premature close on the first Subtask merge is the failure mode this contract prevents) |
+| Standalone Issue (no sub-issues, single PR) | At merge of its PR | GH auto-close on `Closes #issue` in PR body, with the `/soloscrum:refine` janitor as a safety net when auto-close does not fire |
 
-The `/refine` janitor exists because GitHub does **not** auto-close a parent Issue when its Subtasks all close. For the github-only profile, the janitor scans open Issues at the start of `/refine` with two detection paths: (1) **parent Issues** whose Subtask set is fully closed (the contract in `soloscrum-define-branch-commit` forbids per-Subtask PRs from including `Closes #<parent>`, so the parent has no closing PR of its own — the janitor is the only close path), and (2) **standalone Issues** (no Sub-issues) whose direct closing PR merged without GH's auto-close firing — the safety-net case for the original failure mode. For `linear+github`, parent state is already auto-managed by Linear's native sync (per `soloscrum-tracker-linear-transition-state`), so the janitor is a no-op. See `commands/refine.md` for the janitor step.
+The `/soloscrum:refine` janitor exists because GitHub does **not** auto-close a parent Issue when its Subtasks all close. For the github-only profile, the janitor scans open Issues at the start of `/soloscrum:refine` with two detection paths: (1) **parent Issues** whose Subtask set is fully closed (the contract in `soloscrum-define-branch-commit` forbids per-Subtask PRs from including `Closes #<parent>`, so the parent has no closing PR of its own — the janitor is the only close path), and (2) **standalone Issues** (no Sub-issues) whose direct closing PR merged without GH's auto-close firing — the safety-net case for the original failure mode. For `linear+github`, parent state is already auto-managed by Linear's native sync (per `soloscrum-tracker-linear-transition-state`), so the janitor is a no-op. See `commands/refine.md` for the janitor step.
 
 ## Verdict → next-action mapping
 
@@ -166,11 +166,11 @@ These are the specific failure modes this skill exists to prevent. Each one has 
 - ❌ **Mid-sequence pause after `gh pr review --approve` or after the tracker `→ done` transition, "to check before promoting".** The post-verdict sequence runs end-to-end. The only stop is at the merge handoff.
 - ❌ **On Fail, calling `gh pr ready` anyway** because the PR "looks close enough" or because the user might want to review the diff on GitHub. Fail keeps the PR in draft — that signal is part of the contract.
 - ❌ **On Fail, asking the user before reverting the Subtask state to `in-progress`.** State transitions are reversible per the autonomy table; revert and report.
-- ❌ **Running `gh pr merge` autonomously** because the verdict was Pass and the user invoked `/review`. Merge is irreversible and is **always** the user's gate, regardless of how clean the PR looks or how recently the user authorised something else.
-- ❌ **Treating `gh pr create --draft` as needing pre-confirm** because "creating a PR affects shared state". Draft creation is reversible (close removes it from active state with no notifications having fired) and is the standard opening move of `/develop`.
+- ❌ **Running `gh pr merge` autonomously** because the verdict was Pass and the user invoked `/soloscrum:review`. Merge is irreversible and is **always** the user's gate, regardless of how clean the PR looks or how recently the user authorised something else.
+- ❌ **Treating `gh pr create --draft` as needing pre-confirm** because "creating a PR affects shared state". Draft creation is reversible (close removes it from active state with no notifications having fired) and is the standard opening move of `/soloscrum:develop`.
 - ❌ **Inventing a fourth verdict** (e.g. "Pass but I'll wait for the user to look at it first"). The verdict legend in `soloscrum-define-code-review-process` is exhaustive; pick one and execute its mapped sequence.
 - ❌ **Treating self-approve refusal as a Fail or as cause to abort the post-verdict sequence.** In solo-dev, `gh pr review --approve` failing with "Can not approve your own pull request" is the **default, expected** outcome. The verdict comment is the formal Pass record; tracker transition and `gh pr ready` MUST still run. See "Self-approve refusal in solo-dev contexts" above.
-- ❌ **Closing the parent Issue (or any Issue) as part of the post-verdict sequence.** Issue closure happens at merge time via the PR body's `Closes #` keyword + GitHub's auto-close, not at verdict time. Closing pre-merge is premature: if the user decides not to merge, the Issue is wrongly closed; "closed = merged into main" is the GH convention soloscrum follows. See "Issue close happens at merge" below. For parent Issues whose closing event is missed (sub-issue tree where the parent is not directly referenced by any PR), the `/refine` janitor cleans up on the next backlog touch.
+- ❌ **Closing the parent Issue (or any Issue) as part of the post-verdict sequence.** Issue closure happens at merge time via the PR body's `Closes #` keyword + GitHub's auto-close, not at verdict time. Closing pre-merge is premature: if the user decides not to merge, the Issue is wrongly closed; "closed = merged into main" is the GH convention soloscrum follows. See "Issue close happens at merge" below. For parent Issues whose closing event is missed (sub-issue tree where the parent is not directly referenced by any PR), the `/soloscrum:refine` janitor cleans up on the next backlog touch.
 
 ## Repository-specific overrides
 

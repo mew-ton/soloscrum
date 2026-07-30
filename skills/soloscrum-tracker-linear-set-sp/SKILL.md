@@ -26,6 +26,6 @@ Sets a Linear subtask's `estimate` field with the SP value. Active when `tracker
 
 ## Notes
 
-- Issue-level SP (size-check from `/refine`) is **not** stored in Linear; only Subtask SP is registered (per `soloscrum-define-story-points`)
+- Issue-level SP (size-check from `/soloscrum:refine`) is **not** stored in Linear; only Subtask SP is registered (per `soloscrum-define-story-points`)
 - If the team's Linear Estimation setting is disabled, prompt the user to enable a numeric estimation scheme that matches `soloscrum-define-story-points` (1, 2, 3, 5)
 - This operation is usually inlined at subtask creation; use it explicitly only when correcting an existing value

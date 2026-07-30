@@ -29,7 +29,7 @@ Returns active work — items in `state:in-progress` or `state:in-review`. Activ
      --json number,title,labels,url
    ```
 3. For each in-review item, attach its PR via `gh issue view <n> --json closingIssuesReferences,...` or `gh pr list --search "linked:<n>"`
-4. **For each item, classify Subtask vs no-Subtask Issue** by fetching its `parent` and `subIssuesSummary` via the Sub-issues GraphQL preview (requires the `GraphQL-Features: sub_issues` header — the same header `/refine`'s parent-detection path uses, but the per-Issue probe shape is different so the snippet is included here):
+4. **For each item, classify Subtask vs no-Subtask Issue** by fetching its `parent` and `subIssuesSummary` via the Sub-issues GraphQL preview (requires the `GraphQL-Features: sub_issues` header — the same header `/soloscrum:refine`'s parent-detection path uses, but the per-Issue probe shape is different so the snippet is included here):
 
    ```bash
    gh api graphql \
@@ -45,12 +45,12 @@ Returns active work — items in `state:in-progress` or `state:in-review`. Activ
        }' -F owner=<owner> -F repo=<repo> -F number=<n>
    ```
 
-   Classification predicates: `parent != null` → **Subtask**; `parent == null AND subIssuesSummary.total == 0` → **no-Subtask Issue**; `parent == null AND subIssuesSummary.total > 0` → **parent Issue** (not a `/develop` target — surfaces only as context).
+   Classification predicates: `parent != null` → **Subtask**; `parent == null AND subIssuesSummary.total == 0` → **no-Subtask Issue**; `parent == null AND subIssuesSummary.total > 0` → **parent Issue** (not a `/soloscrum:develop` target — surfaces only as context).
 5. (If `issue_number` given) restrict results to that Issue's Sub-issues
 
 ## Output
 
-- Two grouped lists; each entry distinguishes Subtask vs no-Subtask Issue (per `soloscrum-define-branch-commit`'s case-split — `/develop` accepts either):
+- Two grouped lists; each entry distinguishes Subtask vs no-Subtask Issue (per `soloscrum-define-branch-commit`'s case-split — `/soloscrum:develop` accepts either):
 
   ```text
   In Progress:
@@ -65,7 +65,7 @@ Returns active work — items in `state:in-progress` or `state:in-review`. Activ
 
 ## Notes
 
-- This is the basis for `/status` in github-only profile
+- This is the basis for `/soloscrum:status` in github-only profile
 - For design-ui type Sub-issues in review, also surface the Figma URL if recorded in the body
-- **Querying `state:done`**: an Issue carrying the `state:done` label can be either open (`/review` Pass verdict reached, awaiting `gh pr merge`) or closed (PR merged via `Closes #N`). To list "shippable but unmerged" Subtasks, use `gh issue list --state open --label "state:done"`. To list fully shipped (since the label-based mapping was adopted), use `gh issue list --state closed --label "state:done"`.
+- **Querying `state:done`**: an Issue carrying the `state:done` label can be either open (`/soloscrum:review` Pass verdict reached, awaiting `gh pr merge`) or closed (PR merged via `Closes #N`). To list "shippable but unmerged" Subtasks, use `gh issue list --state open --label "state:done"`. To list fully shipped (since the label-based mapping was adopted), use `gh issue list --state closed --label "state:done"`.
 - **Backwards-compat: pre-label-mapping closed Subtasks have no `state:done` label.** Issues closed before this skill switched to label-based `done` are not retroactively labelled. Treat the closed-without-label cohort as "historically shipped"; do not retro-apply the label. If a per-repo report needs the old cohort included, query closed Issues without the label filter and union with the labelled-closed set. See `soloscrum-tracker-github-transition-state` for the full state mapping.

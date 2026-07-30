@@ -9,7 +9,7 @@ A PR moves through four phases. soloscrum's contract draws the line between tran
 
 - **Reversible transitions are autonomous.** The agent runs them, then reports.
 - **Irreversible transitions are user-gated.** The agent surfaces the exact command and stops.
-- **The verdict is the decision point.** Once `/review` reaches Pass, the post-verdict actions run end-to-end. The agent does not pause to re-confirm each reversible step.
+- **The verdict is the decision point.** Once `/soloscrum:review` reaches Pass, the post-verdict actions run end-to-end. The agent does not pause to re-confirm each reversible step.
 
 Pausing on a reversible step after a Pass verdict — for example, asking "may I run `gh pr ready`?" — violates this contract.
 
@@ -18,18 +18,18 @@ Pausing on a reversible step after a Pass verdict — for example, asking "may I
 ```mermaid
 stateDiagram-v2
     [*] --> draft: gh pr create --draft
-    draft --> review: /review starts
+    draft --> review: /soloscrum:review starts
     review --> ready: Verdict = Pass<br/>(or Pass with follow-ups)
     review --> draft: Verdict = Fail
     ready --> merge_handoff: agent surfaces merge command
     merge_handoff --> [*]: user runs gh pr merge
 ```
 
-`/develop` creates the PR directly as **draft**. soloscrum never creates a PR as ready and demotes it; agents never demote a ready PR back to draft.
+`/soloscrum:develop` creates the PR directly as **draft**. soloscrum never creates a PR as ready and demotes it; agents never demote a ready PR back to draft.
 
 | Phase | GitHub state | Owner | Purpose | Exit |
 |---|---|---|---|---|
-| `draft` | open, draft | dev | Implementation lands; local quality gate runs | `/review` is launched |
+| `draft` | open, draft | dev | Implementation lands; local quality gate runs | `/soloscrum:review` is launched |
 | `review` | open, draft | review | DoD + AC + CodeRabbit + multi-agent + per-finding decisions | Verdict reached |
 | `ready` | open, ready | review | Verdict was Pass; tracker subtask is `done`; CI is green | merge command surfaced |
 | `merge-handoff` | open, ready | **user** | User's final gate — agent never runs `gh pr merge` | User runs `gh pr merge` |
@@ -41,7 +41,7 @@ The draft phase serves two independent purposes:
 1. **Auto-reviewer suppression.** GitHub-side reviewers (CodeRabbit, org bots) typically do not run on draft PRs. Keeping the PR in draft until the local pipeline has decided every finding avoids redundant reviews and avoids burning paid review credits on a PR the local pipeline will require changes to.
 2. **Self-quality gate.** Even with no GitHub-side reviewer, the draft phase is the explicit window for the local CodeRabbit CLI + multi-agent pipeline to run before the PR is presented as ready. The verdict semantics in [`soloscrum-define-code-review-process`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-code-review-process/SKILL.md) attach to this state.
 
-A repo can override the always-draft default with `.claude/rules/pr.md`. Until that file exists, every `/develop` opens a draft PR.
+A repo can override the always-draft default with `.claude/rules/pr.md`. Until that file exists, every `/soloscrum:develop` opens a draft PR.
 
 ## Reversible transitions — the agent runs them
 
@@ -90,11 +90,11 @@ The post-verdict sequence — tracker `→ done`, CI wait, `gh pr ready`, surfac
 
 ## Issue close happens at merge
 
-`/review` reaching Pass does **not** close the Issue. It only flips the subtask state to `done`. The Issue closes when the PR merges, via the `Closes #N` keyword GitHub honours. The DoD requires that keyword in every PR body.
+`/soloscrum:review` reaching Pass does **not** close the Issue. It only flips the subtask state to `done`. The Issue closes when the PR merges, via the `Closes #N` keyword GitHub honours. The DoD requires that keyword in every PR body.
 
 Merge-time closure matches the GitHub convention: "closed" means "the change shipped into the base branch." Closing at verdict would break that convention — a Pass followed by the user deciding not to merge would leave the Issue closed without the work landing. The user's merge gate doubles as the closure gate.
 
-For parent Issues whose closing PR referenced sub-issues instead of the parent, the `/refine` janitor sweep closes them on the next refine command.
+For parent Issues whose closing PR referenced sub-issues instead of the parent, the `/soloscrum:refine` janitor sweep closes them on the next refine command.
 
 ## Verdict to next-action map
 

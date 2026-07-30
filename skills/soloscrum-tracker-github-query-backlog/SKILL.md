@@ -42,6 +42,6 @@ Returns the backlog (open Issues and Sub-issues without state labels) ordered by
 
 ## Notes
 
-- This operation skill is the basis for `/next` and `/status` when in github-only profile
+- This operation skill is the basis for `/soloscrum:next` and `/soloscrum:status` when in github-only profile
 - "Backlog" excludes anything currently `in-progress` or `in-review` — those are surfaced by `query-state` instead
 - If the repo has no `priority:*` labels yet, all items are returned ungrouped

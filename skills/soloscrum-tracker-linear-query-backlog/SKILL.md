@@ -34,6 +34,6 @@ Returns the Linear backlog (items in Backlog or Todo states) ordered by priority
 
 ## Notes
 
-- This operation skill is the basis for `/next` and `/status` when in linear+github profile
+- This operation skill is the basis for `/soloscrum:next` and `/soloscrum:status` when in linear+github profile
 - "Backlog" excludes In Progress and In Review — those are surfaced by `query-state` instead
 - If the user has multiple Linear teams, prompt for which team to query (or read from `.claude/rules/tracker.md`)

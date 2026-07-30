@@ -9,7 +9,7 @@ PR は 4 つのフェーズを順に通過します。soloscrum では、agent �
 
 - **reversible な遷移は agent が自律実行します。** 実行後に結果を報告します。
 - **irreversible な遷移はユーザのゲートです。** agent は正確なコマンドを提示して停止します。
-- **verdict が決定ポイントです。** `/review` が Pass に達した時点で、後続のアクションは最後まで一気に走ります。reversible な 1 ステップごとに確認を取り直すことはしません。
+- **verdict が決定ポイントです。** `/soloscrum:review` が Pass に達した時点で、後続のアクションは最後まで一気に走ります。reversible な 1 ステップごとに確認を取り直すことはしません。
 
 Pass の verdict が出た後に「`gh pr ready` を実行してよいですか」と聞くような挙動は、この契約に反します。
 
@@ -18,18 +18,18 @@ Pass の verdict が出た後に「`gh pr ready` を実行してよいですか�
 ```mermaid
 stateDiagram-v2
     [*] --> draft: gh pr create --draft
-    draft --> review: /review starts
+    draft --> review: /soloscrum:review starts
     review --> ready: Verdict = Pass<br/>(or Pass with follow-ups)
     review --> draft: Verdict = Fail
     ready --> merge_handoff: agent surfaces merge command
     merge_handoff --> [*]: user runs gh pr merge
 ```
 
-`/develop` は PR を最初から **draft** として作成します。soloscrum は PR を ready で作成してから draft に降格させることはしませんし、agent が ready 状態の PR を勝手に draft に戻すこともありません。
+`/soloscrum:develop` は PR を最初から **draft** として作成します。soloscrum は PR を ready で作成してから draft に降格させることはしませんし、agent が ready 状態の PR を勝手に draft に戻すこともありません。
 
 | フェーズ | GitHub 上の状態 | Owner | 目的 | 出口 |
 |---|---|---|---|---|
-| `draft` | open + draft | dev | 実装を入れ、local の quality gate を走らせる | `/review` が起動される |
+| `draft` | open + draft | dev | 実装を入れ、local の quality gate を走らせる | `/soloscrum:review` が起動される |
 | `review` | open + draft | review | DoD + AC + CodeRabbit + multi-agent + 各 finding の判断 | verdict が確定する |
 | `ready` | open + ready | review | verdict は Pass、subtask は `done`、CI は green | merge コマンドが提示される |
 | `merge-handoff` | open + ready | **user** | ユーザの最終ゲート (agent は `gh pr merge` を実行しない) | ユーザが `gh pr merge` を実行 |
@@ -41,7 +41,7 @@ draft フェーズには独立した 2 つの役割があります。
 1. **GitHub 側 reviewer を抑止します。** CodeRabbit や組織 bot などの GitHub 側 reviewer は通常、draft PR には動きません。local の pipeline がすべての finding を処理し終わるまで draft に保つことで、無駄な review や重複コメントを避けられ、また有料 review のクレジットを「local 側で修正が必要な PR」に消費せずに済みます。
 2. **local の quality gate のための窓を確保します。** GitHub 側に reviewer がいないリポジトリでも、draft フェーズは local の CodeRabbit CLI と multi-agent pipeline を実行する明示的なタイミングとして機能します。[`soloscrum-define-code-review-process`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-code-review-process/SKILL.md) の verdict semantics はこの状態に紐づきます。
 
-リポジトリ側で `.claude/rules/pr.md` を置くことで、「常に draft で作成する」というデフォルトを上書きできます。このファイルが存在しないリポジトリでは、`/develop` は常に draft で PR を開きます。
+リポジトリ側で `.claude/rules/pr.md` を置くことで、「常に draft で作成する」というデフォルトを上書きできます。このファイルが存在しないリポジトリでは、`/soloscrum:develop` は常に draft で PR を開きます。
 
 ## reversible な遷移 — agent が実行する
 
@@ -90,11 +90,11 @@ verdict 後の一連のアクション — tracker の `→ done`、CI 待機、
 
 ## Issue close は merge のタイミング
 
-`/review` が Pass に到達しても、Issue は close されません。subtask の state が `done` に切り替わるだけです。Issue を実際に閉じるのは PR の merge であり、その引き金は PR 本文の `Closes #N` キーワードです。DoD はすべての PR 本文にこのキーワードを含めることを要求しています。
+`/soloscrum:review` が Pass に到達しても、Issue は close されません。subtask の state が `done` に切り替わるだけです。Issue を実際に閉じるのは PR の merge であり、その引き金は PR 本文の `Closes #N` キーワードです。DoD はすべての PR 本文にこのキーワードを含めることを要求しています。
 
 merge 時に閉じる挙動は GitHub の慣習に揃えています。「closed」は「base ブランチに取り込まれた」を意味します。verdict 時点で閉じてしまうと、Pass が出た後にユーザが merge しないと判断した場合に、コードが入っていないのに Issue が閉じている、というずれが生じます。merge ゲートが close ゲートを兼ねる形にしています。
 
-closing PR が sub-issue 側を参照していて GitHub の自動 close が効かなかった親 Issue については、次回の `/refine` で janitor sweep が回収します。
+closing PR が sub-issue 側を参照していて GitHub の自動 close が効かなかった親 Issue については、次回の `/soloscrum:refine` で janitor sweep が回収します。
 
 ## verdict と次のアクションの対応
 

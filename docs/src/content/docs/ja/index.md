@@ -17,16 +17,16 @@ soloscrum は 4 つのパーツでできています。
 
 - **skills** — フレームワークが契約として読み込む機械可読な仕様です。共通定義の `-define-*`、tracker profile 固有の `-tracker-*`、operation 単位の skill があります。リポジトリの `skills/` 配下に置きます。
 - **agents** — 5 つの役割定義です。`soloscrum-po` (Product Owner)、`soloscrum-design` (Design)、`soloscrum-dev` (Dev)、`soloscrum-ui` (UI)、`soloscrum-review` (Review)。各 agent は自分が所有する概念だけを mutate します。
-- **commands** — エントリポイントです。`/refine` / `/breakdown` / `/develop` / `/review` の 4 つがあります。
+- **commands** — エントリポイントです。`/soloscrum:refine` / `/soloscrum:breakdown` / `/soloscrum:develop` / `/soloscrum:review` の 4 つがあります。
 - **tracker profile** — `github-only` (default) または `linear+github` です。Subtask / SP / state の保存先を選びます。残りのフレームワークは profile に依存しません。詳細は [tracker profile](/ja/concept/tracker-profile/) を参照してください。
 
 ## ワークフロー
 
 ```text
-/refine     → idea becomes a GitHub Issue with Background / Goal / AC / Out of Scope
-/breakdown  → Issue's delivery slices into reviewable Subtask PRs when one PR would be unreviewable
-/develop    → branch, implement, open a draft PR with `Closes #N`
-/review     → DoD + AC + CodeRabbit + multi-agent review; verdict; ready handoff
+/soloscrum:refine     → idea becomes a GitHub Issue with Background / Goal / AC / Out of Scope
+/soloscrum:breakdown  → Issue's delivery slices into reviewable Subtask PRs when one PR would be unreviewable
+/soloscrum:develop    → branch, implement, open a draft PR with `Closes #N`
+/soloscrum:review     → DoD + AC + CodeRabbit + multi-agent review; verdict; ready handoff
 ```
 
 最後の `gh pr merge` だけはユーザが実行します。irreversible なので、人間側に唯一残してあるステップです。それ以前のステップ (PR の作成・verdict の投稿・draft → ready の昇格・state の遷移) はすべて reversible で、command の中で自律的に走ります。
@@ -50,8 +50,8 @@ soloscrum が合わないのは、次のような状況です。
 
 - [はじめに](/ja/onboarding/) — plugin のインストール、tracker profile の選択、最初の Issue を起票するまで
 - [Concept](/ja/concept/tracker-profile/) — tracker profile、agent の責務、PR ライフサイクル、code review プロセス
-- [Policies](/ja/policies/issue-format/) — `/refine` と `/review` が照らすルール (Issue フォーマット、サイズ、SP、優先度、DoD)
-- [Commands](/ja/commands/refine/) — `/refine` / `/breakdown` / `/develop` / `/review` をライフサイクル順に解説
+- [Policies](/ja/policies/issue-format/) — `/soloscrum:refine` と `/soloscrum:review` が照らすルール (Issue フォーマット、サイズ、SP、優先度、DoD)
+- [Commands](/ja/commands/refine/) — `/soloscrum:refine` / `/soloscrum:breakdown` / `/soloscrum:develop` / `/soloscrum:review` をライフサイクル順に解説
 
 ## AI 契約はどこにあるか
 

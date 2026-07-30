@@ -13,13 +13,13 @@ soloscrum は機能の実装作業を 5 つの役割に分割し、それぞれ�
 
 ### `soloscrum-po` — Product Owner
 
-PO はライフサイクルの入口です。`/refine` で動作し、形のないアイデアを GitHub Issue に整形します。動詞から始まるタイトル、Background、Goal、Acceptance Criteria、Out of Scope の 4 セクションで構成された Issue を作成し、priority と size-check 用の SP もここで付与します。size-check SP は、その Issue がライフサイクルに進めるサイズか、先に分割すべきかを判定するための概算値です。
+PO はライフサイクルの入口です。`/soloscrum:refine` で動作し、形のないアイデアを GitHub Issue に整形します。動詞から始まるタイトル、Background、Goal、Acceptance Criteria、Out of Scope の 4 セクションで構成された Issue を作成し、priority と size-check 用の SP もここで付与します。size-check SP は、その Issue がライフサイクルに進めるサイズか、先に分割すべきかを判定するための概算値です。
 
-親 Issue のメタデータを後から変更できるのは PO だけです。`/refine` の janitor sweep — closing PR が sub-issue 側を参照していたために GitHub が自動 close できなかった親 Issue を回収する処理 — も PO の担当です。
+親 Issue のメタデータを後から変更できるのは PO だけです。`/soloscrum:refine` の janitor sweep — closing PR が sub-issue 側を参照していたために GitHub が自動 close できなかった親 Issue を回収する処理 — も PO の担当です。
 
 ### `soloscrum-design` — Designer
 
-Design は `/validate` と `/breakdown` の計画段階で動作します。validate 済みの Issue を、実装可能な計画に落とし込みます。スコープ、依存関係、技術的な実現性を確認し、type と Checklist（スライススコープ）を持つ subtask のリストを作って登録に渡します。Subtask は自分の AC を持ちません — AC は親 Issue に属し、Subtask は配信をスライスするだけです（[issue format](/ja/policies/issue-format/) を参照）。
+Design は `/soloscrum:validate` と `/soloscrum:breakdown` の計画段階で動作します。validate 済みの Issue を、実装可能な計画に落とし込みます。スコープ、依存関係、技術的な実現性を確認し、type と Checklist（スライススコープ）を持つ subtask のリストを作って登録に渡します。Subtask は自分の AC を持ちません — AC は親 Issue に属し、Subtask は配信をスライスするだけです（[issue format](/ja/policies/issue-format/) を参照）。
 
 Design は **subtask レコードをトラッカーに書き込みません**。書き込みは Dev の仕事です。Design パスを冪等な思考ステップに保ち、トラッカーへの書き込みは最後にまとめて行う、という分業になっています。
 
@@ -27,36 +27,36 @@ Design は **subtask レコードをトラッカーに書き込みません**。
 
 Dev は実装を担当します。動作する場面は 2 つです。
 
-- **`/breakdown` の registration ステージ** — Design が提案した subtask をトラッカーに書き込みます (SP / type ラベル / 親リンク)。
-- **`/develop`** — ブランチを切り、コードを書き、Conventional Commits で commit し、draft PR を開きます。
+- **`/soloscrum:breakdown` の registration ステージ** — Design が提案した subtask をトラッカーに書き込みます (SP / type ラベル / 親リンク)。
+- **`/soloscrum:develop`** — ブランチを切り、コードを書き、Conventional Commits で commit し、draft PR を開きます。
 
 subtask の state を idle から `in-progress` に進めるのも、draft PR を開いた後に `in-progress` から `in-review` に進めるのも Dev です。
 
 ### `soloscrum-ui` — UI Designer
 
-UI は design-ui 領域における Dev の対になる役割です。`/design-ui` で動作し、`type:design-ui` がついた subtask に対して Figma 上の成果物 — component、design token、state variant、accessibility check — を作ります。Dev と同様に、Figma ファイルが完成した時点で自分の subtask を `in-review` に進めます。
+UI は design-ui 領域における Dev の対になる役割です。`/soloscrum:design-ui` で動作し、`type:design-ui` がついた subtask に対して Figma 上の成果物 — component、design token、state variant、accessibility check — を作ります。Dev と同様に、Figma ファイルが完成した時点で自分の subtask を `in-review` に進めます。
 
 UI 関連の機能は通常、`design-ui` subtask と、その後に続く `develop` subtask に分けて扱います。`develop` 側は design 側の review が終わるまで待機します。
 
 ### `soloscrum-review` — Reviewer
 
-Review は唯一、何かを done にできる役割です。`/review` で動作し、DoD と AC を検証し、CodeRabbit + multi-agent の review pipeline を走らせ、見つかった finding を 1 件ずつ判断し、verdict コメントを投稿します。Pass の場合は subtask を `done` に進め、CI green を待ち、PR を draft から ready に昇格させます。`gh pr merge` だけは常にユーザのゲートで、agent は merge コマンドを提示した時点で停止します。
+Review は唯一、何かを done にできる役割です。`/soloscrum:review` で動作し、DoD と AC を検証し、CodeRabbit + multi-agent の review pipeline を走らせ、見つかった finding を 1 件ずつ判断し、verdict コメントを投稿します。Pass の場合は subtask を `done` に進め、CI green を待ち、PR を draft から ready に昇格させます。`gh pr merge` だけは常にユーザのゲートで、agent は merge コマンドを提示した時点で停止します。
 
 ボード上の他の概念についても、verifier は常に Review です。terminal な状態へ進められるのは Review だけです。
 
 ## ライフサイクル概観
 
 ```text
-/refine        po       → Issue (size-check SP, priority, AC, dependencies)
-/validate      design   → reads Issue, asks for refinement if invalid
-/breakdown     design   → proposes subtasks (type, Checklist / slice scope — Subtasks have no AC)
+/soloscrum:refine        po       → Issue (size-check SP, priority, AC, dependencies)
+/soloscrum:validate      design   → reads Issue, asks for refinement if invalid
+/soloscrum:breakdown     design   → proposes subtasks (type, Checklist / slice scope — Subtasks have no AC)
                dev      → registers subtasks (SP, type label)
-/develop       dev      → branch + code + draft PR; subtask → in-review
-/design-ui     ui       → Figma + tokens + states; subtask → in-review
-/review        review   → DoD + AC + code; promote PR to ready;
+/soloscrum:develop       dev      → branch + code + draft PR; subtask → in-review
+/soloscrum:design-ui     ui       → Figma + tokens + states; subtask → in-review
+/soloscrum:review        review   → DoD + AC + code; promote PR to ready;
                           subtask → done; surface merge command to user
 user           user     → runs `gh pr merge` (irreversible, user-gated)
-/refine        po       → janitor closes any parent Issues GH missed
+/soloscrum:refine        po       → janitor closes any parent Issues GH missed
 ```
 
 ## 全体を支える 3 つのルール

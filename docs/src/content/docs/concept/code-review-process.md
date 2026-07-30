@@ -1,11 +1,11 @@
 ---
 title: Code review process
-description: How `/review` runs CodeRabbit and the multi-agent review pipeline, why severity is informational, and how each finding resolves into a verdict.
+description: How `/soloscrum:review` runs CodeRabbit and the multi-agent review pipeline, why severity is informational, and how each finding resolves into a verdict.
 sidebar:
   order: 4
 ---
 
-`/review` runs two reviewers in parallel and consolidates their output into a single PR comment. Every finding, from either source, ends at one of two outcomes: **fix it**, or **skip it with a stated reason**. There is no third "ignore because severity is low" path.
+`/soloscrum:review` runs two reviewers in parallel and consolidates their output into a single PR comment. Every finding, from either source, ends at one of two outcomes: **fix it**, or **skip it with a stated reason**. There is no third "ignore because severity is low" path.
 
 ## The two review sources
 
@@ -52,7 +52,7 @@ Not a valid skip reason:
 
 ## The draft-window override
 
-The `code-review:code-review` command ships with an eligibility check that skips PRs still in draft. soloscrum **bypasses** that check. The PR is intentionally in draft when `/review` runs, because the [draft window](/concept/pr-lifecycle/) is where the local quality gate fires. Honouring the upstream skip would drop half the review pipeline.
+The `code-review:code-review` command ships with an eligibility check that skips PRs still in draft. soloscrum **bypasses** that check. The PR is intentionally in draft when `/soloscrum:review` runs, because the [draft window](/concept/pr-lifecycle/) is where the local quality gate fires. Honouring the upstream skip would drop half the review pipeline.
 
 If `code-review:code-review` exposes an explicit override argument, use it. Until then, soloscrum's review treats draft PRs as eligible by design.
 

@@ -53,7 +53,7 @@ tracker を扱う command や agent は、次の順で profile を探し、最�
 
 ライフサイクル / state machine / DoD / review pipeline のいずれにも「Linear」や「GitHub」という固有名は登場しません。tracker に触れる処理はすべて、profile ごとに用意された **operation skill** に委譲します。命名は `soloscrum-tracker-{github|linear}-{operation}` という形式で、profile が prefix を決め、`create-subtask` / `transition-state` / `set-sp` / `query-state` / `query-backlog` / `add-dependency` のいずれかを呼び出します。
 
-この設計により、GitHub のみの OSS リポジトリと Linear を併用するプロダクトチームで、`/develop` の動作は完全に同じです。動詞は共通で、ストレージだけが切り替わります。
+この設計により、GitHub のみの OSS リポジトリと Linear を併用するプロダクトチームで、`/soloscrum:develop` の動作は完全に同じです。動詞は共通で、ストレージだけが切り替わります。
 
 ## `.claude/rules/tracker.md` を置くべき場面
 

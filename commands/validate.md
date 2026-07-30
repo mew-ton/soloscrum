@@ -10,7 +10,7 @@ allowed-tools:
   - Bash(gh issue view:*)
 ---
 
-# /validate
+# /soloscrum:validate
 
 Validate feature design for feasibility.
 

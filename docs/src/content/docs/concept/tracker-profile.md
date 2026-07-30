@@ -53,7 +53,7 @@ Resolution stops at the first match. The repo-level override lets a single repo 
 
 The lifecycle, state machine, DoD, and review pipeline never name "Linear" or "GitHub" directly. Anything that touches the tracker delegates to a profile-namespaced **operation skill**: `soloscrum-tracker-{github|linear}-{operation}`. The profile selects the prefix; from there, the agent invokes the matching `create-subtask`, `transition-state`, `set-sp`, `query-state`, `query-backlog`, or `add-dependency` skill.
 
-A `/develop` flow runs identically on a GitHub-only OSS repo and on a Linear-using product team. The verbs are the same; only the storage backend differs.
+A `/soloscrum:develop` flow runs identically on a GitHub-only OSS repo and on a Linear-using product team. The verbs are the same; only the storage backend differs.
 
 ## When to set `.claude/rules/tracker.md`
 

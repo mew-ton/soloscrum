@@ -38,5 +38,5 @@ Returns active Linear subtasks — items in `In Progress` or `In Review`. Active
 
 ## Notes
 
-- This is the basis for `/status` in linear+github profile
+- This is the basis for `/soloscrum:status` in linear+github profile
 - PR links are typically already attached by Linear's GH integration; falling back to `gh pr list --search` is acceptable

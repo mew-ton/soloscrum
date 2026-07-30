@@ -10,7 +10,7 @@ allowed-tools:
   - Bash(gh issue view:*)
 ---
 
-# /design-ui
+# /soloscrum:design-ui
 
 Design a design-ui Subtask in Figma.
 
