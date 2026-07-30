@@ -12,6 +12,11 @@ description: >
   distinguish a genuinely universal perspective from one whose author forgot.>
   <BOUNDARY — where this does not apply, or an explicit statement that it
   applies broadly. A perspective with no boundary matches everything.>
+  <Two rules have no placeholder because they constrain the whole description
+  rather than a part of it: keep the finished text under 2048 characters, and
+  make it decidable on its own — a reader must be able to tell whether this
+  perspective applies without opening the body. Delete this note once the four
+  elements above are written.>
 ---
 
 <!-- soloscrum-review-perspective -->
