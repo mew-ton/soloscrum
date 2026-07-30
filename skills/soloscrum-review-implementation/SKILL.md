@@ -55,6 +55,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
      ```bash
      skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number>
      ```
+     That path is repo-root-relative, so run it with the **main checkout** as the working directory — after `/soloscrum:develop` the agent may still be inside that unit's worktree, where the path does not resolve (see `soloscrum-define-worktree`, "Paths that stay anchored to the main checkout").
      If any conclusion is **not** `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as **Fail** retroactively: post the failed conclusions on the PR, revert the Subtask to `in-progress` via the `transition-state` skill, and skip the remaining Pass actions (do **not** promote to ready). A green CI is part of the Pass contract — promoting a ready PR with red checks is the failure mode this step exists to prevent. Inline `until` loops over `gh pr view` are the anti-pattern this skill replaces.
    - Promote the PR to ready (`gh pr ready`) — reversible (`gh pr ready --undo`); per `soloscrum-define-pr-lifecycle` this runs without pre-confirm
    - **Stop here.** Surface the exact `gh pr merge` command for the user to run; merge is irreversible and is the user's gate. Do not run `gh pr merge`.
@@ -91,6 +92,7 @@ Follow the comment template defined in `soloscrum-define-code-review-process` (C
 - `soloscrum-define-dod`
 - `soloscrum-define-code-review-process` (verdict + post-action mapping)
 - `soloscrum-define-pr-lifecycle` (draft premise, `gh pr ready` autonomy, merge user-gate)
+- `soloscrum-define-worktree` (which checkout each step runs against)
 - `soloscrum-define-tracker-profile` (routing)
 - `soloscrum-tracker-{github|linear}-transition-state` (delegated)
 - `soloscrum-tracker-github-wait-for-pr-checks` (CI gate before `gh pr ready`)

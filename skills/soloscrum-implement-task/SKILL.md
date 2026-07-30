@@ -33,6 +33,7 @@ Implements code for a develop work unit and generates a **draft** PR. The target
    - Every step below runs with that worktree as the working directory. The main checkout is never switched onto the branch.
    - Write the resolved root as a repo-root-anchored pattern (`/<worktree_root>/`) to `.git/info/exclude` right away (untracked, effective immediately — this is what stops `git add -A` from staging a worktree as a gitlink), and if `.gitignore` does not already cover it, add the entry here too so the durable form lands in this unit's PR. Never commit it directly to the default branch.
 4. Implement code to deliver the slice (and to move the parent Issue's AC closer to satisfied without regression):
+   - **First, if `.claude/rules/stack.md` records an install command, run it in the worktree.** `git worktree add` checks out tracked files only, so gitignored dependency trees (`node_modules/`, `.venv/`, build caches) do not exist in a fresh worktree and the lint and test steps below will fail for an unrelated-looking reason. Skip when reusing an already-provisioned worktree. See `soloscrum-define-worktree`, "Known limitation" (tracked for automation in #99).
    - Write tests (when applicable)
    - Confirm zero lint errors
 5. Commit using Conventional Commits format

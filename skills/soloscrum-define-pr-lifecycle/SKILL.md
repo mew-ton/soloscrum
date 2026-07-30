@@ -15,7 +15,7 @@ This skill establishes a project-specific autonomy contract that **overrides** a
 The contract has three rules:
 
 1. **Reversible transitions are autonomous.** `gh pr create --draft`, `gh pr ready`, `gh pr review --approve`, `gh pr comment`, label edits, tracker state transitions — execute, then report. Do not ask.
-2. **Irreversible transitions are user-gated.** `gh pr merge`, force-push to a shared branch, branch deletion. The agent surfaces the exact command and stops.
+2. **Irreversible transitions are user-gated.** `gh pr merge`, force-push to a shared branch, deleting an **unmerged** local branch or any remote branch. The agent surfaces the exact command and stops. Deleting a *merged* local branch as part of worktree reclamation is classified reversible below — its content survives on the default branch.
 3. **The verdict is the decision point.** Once `soloscrum-review` produces a verdict, the post-verdict action sequence in `soloscrum-define-code-review-process` runs through to completion (or to the merge handoff) without further prompts. There is no "I'll just double-check" detour for reversible steps.
 
 The autonomy table below is the authoritative classification for every PR-side transition in soloscrum. If a transition is in the reversible table, the agent executes it without pre-confirm. If it is in the irreversible table, the agent stops and surfaces the command. Any transition not listed defaults to **irreversible until classified here**.
@@ -65,6 +65,7 @@ A transition is reversible when undoing it requires only one further command and
 | Comment on PR | `gh pr comment` | `gh api --method DELETE` on the comment |
 | Add / remove labels | `gh issue edit --add-label / --remove-label` | reverse the edit |
 | Tracker state transition | (delegated to `soloscrum-tracker-{profile}-transition-state`) | call again with previous state |
+| Reclaim a merged worktree | `git worktree remove` + `git branch -d` (refusing forms only, via `/soloscrum:cleanup`) | re-create the worktree from the merged content on the default branch, or from the merged PR's record. Not from the remote branch — `--delete-branch` removes it, and a squash merge leaves the original tip off the default branch |
 
 Reversibility is the contract. An agent that pauses to ask "may I run `gh pr ready`?" after a Pass verdict is over-cautious — the action is reversible, the verdict is the decision. Pausing here is the failure mode this skill exists to prevent.
 

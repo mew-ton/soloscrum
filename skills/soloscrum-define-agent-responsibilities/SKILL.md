@@ -60,7 +60,7 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
                                      surfaces /soloscrum:cleanup but does not run it
 user                     user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate);
                                      merge fires GH `Closes #` auto-close on referenced Issues
-/soloscrum:cleanup       dev      → reclaims worktrees whose branch merged (mechanical test: PR state, then
+/soloscrum:cleanup       (none)   → reclaims worktrees whose branch merged (mechanical test: PR state, then
                                      ancestry); never removes one holding uncommitted or unpushed work
 /soloscrum:refine        po       → janitor sweep at start: (a) closes parent Issues whose Sub-issue tree is fully closed
                                      (the only close path for parents, since per-Subtask PRs do not reference the parent

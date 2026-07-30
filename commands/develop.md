@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - Grep
   - Bash(git:*)
+  - Bash(skills/soloscrum-define-worktree/scripts/reclaim-worktrees.sh:*)
   - Bash(gh issue:*)
   - Bash(gh pr:*)
   - Bash(gh api:*)
@@ -26,7 +27,7 @@ Implement a develop work unit (Subtask of type `develop`, or a no-Subtask Issue 
 1. Receive target work unit (`$ARGUMENTS`) — either:
    - a **Subtask** of type `develop` (when the parent Issue went through `/soloscrum:breakdown`), or
    - a **no-Subtask Issue** (when the Issue's intent fits a single reviewable PR per `soloscrum-define-issue-size` and skipped `/soloscrum:breakdown`). The Issue still needs `type:develop` semantically — design-ui work goes through `/soloscrum:design-ui` regardless of split.
-2. `git fetch origin`, then reclaim merged worktrees before creating a new one, so the worktree root does not accumulate across work units:
+2. Resolve `worktree_root` per `soloscrum-define-worktree`'s resolution order (`.claude/rules/branch.md` frontmatter → plugin `userConfig` → `.soloscrum/worktrees`). Then, **with the main checkout as the working directory** — this is the first command of the run, and the agent may still be sitting in a previous run's worktree — fetch and reclaim merged worktrees, so the root does not accumulate across work units:
 
    ```bash
    git fetch origin

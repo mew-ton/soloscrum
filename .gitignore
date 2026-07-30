@@ -1,8 +1,11 @@
 # Claude Code per-user settings (committed: .claude/settings.json)
 .claude/settings.local.json
 
-# /soloscrum:develop worktree root (see skills/soloscrum-define-worktree)
-.soloscrum/
+# /soloscrum:develop worktree root (see skills/soloscrum-define-worktree).
+# Anchored to the repo root and scoped to the resolved root itself, per that
+# skill's ignore rule — not the .soloscrum/ segment, which would also hide
+# anything else soloscrum places there later.
+/.soloscrum/worktrees/
 
 # OS / editor scratch
 .DS_Store

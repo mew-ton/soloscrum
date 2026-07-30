@@ -3,10 +3,11 @@ name: soloscrum-define-worktree
 description: "Reference: where /soloscrum:develop does its work. Each work unit gets its own git worktree under a repo-internal root (default .soloscrum/worktrees), so the main checkout is never switched onto a feature branch. Defines the layout, the worktree_root resolution order, the create/reuse rules, and the merged-branch test /soloscrum:cleanup uses to reclaim them."
 user-invocable: false
 allowed-tools:
-  - Bash(git worktree:*)
+  - Bash(skills/soloscrum-define-worktree/scripts/reclaim-worktrees.sh:*)
+  - Bash(git worktree add:*)
+  - Bash(git worktree list:*)
   - Bash(git rev-parse:*)
   - Bash(git fetch:*)
-  - Bash(git branch:*)
 ---
 
 # soloscrum-define-worktree
