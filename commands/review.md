@@ -31,6 +31,7 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
 1. Receive target PR or Figma file (`$ARGUMENTS`)
 2. Launch `soloscrum-review` to:
    - Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`. AC verification operates at two layers per the DoD's "AC verification" section: a **Subtask PR** verifies slice-level delivery + no-regression on parent AC; an **Issue-without-Subtasks PR** verifies the full Issue AC; the **parent Issue's intent-level AC sign-off** happens once all its Subtasks close, not at any single Subtask PR.
+   - Apply the user's stored **review perspectives** as additional lenses, selected on their descriptions per `soloscrum-define-review-perspective`. An empty or absent corpus is the normal starting state and is not reported as a gap.
    - Check code quality (for PRs)
    - Flag issues and post review comments
 3. Optional: `soloscrum-design` checks for feature scope deviation
@@ -68,5 +69,5 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
 ## Resources
 
 - Subagents: `soloscrum-review` (required), `soloscrum-design` (optional), `soloscrum-ui` (optional)
-- Skills: `soloscrum-review-implementation`, `soloscrum-define-worktree` (which checkout each step runs against), `soloscrum-define-dod`, `soloscrum-define-code-review-process`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`, `soloscrum-tracker-github-wait-for-pr-checks` (call before `gh pr ready` so the user does not see a freshly-ready PR with red checks)
+- Skills: `soloscrum-review-implementation`, `soloscrum-define-worktree` (which checkout each step runs against), `soloscrum-define-review-perspective` (the corpus the review selects lenses from), `soloscrum-define-dod`, `soloscrum-define-code-review-process`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`, `soloscrum-tracker-github-wait-for-pr-checks` (call before `gh pr ready` so the user does not see a freshly-ready PR with red checks)
 - Rules: `.claude/rules/dod-extra.md`

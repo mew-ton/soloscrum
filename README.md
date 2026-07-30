@@ -88,6 +88,23 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
 | `/soloscrum:status` | 現在の作業状況を確認する |
 | `/soloscrum:next` | 次にやるべきことを提示する |
 | `/soloscrum:cleanup` | マージ済みブランチの worktree を回収する |
+| `/soloscrum:collect-perspective` | 壁打ちや他人の PR レビューからレビュー観点を収集する |
+
+### レビュー観点
+
+`/soloscrum:review` は、利用者が蓄積したレビュー観点を追加のレンズとして適用する。観点はマシンローカルの `~/.claude/review-perspectives/<name>/PERSPECTIVE.md` に置かれ、git 管理外で、全リポジトリ共通で参照される。
+
+```
+~/.claude/review-perspectives/
+  canonical-first/
+    PERSPECTIVE.md     frontmatter は skill と同型（name / description）
+```
+
+`/soloscrum:collect-perspective` が、壁打ちの会話や他人の PR のレビューコメントから観点を抽出して書き込む。`/soloscrum:review` は各観点の `description` だけを読んで適用対象を選び、選ばれたものの本文だけを読む。そのため `description` には英語・2048 文字以内・when と what を書くという制約がある。詳細は `skills/soloscrum-define-review-perspective/SKILL.md`。
+
+観点が 1 件も無い状態は正常で、`/soloscrum:review` は何も報告せずそのまま進む。`~/.claude/settings.json` に `Write(~/.claude/review-perspectives/**)` を足すと書き込み時のハーネス確認を減らせる（リポジトリの `.claude/settings.json` には入れない — ユーザーレベルの設定のため）。
+
+---
 
 ### コマンド名前空間
 

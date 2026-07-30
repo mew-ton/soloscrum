@@ -5,24 +5,28 @@ sidebar:
   order: 4
 ---
 
-`/soloscrum:review` は 2 つの reviewer を並列に走らせ、その出力を 1 つの PR コメントにまとめます。どちらの reviewer から出てきた finding も、最終的に **修正する** か **理由を明記して skip する** のどちらかに収束します。「severity が低いから無視」という 3 つ目の選択肢はありません。
+`/soloscrum:review` は 3 つの reviewer を並列に走らせ、その出力を 1 つの PR コメントにまとめます。どちらの reviewer から出てきた finding も、最終的に **修正する** か **理由を明記して skip する** のどちらかに収束します。「severity が低いから無視」という 3 つ目の選択肢はありません。
 
-## 2 つの review source
+## 3 つの review source
 
 **CodeRabbit** は `coderabbit review --plain --base main` で実行します。finding には `critical` / `major` / `minor` / `nitpick` のタグが付きますが、これは issue の種類を表すラベルであって、skip 判断のための severity ではありません。スコープ内で内容も正しい `nitpick` は、修正する価値があります。
 
 **multi-agent review** は `code-review:code-review` slash command で実行します。このコマンドは複数の Sonnet agent を並列起動し、security / architecture / bug scan / history / in-file rules / coverage gaps といった観点ごとに review させます。別途 Haiku agent が各 finding に 0-100 のスコアを付けます。スコアは新規 agent が制約を捏造したりルールを誤って引用したりするノイズ傾向を踏まえて調整されています。
 
-両 source の finding は集約され、末尾に 1 行の verdict を持つ単一の PR コメントとして投稿されます。
+**レビュー観点 (review perspectives)** は、利用者自身が蓄積した判断です。マシンローカルの `~/.claude/review-perspectives/` に置かれ、[`/soloscrum:collect-perspective`](/ja/commands/collect-perspective/) で収集します。前の 2 つが一般的なレビューであるのに対し、これは**その利用者が具体的に学んだこと**であり、二度と学び直したくないものです。レビューは各観点の `description` だけを読んで適用対象を決め、選ばれたものの本文だけを読みます。観点が 1 件も無い状態は正常な初期状態で、その場合このステップは黙ってスキップされ、不足として報告されることはありません。
 
-## 2 つのしきい値を使い分ける理由
+3 つの source の finding は集約され、末尾に 1 行の verdict を持つ単一の PR コメントとして投稿されます。
 
-2 つの source は失敗の出方が違うので、フィルタも別にしてあります。
+## しきい値を使い分ける理由
+
+source ごとに失敗の出方が違うので、フィルタも別にしてあります。
 
 - **CodeRabbit の finding はツール側ですでにフィルタ済み。** severity は情報用であって、最下位の tier であっても文書化された pattern に対応しています。severity で再フィルタすると、正当なシグナルを取りこぼします。
 - **multi-agent の reviewer は PR ごとに新規起動。** 制約を hallucinate したり、意図のある変更を flag したりしがちです。confidence 80 のプレフィルタは、その種のノイズを抑えるために設定されています。
 
-このプレフィルタは multi-agent 側にだけ適用します。フィルタを通った finding は、source を問わず同じ per-item 判断にかけます。
+- **レビュー観点は意図して書かれたもの。** 利用者自身が書き、収集時にレビュー済みです。agent 用の confidence フィルタを適用すると、まさに残そうとして収集した判断を捨てることになります。したがって観点は CodeRabbit と同じ側 — プレフィルタなし — に置きます。
+
+このプレフィルタは multi-agent 側にだけ適用します。フィルタを通った finding は、source を問わず同じ per-item 判断にかけます。観点由来の finding には、どの観点が出したかを記録します。skip され続ける観点は較正がずれているということであり、その兆候は出所を残していないと見えません。
 
 両者を混ぜる挙動 — agent 用の confidence フィルタを CodeRabbit に適用したり、confidence 80 未満の agent finding を「もっともらしいから」と通したり — は anti-pattern として明示的に禁止しています。
 
@@ -64,7 +68,7 @@ verdict は 3 種類です。どれになるかは、表面化した finding を
 - **Pass with follow-ups** — すべての finding を判断したが、1 件以上が *スコープ外として skip* され、別の follow-up Issue に切り出されている。PR は merge 可能で、follow-up Issue が存在している
 - **Fail** — 修正されておらず正当な「スコープ外」でもない、correctness / security / DoD 違反の finding が 1 件以上残っている
 
-両 source から判断対象の finding が一切出なかった場合 (CodeRabbit が「No findings ✔」、multi-agent でも confidence 80 以上の finding がない) は、定型の「No issues found」コメントを投稿します。
+どの source からも判断対象の finding が出なかった場合 (CodeRabbit が「No findings ✔」、multi-agent でも confidence 80 以上の finding がなく、観点由来の finding も無い) は、定型の「No issues found」コメントを投稿します。
 
 ## verdict が確定した後
 

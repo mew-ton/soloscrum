@@ -10,12 +10,25 @@ Defines the standard code review pipeline run during `/soloscrum:review`, plus t
 
 ## Pipeline
 
-A code review combines two complementary sources, run in parallel:
+A code review combines three complementary sources, run in parallel:
 
 1. **CodeRabbit** (`coderabbit review --plain --base main`) — produces findings with its own severity classification: `critical` / `major` / `minor` / `nitpick`.
 2. **Multi-agent review** — implemented via the `code-review:code-review` slash command (N parallel Sonnet agents, each with a focused lens: security, architecture, bug scan, history, in-file rules, coverage gap). Produces free-text findings, scored 0–100 by a Haiku agent per the rubric in that command.
+3. **Review perspectives** — the user's own accumulated judgements, stored machine-locally per `soloscrum-define-review-perspective`. The first two sources are general; this one is what the user has specifically learned and does not want re-learned.
 
-Both sources' findings are then consolidated into a single PR comment.
+All three sources' findings are then consolidated into a single PR comment.
+
+### Applying review perspectives
+
+Perspectives live at `~/.claude/review-perspectives/*/PERSPECTIVE.md` and are selected, not loaded wholesale:
+
+1. Glob the corpus and read **only the frontmatter `description`** of each. Descriptions are written to be decidable on their own (that skill's description rules exist for this step).
+2. Select the ones whose stated *when* matches this PR — its diff, the areas it touches, the kind of change it is. Respect a stated negative trigger.
+3. Read the **body** of the selected perspectives only, and apply each as an additional review lens.
+
+**An empty or absent corpus is the normal starting state**, not an error and not a warning. Skip the step and say nothing; a user who has collected no perspectives should not see this reported as a gap on every review.
+
+Perspectives are collected via `/soloscrum:collect-perspective`.
 
 ### Draft-window override for `code-review:code-review`
 
@@ -43,6 +56,12 @@ Severity and confidence scores are **inputs to a per-item decision**, never auto
 - Each agent finding is scored 0–100 by a separate Haiku scoring agent (per the rubric in `code-review:code-review`).
 - **Pre-filter: drop findings with score < 80** (high false-positive rate from fresh agents).
 - Surviving findings then go through the same per-item decision below.
+
+### Review-perspective findings — no pre-filter, like CodeRabbit
+
+- **No pre-filter.** The user wrote these perspectives deliberately, so a finding one produces carries their own prior judgement. Dropping it silently is the same process failure as dropping a `nitpick`.
+- Perspective findings are **not** agent-generated in the sense the 80-confidence filter targets. That filter exists for lenses invented fresh per PR; a perspective was authored once, on purpose, and reviewed by the user when it was collected.
+- Record which perspective produced each finding. A perspective that keeps producing skipped findings is miscalibrated — that signal is only visible if the attribution is kept.
 
 ### The per-item decision
 
@@ -73,6 +92,7 @@ For every surfaced finding, choose one:
 - CodeRabbit findings have already been filtered by the tool itself; its severity classification is informational, and even its lowest tier corresponds to documented patterns. Re-filtering by severity silently drops legitimate signal.
 - Multi-agent reviewers spawn fresh per PR and are prone to inventing constraints, mis-citing rules, or flagging intentional changes. The 80-confidence pre-filter is calibrated for that noise. After the pre-filter, the decision is still per-item.
 - Mixing the two — applying the agent confidence pre-filter to CodeRabbit output, or accepting agent findings below 80 because they "look plausible" — is the failure mode this skill exists to prevent.
+- Review perspectives sit on the CodeRabbit side of this line: authored deliberately, so no pre-filter. Applying the 80-confidence filter to them would discard exactly the judgements the user collected them to preserve.
 
 ## PR Comment Format
 
@@ -91,6 +111,11 @@ A single comment combining both sources. Every surfaced finding records the acti
 1. <one-line description> (<rule or rationale>) — <action: fix | skip + reason>
    <link to file with full SHA + line range>
 
+#### Review-perspective findings
+
+1. <one-line description> (perspective: <name>) — <action: fix | skip + reason>
+   <link to file with full SHA + line range>
+
 #### Verdict
 
 Pass | Pass with follow-ups | Fail
@@ -102,7 +127,7 @@ Pass | Pass with follow-ups | Fail
 - **Pass with follow-ups** — every finding was decided, but one or more were skipped *as out-of-scope* and tracked as follow-up Issues. The PR is mergeable; the follow-ups exist as separate Issues.
 - **Fail** — at least one finding identifies a real correctness, security, or DoD violation that has not been fixed and is not legitimately out of scope.
 
-If both sources produce zero findings to decide on (CodeRabbit "No findings ✔" and no agent finding ≥80), post the canonical "No issues found" comment.
+If all sources produce zero findings to decide on (CodeRabbit "No findings ✔", no agent finding ≥80, and no perspective finding), post the canonical "No issues found" comment. Omit the perspective section entirely when the corpus is empty — an empty section reads as a missing step rather than an absent input.
 
 ### Post-verdict actions
 

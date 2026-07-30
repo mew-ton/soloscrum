@@ -1,0 +1,55 @@
+---
+name: collect-perspective
+description: Extracts reusable review perspectives from another project's PR review comments, or from the current conversation, and stores them at ~/.claude/review-perspectives/ for /soloscrum:review to select from. Generalises past the originating case, reconciles against existing perspectives so a near-duplicate updates rather than multiplies, and confirms once before writing outside the repository.
+argument-hint: "[pr-url]"
+disable-model-invocation: true
+allowed-tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - Bash(gh pr view:*)
+  - Bash(gh api:*)
+---
+
+# /soloscrum:collect-perspective
+
+Turn review knowledge into something the next review can apply.
+
+## Behavior
+
+1. **Determine the source** from `$ARGUMENTS`:
+   - **A PR URL** — read its review comments: `gh pr view <url> --comments`, plus the inline comments (`gh api repos/{owner}/{repo}/pulls/{n}/comments`). Reviews of *other people's* projects are the richest source, because the reasoning is stated explicitly for a reader who lacks the author's context.
+   - **No argument** — draw from the current conversation. Whatever the user has been working through with you is the source: a decision reached, a mistake diagnosed, a convention argued for.
+2. **Extract candidate judgements.** A candidate is a statement about what to look for that would still be true on a different change. Skip anything that only reports a fact about the specific diff.
+3. **Generalise.** Strip the originating case down to its transferable core — the framework, not the file; the class of mistake, not the instance. A perspective that only fires on the situation that produced it will never fire again. Keep the concrete example; move it to the body.
+4. **Reconcile against what exists.** Read the `description` of every perspective under `~/.claude/review-perspectives/*/PERSPECTIVE.md`. If a candidate overlaps one, propose an **update** to that perspective rather than a new sibling. Near-duplicates are the failure mode that makes a corpus unselectable — two perspectives with overlapping triggers force the selector to guess, and both get applied or neither does.
+5. **Draft the file** per `soloscrum-define-review-perspective`: kebab-case directory, `PERSPECTIVE.md`, `name` + `description` frontmatter. Hold the description to the rules that skill defines — English, ≤ 2048 characters, When and What, a negative trigger, decidable without the body.
+6. **Show the content and take one confirmation**, then write. See Autonomy below.
+
+## Autonomy
+
+This command writes **outside the repository**, into the user's home directory. That is a deliberate exception to soloscrum's autonomy contract, which is scoped to repository state and to PRs (`soloscrum-define-pr-lifecycle`). Nothing in that contract authorises a command to modify the user's machine, and the perspective corpus is a personal asset that outlives every repository — a wrong entry in it degrades every future review, silently.
+
+So: present the full proposed file content, take **one** confirmation for the invocation, then write without further prompting. Do not ask per file when several perspectives come out of one source.
+
+An update to an existing perspective shows the diff, not just the new content — the user is being asked to approve a change to something they already accepted.
+
+## Input
+
+- **`[pr-url]`** — a GitHub PR whose review comments are the source. Any repository the user can read; the value of this command is highest on projects that are not theirs.
+- **(no argument)** — the current conversation is the source.
+
+## Output
+
+Per perspective: whether it was created or updated, its path, and its description. Plus a one-line summary of what was extracted and what was discarded as too case-specific to generalise — the discards matter, because they are what the user would otherwise assume was captured.
+
+## Notes
+
+- Perspectives are machine-local and cross-repository. They are never committed, and `/soloscrum:collect-perspective` never writes into the repository it is invoked from.
+- Adding `Write(~/.claude/review-perspectives/**)` to the user's own `~/.claude/settings.json` removes the harness prompt on each write. The confirmation in step 6 is soloscrum's own gate and stays regardless.
+- Collecting from a PR does not require any relationship to it. Reading a stranger's review is a legitimate and unusually good source.
+
+## Resources
+
+- Skills: `soloscrum-define-review-perspective` (the format and the description rules), `soloscrum-define-code-review-process` (how the collected perspectives are later applied)

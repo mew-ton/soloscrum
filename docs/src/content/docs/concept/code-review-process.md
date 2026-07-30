@@ -5,24 +5,28 @@ sidebar:
   order: 4
 ---
 
-`/soloscrum:review` runs two reviewers in parallel and consolidates their output into a single PR comment. Every finding, from either source, ends at one of two outcomes: **fix it**, or **skip it with a stated reason**. There is no third "ignore because severity is low" path.
+`/soloscrum:review` runs three reviewers in parallel and consolidates their output into a single PR comment. Every finding, from either source, ends at one of two outcomes: **fix it**, or **skip it with a stated reason**. There is no third "ignore because severity is low" path.
 
-## The two review sources
+## The three review sources
 
 **CodeRabbit** runs via `coderabbit review --plain --base main`. It produces findings tagged `critical` / `major` / `minor` / `nitpick`. The tags describe what kind of issue it is, not whether to skip. A correct, in-scope `nitpick` is still worth fixing.
 
 **The multi-agent review** runs via the `code-review:code-review` slash command. That command spins up several Sonnet agents in parallel, each with a focused lens (security, architecture, bug scan, history, in-file rules, coverage gaps). A separate Haiku agent scores each finding 0–100. The score is calibrated for the noise pattern of fresh agents, which tend to invent constraints and mis-cite rules.
 
-Both sources' findings are consolidated into one PR comment with a single verdict line at the bottom.
+**Review perspectives** are your own accumulated judgements, stored machine-locally at `~/.claude/review-perspectives/` and collected via [`/soloscrum:collect-perspective`](/commands/collect-perspective/). The first two sources are general; this one is what *you* have specifically learned and do not want re-learned. The review reads only each perspective's `description` to decide which apply to this PR, then reads the bodies of the selected few. An empty or absent corpus is the normal starting state — the step is skipped silently, not reported as a gap.
+
+All three sources' findings are consolidated into one PR comment with a single verdict line at the bottom.
 
 ## Why two thresholds exist
 
-The two sources fail differently, so they get different filters:
+The sources fail differently, so they get different filters:
 
 - **CodeRabbit findings are already filtered by the tool.** Its severity classification is informational, and even its lowest tier corresponds to documented patterns. Re-filtering by severity silently drops legitimate signal.
 - **Multi-agent reviewers spawn fresh per PR.** They are prone to hallucinating constraints and flagging intentional changes. The 80-confidence pre-filter is the noise gate calibrated for that.
 
-The pre-filter applies only to the multi-agent side. After it, every surviving finding goes through the same per-item decision.
+- **Review perspectives were authored deliberately.** You wrote each one, and reviewed it when it was collected. Applying the agent confidence filter to them would discard exactly the judgements you collected them to preserve — so they sit on the CodeRabbit side of the line: no pre-filter.
+
+The pre-filter applies only to the multi-agent side. After it, every surviving finding goes through the same per-item decision. Perspective findings record which perspective produced them; a perspective whose findings are repeatedly skipped is miscalibrated, and that signal is only visible if the attribution is kept.
 
 Mixing the two — applying the agent confidence filter to CodeRabbit, or accepting agent findings below 80 because they "look plausible" — is a named anti-pattern.
 
@@ -64,7 +68,7 @@ Three verdicts are possible. The choice depends only on what happened to the sur
 - **Pass with follow-ups** — every finding was decided, but one or more were skipped *as out of scope* and tracked as separate follow-up Issues. The PR is mergeable; the follow-ups exist.
 - **Fail** — at least one finding identifies a real correctness, security, or DoD violation that has not been fixed and is not legitimately out of scope.
 
-If both sources produce zero findings to decide on (CodeRabbit "No findings ✔" and no agent finding scoring 80 or higher), the canonical "No issues found" comment is posted.
+If all sources produce zero findings to decide on (CodeRabbit "No findings ✔", no agent finding scoring 80 or higher, and no perspective finding), the canonical "No issues found" comment is posted.
 
 ## What happens after the verdict
 

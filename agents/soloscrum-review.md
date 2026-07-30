@@ -7,6 +7,7 @@ skills:
   - soloscrum-review-implementation
   - soloscrum-define-dod
   - soloscrum-define-code-review-process
+  - soloscrum-define-review-perspective
   - soloscrum-define-pr-lifecycle
   - soloscrum-define-tracker-profile
   - soloscrum-define-agent-responsibilities
@@ -42,16 +43,17 @@ PR merge itself is **not** an agent action — it is the user's gate, per `solos
 2. Check every DoD item without exception and state results explicitly
 3. Verify AC at the appropriate layer per `soloscrum-define-dod`'s "AC verification" section: Subtask PR (slice delivered + no regression on parent AC); Issue-without-Subtasks PR (full Issue AC satisfied); parent Issue intent-level sign-off (when all Subtasks close, **not** at any single Subtask PR). Mark as Fail if the layer-appropriate check fails.
 4. Run the automated code review pipeline per `soloscrum-define-code-review-process` (CodeRabbit + multi-agent), apply the per-item decision (fix / skip with stated reason) to every surviving finding, and consolidate into the PR comment using the canonical template
-5. Complement the automated pipeline with a manual code review for items the tools cannot judge:
+5. Apply the user's **review perspectives** (`soloscrum-define-review-perspective`): select from `~/.claude/review-perspectives/` on descriptions alone, then apply the selected bodies as additional lenses. These carry judgements the user collected deliberately, so they take no confidence pre-filter — same treatment as CodeRabbit findings. An empty corpus is normal and is not reported.
+6. Complement the automated pipeline with a manual code review for items the tools cannot judge:
    - Logic correctness
    - Security (OWASP Top 10 perspective)
    - Performance concerns
    - Readability and maintainability
-6. Make feedback specific and include improvement suggestions
-7. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. **Wait for CI green** via `soloscrum-tracker-github-wait-for-pr-checks` before `gh pr ready`; if any conclusion is not `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as Fail and revert the Subtask to `in-progress`. Inline `until` loops over `gh pr view` are an anti-pattern (per `CLAUDE.md`). On Fail, leave the PR in draft.
-8. Never run `gh pr merge`. Surface the exact merge command to the user; merge is the user's gate.
-9. Do **not** close any Issue (Subtask or parent) as part of `/soloscrum:review`. Closure happens at merge via the PR body's `Closes #` keyword; missed parents are picked up by the `/soloscrum:refine` janitor. Per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
-10. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
+7. Make feedback specific and include improvement suggestions
+8. Only promote PR to ready (`gh pr ready`) and transition Subtask to `done` on Pass / Pass with follow-ups verdict. Per `soloscrum-define-pr-lifecycle` these are reversible transitions and run without pre-confirm; do not pause to ask the user. **Wait for CI green** via `soloscrum-tracker-github-wait-for-pr-checks` before `gh pr ready`; if any conclusion is not `SUCCESS` / `SKIPPED` / `NEUTRAL`, treat the verdict as Fail and revert the Subtask to `in-progress`. Inline `until` loops over `gh pr view` are an anti-pattern (per `CLAUDE.md`). On Fail, leave the PR in draft.
+9. Never run `gh pr merge`. Surface the exact merge command to the user; merge is the user's gate.
+10. Do **not** close any Issue (Subtask or parent) as part of `/soloscrum:review`. Closure happens at merge via the PR body's `Closes #` keyword; missed parents are picked up by the `/soloscrum:refine` janitor. Per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
+11. Resolve the active tracker profile via `soloscrum-define-tracker-profile`, then route every state transition through `soloscrum-tracker-{profile}-transition-state` — never call Linear MCP or `gh issue close` for state transitions directly
 
 ## External Access
 

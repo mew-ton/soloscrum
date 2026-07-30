@@ -93,6 +93,7 @@ Skills (the soloscrum spec — read these for the contract):
 
 - `skills/soloscrum-define-pr-lifecycle/SKILL.md` — autonomy contract, reversible-vs-irreversible, anti-patterns, self-approve fallback, parent-close mechanism (janitor-only)
 - `skills/soloscrum-define-code-review-process/SKILL.md` — review pipeline, per-finding decision, verdict mapping, draft-window override
+- `skills/soloscrum-define-review-perspective/SKILL.md` — the Review Perspective format (`~/.claude/review-perspectives/`), the description rules `/soloscrum:review` selects on, and why perspectives are not stored as skills
 - `skills/soloscrum-define-issue-format/SKILL.md` — Concept (Issue = intent), Issue body format, Issue-vs-Subtask discriminator, Subtask body contract, the two AC shapes (Shape A user-facing / Shape B structural)
 - `skills/soloscrum-define-issue-size/SKILL.md` — split criteria as mis-scope smells, `/soloscrum:breakdown` reviewability trigger, split axes (feature / phase — layer is NOT an Issue split axis)
 - `skills/soloscrum-define-branch-commit/SKILL.md` — branch-per-Subtask vs branch-per-Issue, Conventional Commits, parent Issue close (janitor-only)
@@ -104,7 +105,7 @@ Skills (the soloscrum spec — read these for the contract):
 
 Commands the user invokes:
 
-- `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`, `/soloscrum:cleanup` — see `commands/` (these ship in the plugin to consumer repos)
+- `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`, `/soloscrum:cleanup`, `/soloscrum:collect-perspective` — see `commands/` (these ship in the plugin to consumer repos)
 
 ## Local commands (this repo only)
 
