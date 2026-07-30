@@ -35,6 +35,7 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 | Subtask Checklist | design (during `/soloscrum:breakdown` — slice scope: "what" + concrete steps; not AC) | dev/ui (during implementation) | review (per-Subtask correctness + no regression; intent-level AC sign-off is at the parent Issue, not here) |
 | Subtask / no-Subtask Issue State (`/soloscrum:develop` target) | dev (develop type) / ui (design-ui type) — to In Review | review — to Done | review |
 | Branch | dev | — | review (PR check) |
+| Worktree | dev (one per `/soloscrum:develop` target, per `soloscrum-define-worktree`) | — | reclaimed by `/soloscrum:cleanup` on a mechanical merged test — no role judgement involved |
 | Commit | dev | — | review |
 | PR | dev (creates as draft) | review (promote to ready) — **user merges** | review |
 | Figma artifact | ui | ui | review (optional design fidelity check) |
@@ -49,14 +50,18 @@ For each concept, the **Creator** writes it first, the **Mutator** changes it du
 /soloscrum:validate      design   → reads Issue, asks for refinement if invalid
 /soloscrum:breakdown     design   → proposes subtasks (with type, Checklist / slice scope — Subtasks have no AC per soloscrum-define-issue-format)
                          dev      → registers subtasks (with SP, type label)
-/soloscrum:develop       dev      → branch + code + draft PR; transitions target (Subtask or no-Subtask Issue per
-                                     soloscrum-define-branch-commit) to In Review
+/soloscrum:develop       dev      → worktree + branch + code + draft PR; transitions target (Subtask or
+                                     no-Subtask Issue per soloscrum-define-branch-commit) to In Review;
+                                     reclaims merged worktrees at start
 /soloscrum:design-ui     ui       → Figma + tokens + states; transitions Subtask to In Review
 /soloscrum:review        review   → DoD + AC + code; promotes PR to ready; transitions Subtask to Done;
                                      surfaces merge command to user (Issue close happens at merge,
-                                     not at verdict — see soloscrum-define-pr-lifecycle)
+                                     not at verdict — see soloscrum-define-pr-lifecycle);
+                                     surfaces /soloscrum:cleanup but does not run it
 user                     user     → runs `gh pr merge` (the only irreversible PR transition is the user's gate);
                                      merge fires GH `Closes #` auto-close on referenced Issues
+/soloscrum:cleanup       dev      → reclaims worktrees whose branch merged (mechanical test: PR state, then
+                                     ancestry); never removes one holding uncommitted or unpushed work
 /soloscrum:refine        po       → janitor sweep at start: (a) closes parent Issues whose Sub-issue tree is fully closed
                                      (the only close path for parents, since per-Subtask PRs do not reference the parent
                                      via Closes #); (b) closes standalone Issues whose direct merged PR did not fire GH's

@@ -54,22 +54,39 @@ worktree_root: .soloscrum/worktrees
 
 ## Ignoring the worktree root
 
-The worktree root must be ignored, or every worktree shows up as untracked content in the main checkout.
+The worktree root must be ignored, and it must be ignored **immediately** — not once a PR merges. A worktree directory contains a `.git` file, so an unignored worktree root is not merely untracked noise: `git add -A` from the enclosing checkout stages the worktree as a **gitlink** (`warning: adding embedded git repository`), and a commit carrying that broken submodule reference is far harder to undo than it was to create.
 
-`/soloscrum:develop` ensures the entry exists. When `.gitignore` does not already cover the resolved root, it appends the top-level segment (`.soloscrum/` for the default) **inside the work unit's worktree, on its branch**, so the addition lands in that unit's PR. Never commit it directly to the default branch — `soloscrum-define-branch-commit` forbids that, and the ignore entry is not special.
+`/soloscrum:develop` therefore writes the ignore in two places:
 
-Until that PR merges, the main checkout's `.gitignore` does not yet carry the entry, so `git status` there reports the worktree root as untracked. That is expected and harmless: the worktrees contain no content the repository needs to track, and the state resolves on the first merge.
+1. **`.git/info/exclude`, at creation time.** Takes effect the instant the worktree exists, is not tracked, needs no commit, and is shared by every worktree of the repository because it lives in the common directory. This is what closes the window.
+2. **`.gitignore`, if not already covered** — appended **inside the work unit's worktree, on its branch**, so it lands in that unit's PR. Never commit it directly to the default branch; `soloscrum-define-branch-commit` forbids that, and the ignore entry is not special. This is what makes the ignore durable and visible to collaborators and to fresh clones.
+
+The `.git/info/exclude` entry is what makes step 2's delay safe. Without it, every worktree cut before the ignore-bearing PR merged would be exposed for its entire lifetime, not just during a first-run bootstrap.
+
+### What ignoring does not cover
+
+`.gitignore` and `.git/info/exclude` govern **git's** view. They do not govern tooling that walks the filesystem on its own — TypeScript `include` globs, ESLint without an explicit ignore entry, Jest's default `testPathIgnorePatterns`, bundler watchers, IDE indexers. Each worktree is a complete checkout, so a broad `**/*` glob run from the main checkout will find every source file a second time, once per worktree.
+
+A repository whose tooling globs broadly should add the worktree root to those tools' own ignore configuration. Record it in `.claude/rules/stack.md` so it is applied consistently rather than rediscovered per work unit.
 
 ## Creating the worktree
 
-1. `git fetch origin` — the branch must be cut from current upstream state, not from whatever the main checkout last pulled.
-2. Resolve the default branch: `git rev-parse --abbrev-ref origin/HEAD` (e.g. `origin/main`).
-3. Resolve `worktree_root`, compute `<repo-root>/<worktree_root>/<branch>`.
-4. Create or reuse:
+1. **Resolve the main checkout root first, and build an absolute path from it:**
+
+   ```bash
+   main_root=$(dirname "$(git rev-parse --path-format=absolute --git-common-dir)")
+   ```
+
+   Never compute the worktree path relative to the current working directory. An agent's working directory persists across steps and sessions, so after one `/soloscrum:develop` it is already *inside* a worktree — and a relative `git worktree add .soloscrum/worktrees/<branch>` from there creates the new worktree **nested inside the previous one**. That nesting is not cosmetic: the inner worktree's `.git` file makes `git add -A` in the outer one stage it as a gitlink (`warning: adding embedded git repository`), and if that commit merges, the default branch permanently carries a broken submodule reference. `--git-common-dir` resolves to the shared directory from any worktree, so this form is correct wherever it runs.
+
+2. `git fetch origin` — the branch must be cut from current upstream state, not from whatever the main checkout last pulled.
+3. Resolve the default branch: `git rev-parse --abbrev-ref origin/HEAD` (e.g. `origin/main`). `origin/HEAD` is unset on some clones; fall back to the remote's advertised default (`gh repo view --json defaultBranchRef`), then to `origin/main`.
+4. Resolve `worktree_root` and compute `${main_root}/<worktree_root>/<branch>`.
+5. Create or reuse:
    - **A worktree for this branch already exists** (`git worktree list --porcelain` reports it) → **reuse it**. Do not create a second one; git refuses to check the same branch out twice anyway. A reused worktree may hold work from an interrupted run — inspect it before continuing rather than assuming a clean slate.
    - **The branch exists but has no worktree** → `git worktree add <path> <branch>`
    - **Neither exists** → `git worktree add -b <branch> <path> origin/<default>`
-5. Everything downstream — reading files, editing, `git add` / `git commit`, `gh pr create` — runs with the worktree as the working directory.
+6. Everything downstream — reading files, editing, `git add` / `git commit`, `gh pr create` — runs with the worktree as the working directory.
 
 ### Paths that stay anchored to the main checkout
 
@@ -95,6 +112,12 @@ A worktree is **reported, not removed**, when any of these holds:
 - `git status --porcelain` in the worktree is non-empty (uncommitted changes, including untracked files)
 - the worktree is detached (no branch to test)
 - a merged PR exists for the branch, but the branch's local tip is **not** the commit that PR merged (`headRefOid`) — commits were made locally after the push and never reached the remote
+- the reclaim pass is itself running from inside that worktree, or from a directory under it
+- the worktree's status cannot be read at all — unverifiable is treated as unsafe, not as clean
+
+The running-from-inside condition is not a git-state check. `git worktree remove` succeeds regardless of what process has the directory open; git holds no lock. Removing the directory a caller is standing in leaves it on a path that no longer exists, and every subsequent relative command fails opaquely. Git cannot see that, so it is checked separately.
+
+The same hazard exists for a *different* live process — a second terminal idling in a merged worktree, say. That one is not detectable from here, and is the reason `/soloscrum:cleanup` reports every removal rather than working silently.
 
 Each merged test carries its own "nothing is unsaved" evidence, which is why there is no separate upstream check:
 
@@ -110,6 +133,14 @@ An upstream-based check (`@{upstream}`, `rev-list --count`) cannot be used here.
 Both commands are used in their **refusing** form on purpose. Plain `remove` refuses a dirty worktree; `-d` refuses an unmerged branch. They are a second, independent guard behind the safety conditions above — if the checks and the removal ever disagree, git wins and the work survives. `git worktree remove --force` and `git branch -D` defeat exactly that guard and are denied in this repository's permission settings.
 
 `git worktree prune` clears administrative entries for worktrees whose directory disappeared some other way (the user deleted it by hand). It never touches an existing directory.
+
+## Known limitation: a fresh worktree has no installed dependencies
+
+`git worktree add` checks out tracked files only. Anything gitignored — `node_modules/`, `.venv/`, build and test caches — does **not** exist in a new worktree, and nothing in soloscrum installs it.
+
+For a repository whose lint and test steps depend on installed dependencies, that means the first commands `soloscrum-implement-task` runs in a new worktree ("confirm zero lint errors", "write tests") will fail until the project's install step has run there. This is not a duplication concern; it is an absence. Under the previous single-checkout model the install happened once and persisted, so the worktree model shifts a cost that used to be invisible.
+
+Until provisioning is part of the flow, a repository in this position should record its install command in `.claude/rules/stack.md` so the implementation step runs it before lint and test rather than discovering the gap. Per-worktree dependency provisioning is tracked separately (#99); it is deliberately out of scope for this skill.
 
 ## Companion script
 

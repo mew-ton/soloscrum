@@ -68,5 +68,5 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
 ## Resources
 
 - Subagents: `soloscrum-review` (required), `soloscrum-design` (optional), `soloscrum-ui` (optional)
-- Skills: `soloscrum-review-implementation`, `soloscrum-define-dod`, `soloscrum-define-code-review-process`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`, `soloscrum-tracker-github-wait-for-pr-checks` (call before `gh pr ready` so the user does not see a freshly-ready PR with red checks)
+- Skills: `soloscrum-review-implementation`, `soloscrum-define-worktree` (which checkout each step runs against), `soloscrum-define-dod`, `soloscrum-define-code-review-process`, `soloscrum-define-pr-lifecycle`, `soloscrum-define-tracker-profile`, `soloscrum-tracker-github-wait-for-pr-checks` (call before `gh pr ready` so the user does not see a freshly-ready PR with red checks)
 - Rules: `.claude/rules/dod-extra.md`

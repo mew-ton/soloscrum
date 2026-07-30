@@ -31,7 +31,7 @@ Per `soloscrum-define-agent-responsibilities`:
 ## Guidelines
 
 1. Follow branch naming and commits per `soloscrum-define-branch-commit`
-2. Work inside the target's **own worktree** per `soloscrum-define-worktree` — create it under the resolved `worktree_root` (reusing an existing one for the same branch), and run implementation, commits, and `gh pr create` with that worktree as the working directory. Never switch the main checkout onto the branch. Never use `git worktree remove --force` or `git branch -D`; both are denied and both defeat the safety conditions reclamation depends on.
+2. Work inside the target's **own worktree** per `soloscrum-define-worktree` — create it under the resolved `worktree_root`, with the path built from the main checkout root (`git rev-parse --path-format=absolute --git-common-dir`) rather than the current directory (reusing an existing worktree for the same branch), and run implementation, commits, and `gh pr create` with that worktree as the working directory. Never switch the main checkout onto the branch. Never use `git worktree remove --force` or `git branch -D`; both are denied and both defeat the safety conditions reclamation depends on.
 3. Reference `.claude/rules/stack.md` for tech stack and naming conventions
 4. Check repository-specific branch strategy and `worktree_root` override in `.claude/rules/branch.md`
 5. Verify DoD with `soloscrum-define-dod` and `.claude/rules/dod-extra.md`

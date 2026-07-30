@@ -70,6 +70,18 @@ case "$worktree_root" in
   "")    echo "worktree_root must not be empty" >&2; exit 2 ;;
 esac
 
+# Strip trailing slashes. Without this, a configured root of "a/b/" builds a
+# prefix ending in "//", which matches no real worktree path — every worktree
+# under a slightly-misconfigured root would silently vanish from the report
+# rather than being reclaimed or flagged.
+while [ "${worktree_root%/}" != "$worktree_root" ]; do
+  worktree_root="${worktree_root%/}"
+done
+if [ -z "$worktree_root" ]; then
+  echo "worktree_root must not resolve to the repository root itself" >&2
+  exit 2
+fi
+
 # The main checkout's root, resolved from the shared common directory so this
 # works identically whether invoked from the main checkout or from a worktree.
 common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
@@ -97,6 +109,12 @@ if command -v gh >/dev/null 2>&1; then
   has_gh=true
 fi
 
+# The directory this pass is running from. Removing a worktree that a live
+# process is sitting in succeeds on Linux — git holds no lock — and leaves that
+# process on a path that no longer exists, with every later relative command
+# failing opaquely. Git state cannot see this, so it is checked separately.
+cwd_real=$(pwd -P 2>/dev/null || true)
+
 # Collect results as ASCII-separator-delimited records (US between fields, RS
 # between entries) so branch names and paths never need quoting until jq builds
 # the JSON. Git refs cannot contain control characters, so the separators are
@@ -115,7 +133,7 @@ wt_branch=""
 wt_detached=false
 
 process_record() {
-  local local_tip merged reason pr_json pr_number pr_head
+  local local_tip merged reason pr_json pr_number pr_head status_out
   [ -n "$wt_path" ] || return 0
 
   # Only worktrees under the configured root are ours to reclaim.
@@ -129,8 +147,22 @@ process_record() {
     return 0
   fi
 
-  # Unsaved work: uncommitted changes (including untracked files).
-  if [ -n "$(git -C "$wt_path" status --porcelain 2>/dev/null)" ]; then
+  # Never reclaim the worktree the caller is inside, or an ancestor of it.
+  case "$cwd_real" in
+    "$wt_path"|"$wt_path"/*)
+      emit "$wt_branch" "$wt_path" "skipped" "this pass is running from inside this worktree"
+      return 0
+      ;;
+  esac
+
+  # Unsaved work: uncommitted changes (including untracked files). A failing
+  # status check is "unverifiable", not "clean" — an empty stdout from a git
+  # error would otherwise read identically to a clean tree.
+  if ! status_out=$(git -C "$wt_path" status --porcelain 2>/dev/null); then
+    emit "$wt_branch" "$wt_path" "skipped" "could not read the worktree's status — state unverifiable"
+    return 0
+  fi
+  if [ -n "$status_out" ]; then
     emit "$wt_branch" "$wt_path" "skipped" "uncommitted changes in the worktree"
     return 0
   fi
