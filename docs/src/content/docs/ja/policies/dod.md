@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-`/review` が Pass の verdict を出すには、subtask が 6 つの条件をすべて満たしている必要があります。verdict コメントはこのチェックリストに照らして書かれます。
+`/soloscrum:review` が Pass の verdict を出すには、subtask が 6 つの条件をすべて満たしている必要があります。verdict コメントはこのチェックリストに照らして書かれます。
 
 ## チェックリスト
 
@@ -26,15 +26,15 @@ sidebar:
 AC 検証は 2 つのレイヤーで動きます。Subtask は work をスライスするものであって intent をスライスするものではないため（[issue-format](/ja/policies/issue-format/) の Subtask 本文を参照）、PR の種類によって検証範囲が変わります。
 
 - **Subtask PR。** スライスが配信されたこと（"what" と Checklist 項目）と、退行がないこと（直前まで満たされていた親 AC が今は壊れていないか）を確認します。親 Issue の AC が完全に満たされていることは、この PR では要求されません。
-- **Subtask を持たない Issue**（単一 `/develop` 単位の Issue）。Issue の全 AC が満たされていることを、エビデンス（スクリーンショット、テスト結果など）付きで確認します。PR は `Closes #<issue>` で Issue を直接 close します。
-- **親 Issue（Subtask あり） — intent 単位の AC サインオフ。** 親の全 AC は、すべての Subtask が close したタイミングで検証します。個別 Subtask PR の段階では確認しません。最後の Subtask PR が merge されると、`/refine` の定期実行（janitor）が親を close します（詳細は [`/refine`](/ja/commands/refine/) を参照）。そのとき、親の AC は Subtask 群の配信物の和集合から満たせている必要があります。
+- **Subtask を持たない Issue**（単一 `/soloscrum:develop` 単位の Issue）。Issue の全 AC が満たされていることを、エビデンス（スクリーンショット、テスト結果など）付きで確認します。PR は `Closes #<issue>` で Issue を直接 close します。
+- **親 Issue（Subtask あり） — intent 単位の AC サインオフ。** 親の全 AC は、すべての Subtask が close したタイミングで検証します。個別 Subtask PR の段階では確認しません。最後の Subtask PR が merge されると、`/soloscrum:refine` の定期実行（janitor）が親を close します（詳細は [`/soloscrum:refine`](/ja/commands/refine/) を参照）。そのとき、親の AC は Subtask 群の配信物の和集合から満たせている必要があります。
 
 ## 適用される場面
 
 DoD を確認する場面は 2 つあります。
 
-- `/develop` 中、Dev agent が「review が Pass している」以外の全項目を自己チェックします。review の verdict だけは Dev が自分で出せません。
-- `/review` 中、6 項目すべてを検証します。verdict コメントは項目ごとに OK / Not OK と理由を並べます。
+- `/soloscrum:develop` 中、Dev agent が「review が Pass している」以外の全項目を自己チェックします。review の verdict だけは Dev が自分で出せません。
+- `/soloscrum:review` 中、6 項目すべてを検証します。verdict コメントは項目ごとに OK / Not OK と理由を並べます。
 
 ## リポジトリ固有の追加項目
 

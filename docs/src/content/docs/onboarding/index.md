@@ -1,18 +1,18 @@
 ---
 title: Getting started
-description: Adopt soloscrum into a new repository — install the plugin, choose a tracker profile, configure repo rules, and file your first Issue with /refine.
+description: Adopt soloscrum into a new repository — install the plugin, choose a tracker profile, configure repo rules, and file your first Issue with /soloscrum:refine.
 sidebar:
   order: 1
 ---
 
-Adopt soloscrum into a new repository in four steps. After this page you will have the plugin installed, a tracker profile selected, optional repo-level rules configured, and your first Issue filed via `/refine`.
+Adopt soloscrum into a new repository in four steps. After this page you will have the plugin installed, a tracker profile selected, optional repo-level rules configured, and your first Issue filed via `/soloscrum:refine`.
 
 ## Prerequisites
 
 - **Claude Code** installed and authenticated.
 - **GitHub CLI (`gh`)** installed, authenticated against the GitHub account that owns the repo, and able to read / create / edit Issues and PRs.
 - **Repository on GitHub** — soloscrum treats GitHub as the canonical Issue store regardless of tracker profile.
-- (Optional) **CodeRabbit CLI** authenticated. `/review` runs CodeRabbit as part of the multi-agent pipeline; without it the local quality gate is weaker but still runs.
+- (Optional) **CodeRabbit CLI** authenticated. `/soloscrum:review` runs CodeRabbit as part of the multi-agent pipeline; without it the local quality gate is weaker but still runs.
 - (Optional) **Linear MCP** connected with GitHub→Linear native sync configured. Required only for the `linear+github` tracker profile.
 
 ## Step 1 — install the plugin
@@ -26,7 +26,9 @@ soloscrum ships as a Claude Code plugin via its marketplace. From inside Claude 
 
 If you installed it before in a different repo, run `/plugin marketplace update soloscrum` to pull the latest version.
 
-After install, the soloscrum commands (`/refine`, `/breakdown`, `/develop`, `/review`) are available in any Claude Code session against the repo.
+After install, the soloscrum commands (`/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`) are available in any Claude Code session against the repo.
+
+The `soloscrum:` prefix comes from the plugin's `name` field. Claude Code registers plugin-distributed commands as `<plugin-name>:<command-name>`, so soloscrum's commands never collide with a command of the same name from another plugin. The bare form (`/refine`) also resolves as long as no other installed plugin claims that name — but whether it does depends on what else you have installed, so this documentation always uses the namespaced form.
 
 ## Step 2 — choose a tracker profile
 
@@ -56,7 +58,7 @@ soloscrum reads optional repo-specific rules from `.claude/rules/`. None are req
 | File | What it controls |
 |---|---|
 | `.claude/rules/tracker.md` | Tracker profile override (see Step 2). |
-| `.claude/rules/stack.md` | Tech stack, directory layout, and naming conventions Dev consults during `/develop`. |
+| `.claude/rules/stack.md` | Tech stack, directory layout, and naming conventions Dev consults during `/soloscrum:develop`. |
 | `.claude/rules/branch.md` | Branch strategy specific to this repo (e.g. trunk-based vs gitflow), if it diverges from the default `<type>/<issue-id>-<slug>` form. |
 | `.claude/rules/dod-extra.md` | Extra DoD items appended to the [core checklist](/policies/dod/) — e.g. "Storybook story exists for every new component", "i18n strings registered in both locales". |
 | `.claude/rules/pr.md` | Optional override of the always-draft PR default (rarely needed; see [PR lifecycle](/concept/pr-lifecycle/)). |
@@ -64,26 +66,26 @@ soloscrum reads optional repo-specific rules from `.claude/rules/`. None are req
 
 Each file is plain Markdown. Add only the overrides you want; missing files mean the soloscrum defaults apply.
 
-## Step 4 — file your first Issue with `/refine`
+## Step 4 — file your first Issue with `/soloscrum:refine`
 
 Open a Claude Code session in the repo and run:
 
 ```bash
-/refine "<your idea here>"
+/soloscrum:refine "<your idea here>"
 ```
 
 The first line of output is the janitor sweep — on a brand-new repo this is `No stale Issues found`. The PO agent then structures your idea into a four-section Issue body (Background / Goal / AC / Out of Scope), assigns a priority label, and computes a size-check SP. You confirm; the Issue is created.
 
 From there, the lifecycle is:
 
-- If `/refine` flagged the Issue as a mis-scope smell (SP > 5 or > 5 Subtasks expected per [issue size](/policies/issue-size/)), the Issue likely bundles multiple intents — split it into separate Issues via `/refine` first.
-- If the Issue's intent is coherent and the work fits a single reviewable PR, run [`/develop`](/commands/develop/) on the Issue directly.
-- If the intent is coherent but a single PR would be unreviewable, run [`/breakdown`](/commands/breakdown/) to slice the delivery into Subtask PRs, then `/develop` each one. (`/breakdown` slices delivery, not intent.)
-- After `/develop` opens the draft PR, run [`/review`](/commands/review/) on it. On Pass, `/review` promotes the PR to ready and surfaces the `gh pr merge` command — that final merge is your gate, not the agent's.
+- If `/soloscrum:refine` flagged the Issue as a mis-scope smell (SP > 5 or > 5 Subtasks expected per [issue size](/policies/issue-size/)), the Issue likely bundles multiple intents — split it into separate Issues via `/soloscrum:refine` first.
+- If the Issue's intent is coherent and the work fits a single reviewable PR, run [`/soloscrum:develop`](/commands/develop/) on the Issue directly.
+- If the intent is coherent but a single PR would be unreviewable, run [`/soloscrum:breakdown`](/commands/breakdown/) to slice the delivery into Subtask PRs, then `/soloscrum:develop` each one. (`/soloscrum:breakdown` slices delivery, not intent.)
+- After `/soloscrum:develop` opens the draft PR, run [`/soloscrum:review`](/commands/review/) on it. On Pass, `/soloscrum:review` promotes the PR to ready and surfaces the `gh pr merge` command — that final merge is your gate, not the agent's.
 
 ## Where to go next
 
 - [Concept section](/concept/tracker-profile/) — tracker profile, agent ownership rules, PR lifecycle, code review process.
-- [Policies section](/policies/issue-format/) — the rules `/refine` and `/review` decide against (Issue format, priority, story points, issue size, DoD).
-- [Commands section](/commands/refine/) — per-command walkthroughs for `/refine`, `/breakdown`, `/develop`, `/review`.
+- [Policies section](/policies/issue-format/) — the rules `/soloscrum:refine` and `/soloscrum:review` decide against (Issue format, priority, story points, issue size, DoD).
+- [Commands section](/commands/refine/) — per-command walkthroughs for `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`.
 - Canonical specs: [`skills/`](https://github.com/mew-ton/soloscrum/tree/main/skills), [`agents/`](https://github.com/mew-ton/soloscrum/tree/main/agents), [`commands/`](https://github.com/mew-ton/soloscrum/tree/main/commands).

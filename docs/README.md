@@ -8,7 +8,7 @@ This site is the place for:
 
 - Conceptual overviews ("what is soloscrum, and why does it look this way")
 - Onboarding walkthroughs (getting from "I just installed the plugin" to "I shipped my first issue")
-- Command reference written for humans (`/refine`, `/breakdown`, `/develop`, `/review`)
+- Command reference written for humans (`/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`)
 - Glossary / cross-cutting reference material
 
 It is **not** a transformed view of the framework's spec files. The Markdown under `skills/`, `agents/`, `commands/`, and the root `CLAUDE.md` is the AI contract — those files are read directly by Claude Code agents and are tuned for that audience. This site references them but does not import, symlink, or build-time-copy their content. The two surfaces are kept independent on purpose so each can evolve without dragging the other along.
@@ -17,7 +17,7 @@ If you are looking for the authoritative behaviour spec, read the source files a
 
 - [`skills/`](https://github.com/mew-ton/soloscrum/tree/main/skills) — skill specifications
 - [`agents/`](https://github.com/mew-ton/soloscrum/tree/main/agents) — agent role definitions
-- [`commands/`](https://github.com/mew-ton/soloscrum/tree/main/commands) — `/refine`, `/breakdown`, `/develop`, `/review`
+- [`commands/`](https://github.com/mew-ton/soloscrum/tree/main/commands) — `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`
 - [`CLAUDE.md`](https://github.com/mew-ton/soloscrum/blob/main/CLAUDE.md) — repo-level instructions
 
 ## Stack
@@ -55,15 +55,15 @@ The sidebar `autogenerate` directive references `directory: 'onboarding'`, `dire
 
 The site has four top-level sections, kept narrow on purpose:
 
-- **Onboarding** — getting a fresh repo from `/plugin install` to a first `/refine`. Single page (`onboarding/index.md`).
+- **Onboarding** — getting a fresh repo from `/plugin install` to a first `/soloscrum:refine`. Single page (`onboarding/index.md`).
 - **Concept** — the human-facing flow narrative (tracker profile, agent responsibilities, PR lifecycle, code review process). These pages explain *how soloscrum's lifecycle hangs together*.
 - **Policies** — the five rules a human actively uses or judges against:
   - `issue-format` — the structural shape of an Issue body
   - `priority` — the priority levels and when to choose each
   - `story-points` — the SP scale (so the PO's estimate can be sanity-checked)
   - `issue-size` — when an Issue is too big and needs splitting
-  - `dod` — Definition of Done, the bar `/review` decides against
-- **Commands** — per-command walkthroughs for `/refine`, `/breakdown`, `/develop`, `/review`, sequenced in lifecycle order.
+  - `dod` — Definition of Done, the bar `/soloscrum:review` decides against
+- **Commands** — per-command walkthroughs for `/soloscrum:refine`, `/soloscrum:breakdown`, `/soloscrum:develop`, `/soloscrum:review`, sequenced in lifecycle order.
 
 The previous "Reference" section (one page per `soloscrum-define-*` skill) was retired in #47 v3: pages that covered orchestration the **agent** owns (branch naming, Conventional Commits, tracker operation routing, agent role splits, task type, design criteria, UI standards) are not human-actionable and live only as `skills/*/SKILL.md` for the AI contract; pages that re-stated content already in Concept were merged into Concept.
 

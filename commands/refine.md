@@ -18,7 +18,7 @@ allowed-tools:
   - Bash(gh label:*)
 ---
 
-# /refine
+# /soloscrum:refine
 
 Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose closing PR has already merged.
 
@@ -44,28 +44,28 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 
        Close eligibility is `subIssuesSummary.total > 0 AND subIssuesSummary.total == subIssuesSummary.completed`. When per-Subtask detail is needed (e.g. surface which Subtasks are still open in the janitor's diagnostic output), fall back to `subIssues(first: 100) { nodes { number state } }` under the same header. The PR-keyword detection below does **not** apply to parent Issues — the contract guarantees their `closedByPullRequestsReferences` is empty.
 
-       **Error / null handling**: on a non-empty `.errors` array (e.g. the `sub_issues` preview not enabled at the org or a missing token scope; the API returns HTTP 200 with `.errors` populated rather than a non-zero exit), or a `null` `repository.issue` (Issue was deleted between the list scan and the per-Issue probe), log the condition and skip that Issue — janitor failures per-Issue must not block the rest of the sweep (matching the "Janitor failures MUST NOT block `/refine`" policy below).
+       **Error / null handling**: on a non-empty `.errors` array (e.g. the `sub_issues` preview not enabled at the org or a missing token scope; the API returns HTTP 200 with `.errors` populated rather than a non-zero exit), or a `null` `repository.issue` (Issue was deleted between the list scan and the per-Issue probe), log the condition and skip that Issue — janitor failures per-Issue must not block the rest of the sweep (matching the "Janitor failures MUST NOT block `/soloscrum:refine`" policy below).
 
-       **Nested Sub-issue trees** (3+ levels): this check is one-level (only direct children of the scanned Issue). Deeper trees converge over successive `/refine` runs — each sweep closes one nesting level whose direct children are all closed, and the next sweep can then close its parent. Explicit recursion is unnecessary because the next `/refine` invocation re-scans.
+       **Nested Sub-issue trees** (3+ levels): this check is one-level (only direct children of the scanned Issue). Deeper trees converge over successive `/soloscrum:refine` runs — each sweep closes one nesting level whose direct children are all closed, and the next sweep can then close its parent. Explicit recursion is unnecessary because the next `/soloscrum:refine` invocation re-scans.
      - **Otherwise** (standalone Issue, `subIssuesSummary.total == 0`), find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set — `closedByPullRequestsReferences` already encodes GitHub's server-side closing-keyword resolution, so the keyword list above is the contract GitHub honours, not a client-side regex the janitor needs to re-run; treat any merged PR present in that field as a positive match.
    - **`linear+github`**: skip — Linear's native sync auto-manages parent close (per `soloscrum-tracker-linear-transition-state`), so a janitor sweep on the GH side would dual-update.
-   - Surface the result at the start of `/refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`).
+   - Surface the result at the start of `/soloscrum:refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`).
    - **Always use `gh issue close --reason completed`.** Janitor never closes with `--reason not-planned` — that is a deliberate human decision. Janitor never reopens already-closed Issues.
-   - **Janitor failures MUST NOT block `/refine`**. If the scan errors (network, permission), log a one-line notice and proceed to the structuring step. The user can re-run with `--no-janitor` to bypass entirely on a flaky environment.
+   - **Janitor failures MUST NOT block `/soloscrum:refine`**. If the scan errors (network, permission), log a one-line notice and proceed to the structuring step. The user can re-run with `--no-janitor` to bypass entirely on a flaky environment.
 2. Receive idea or request from user (`$ARGUMENTS`)
 3. Launch `soloscrum-po` to:
    - Structure the idea into GitHub Issue format
-   - Check size against `soloscrum-define-issue-size` criteria. SP > 5 and `/breakdown` would produce > 5 Subtasks both read as **mis-scope smells** (likely multiple intents bundled), not hard work-volume limits.
-   - When a size signal indicates likely intent bundling, propose Issue split via `suggest_split` along the feature / phase axes per `soloscrum-define-issue-size`. This is Issue split (multiple intents → multiple Issues), distinct from `/breakdown`'s delivery slicing (one coherent intent → multiple Subtask PRs).
+   - Check size against `soloscrum-define-issue-size` criteria. SP > 5 and `/soloscrum:breakdown` would produce > 5 Subtasks both read as **mis-scope smells** (likely multiple intents bundled), not hard work-volume limits.
+   - When a size signal indicates likely intent bundling, propose Issue split via `suggest_split` along the feature / phase axes per `soloscrum-define-issue-size`. This is Issue split (multiple intents → multiple Issues), distinct from `/soloscrum:breakdown`'s delivery slicing (one coherent intent → multiple Subtask PRs).
    - Determine priority using `soloscrum-define-priority` criteria
    - Calculate Issue-level SP using `soloscrum-define-story-points` criteria (size-check only — not registered)
 4. Present structured result to user for confirmation
 5. Create the GitHub Issue (with priority label `priority:*` applied at creation)
 6. In `linear+github` profile, Linear's native sync replicates the Issue automatically — no extra MCP call needed
 
-## Why the janitor lives in `/refine`
+## Why the janitor lives in `/soloscrum:refine`
 
-`/refine` is the natural moment to clean the backlog: it's the entry point where the user touches the Issue list, and any new Issue is created against the current open set. Sweeping closed-but-still-open Issues here keeps the backlog accurate before the user picks the next thing to work on.
+`/soloscrum:refine` is the natural moment to clean the backlog: it's the entry point where the user touches the Issue list, and any new Issue is created against the current open set. Sweeping closed-but-still-open Issues here keeps the backlog accurate before the user picks the next thing to work on.
 
 The janitor exists because Issue close happens at merge time (per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge"), but GitHub's auto-close only fires on the directly-referenced Issue. Two cases need the janitor: (1) **parent Issues** in a sub-issue tree — `soloscrum-define-branch-commit`'s parent-close contract deliberately forbids per-Subtask PRs from including `Closes #<parent>` (to avoid premature close on the first Subtask merge), so the parent has no closing PR of its own; the janitor's parent-detection path catches parents whose Sub-issue tree is fully closed. (2) **standalone Issues** whose direct PR merged without GH's auto-close firing — the janitor's standalone-detection path is the safety net.
 

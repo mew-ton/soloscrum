@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-Every subtask must satisfy six criteria before `/review` can issue a Pass verdict. The verdict comment checks against this list.
+Every subtask must satisfy six criteria before `/soloscrum:review` can issue a Pass verdict. The verdict comment checks against this list.
 
 ## The checklist
 
@@ -26,15 +26,15 @@ Each item has a precise rule:
 AC verification operates at two layers because Subtasks slice work, not intent (see [issue-format](/policies/issue-format/)'s Subtask body):
 
 - **Subtask PR.** Verify the slice was delivered (its "what" + Checklist items) and that there is no regression — no parent AC item that was previously satisfied is now broken. The parent's AC is **not** required to be fully satisfied at this PR.
-- **Issue without Subtasks** (single-`/develop`-unit Issue). Verify all the Issue's AC are met, with evidence. The PR closes the Issue directly via `Closes #<issue>`.
-- **Parent Issue (with Subtasks) — intent-level AC sign-off.** The parent's full AC is verified when all of its Subtasks are closed, not at any individual Subtask PR. The last Subtask PR's merge triggers the parent's close via the `/refine` janitor (see [`/refine`](/commands/refine/) for the janitor step); at that point the parent's AC must be satisfiable from the union of the Subtasks' deliveries.
+- **Issue without Subtasks** (single-`/soloscrum:develop`-unit Issue). Verify all the Issue's AC are met, with evidence. The PR closes the Issue directly via `Closes #<issue>`.
+- **Parent Issue (with Subtasks) — intent-level AC sign-off.** The parent's full AC is verified when all of its Subtasks are closed, not at any individual Subtask PR. The last Subtask PR's merge triggers the parent's close via the `/soloscrum:refine` janitor (see [`/soloscrum:refine`](/commands/refine/) for the janitor step); at that point the parent's AC must be satisfiable from the union of the Subtasks' deliveries.
 
 ## When this applies
 
 Two moments:
 
-- During `/develop`, the developer agent self-checks every item except "Review has passed" — the developer cannot self-grant the review verdict.
-- During `/review`, all six items are verified, including the review pass `/review` is about to issue. The verdict comment lists per-item OK / Not OK with rationale.
+- During `/soloscrum:develop`, the developer agent self-checks every item except "Review has passed" — the developer cannot self-grant the review verdict.
+- During `/soloscrum:review`, all six items are verified, including the review pass `/soloscrum:review` is about to issue. The verdict comment lists per-item OK / Not OK with rationale.
 
 ## Repo-specific extras
 

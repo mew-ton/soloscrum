@@ -75,8 +75,8 @@ The reviewer (or the user reading the report) applies the per-item decision rule
 `/audit` itself does not file Issues. If findings warrant action:
 
 1. Review the report
-2. For each finding worth fixing, run `/refine` to convert it into a properly-structured GitHub Issue
-3. `/develop` the resulting Issue per the standard flow
+2. For each finding worth fixing, run `/soloscrum:refine` to convert it into a properly-structured GitHub Issue
+3. `/soloscrum:develop` the resulting Issue per the standard flow
 
 This is the **dogfooding loop** referenced in #18: audit → refine → develop. Do **not** edit files directly from the report — every fix goes through the flow per `CLAUDE.md`.
 

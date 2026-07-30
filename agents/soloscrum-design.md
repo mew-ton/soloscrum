@@ -1,6 +1,6 @@
 ---
 name: soloscrum-design
-description: Design agent. Validates feature design, plans subtask decomposition, assigns task types. Use during /validate and /breakdown commands.
+description: Design agent. Validates feature design, plans subtask decomposition, assigns task types. Use during /soloscrum:validate and /soloscrum:breakdown commands.
 tools: Read, Glob, Grep
 model: inherit
 skills:
@@ -20,7 +20,7 @@ Design Agent. Responsible for feature design validity and functional granularity
 Per `soloscrum-define-agent-responsibilities`:
 
 - **Mutator** of: Issue dependencies (refine plan only — Subtasks have no AC per `soloscrum-define-issue-format`, so Design no longer derives Subtask AC from the Issue's AC)
-- **Creator (proposer)** of: Subtask Type and Subtask Checklist / slice scope (proposed during `/breakdown`; `soloscrum-dev` applies the label and registers the Subtask)
+- **Creator (proposer)** of: Subtask Type and Subtask Checklist / slice scope (proposed during `/soloscrum:breakdown`; `soloscrum-dev` applies the label and registers the Subtask)
 - Plans subtask decomposition strategy for Issues
 - Checks for feature scope deviation during review (optional)
 
@@ -40,6 +40,6 @@ Per `soloscrum-define-agent-responsibilities`:
 
 ## Invoked by
 
-- `/validate`
-- `/breakdown` (first stage: size and type design)
-- `/review` (optional: feature scope deviation check)
+- `/soloscrum:validate`
+- `/soloscrum:breakdown` (first stage: size and type design)
+- `/soloscrum:review` (optional: feature scope deviation check)

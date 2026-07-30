@@ -24,7 +24,7 @@ Transitions an Issue or Sub-issue between soloscrum lifecycle states. Active whe
 | `in-review` | open + label `state:in-review` |
 | `done` | open + label `state:done` (verdict passed; merge pending). The Issue itself closes when the linked PR merges via its `Closes #` keyword. |
 
-The `done` state is **deliberately decoupled from GH closed/open**. GH "closed" is reserved for "merged into main" (the GH convention everyone outside soloscrum follows). soloscrum's `done` state is "verdict passed by `/review` — work is shippable, awaiting the user's `gh pr merge`." Querying `state:done` AND `is:open` enumerates Subtasks in this intermediate state; querying `state:done` AND `is:closed` enumerates fully-shipped work.
+The `done` state is **deliberately decoupled from GH closed/open**. GH "closed" is reserved for "merged into main" (the GH convention everyone outside soloscrum follows). soloscrum's `done` state is "verdict passed by `/soloscrum:review` — work is shippable, awaiting the user's `gh pr merge`." Querying `state:done` AND `is:open` enumerates Subtasks in this intermediate state; querying `state:done` AND `is:closed` enumerates fully-shipped work.
 
 ## Steps
 
@@ -48,7 +48,7 @@ The `done` state is **deliberately decoupled from GH closed/open**. GH "closed" 
 ## Notes
 
 - Only `soloscrum-review` may transition to `done` (per `soloscrum-define-agent-responsibilities`)
-- **This skill never calls `gh issue close`.** Issue closure happens at merge time via the PR body's `Closes #` keyword (which is in the DoD per `soloscrum-define-dod`); parent Issues that GH does not auto-close are picked up by the `/refine` janitor sweep. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
+- **This skill never calls `gh issue close`.** Issue closure happens at merge time via the PR body's `Closes #` keyword (which is in the DoD per `soloscrum-define-dod`); parent Issues that GH does not auto-close are picked up by the `/soloscrum:refine` janitor sweep. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
 - If `state:*` labels do not exist in the repo, create them once:
   ```
   gh label create state:in-progress --color BFD4F2

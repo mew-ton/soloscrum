@@ -16,7 +16,7 @@ soloscrum の Issue は **intent（目的・成功条件・スコープ境界）
 ある作業項目を独立した Issue として立てるかどうかは、次の **2 条件が両方成り立つか**で判定します。
 
 1. **自己完結した、独立に検証可能な outcome を持つ。** 「done」を単独で判定できる。outcome はユーザー視点の挙動でも、構造的/契約的/能力的なマイルストーンでも構わない（例:「auth モジュールがこの契約を公開し、テストが通る」「署名済みリリース成果物がビルドから出る」）。
-2. **既存の上位 intent の単なる配信スライスではない。** すでに登録済みの、または今 `/refine` 中の上位 intent が「why」を持っていて、候補がその一部を切り出しただけ、という関係になっていない。
+2. **既存の上位 intent の単なる配信スライスではない。** すでに登録済みの、または今 `/soloscrum:refine` 中の上位 intent が「why」を持っていて、候補がその一部を切り出しただけ、という関係になっていない。
 
 どちらかが満たされなければ、その候補は親 intent の Subtask です。
 
@@ -60,7 +60,7 @@ AC は次の 2 つの shape のいずれかを使います（Issue ごとに選�
 
 どちらの shape も「検証可能な状態」を書きます。「手順」ではありません。1 つの Issue が両方の surface にまたがる場合は、両形を混在させて構いません。
 
-本文の先頭には `<!-- soloscrum-issue-format -->` の HTML コメント、末尾には小さなイタリック体のフッタが付きます。これにより janitor や `/validate` は、その Issue が soloscrum フォーマットで書かれているかどうかを軽く判定できます。
+本文の先頭には `<!-- soloscrum-issue-format -->` の HTML コメント、末尾には小さなイタリック体のフッタが付きます。これにより janitor や `/soloscrum:validate` は、その Issue が soloscrum フォーマットで書かれているかどうかを軽く判定できます。
 
 ## Subtask 本文（作業）
 
@@ -84,14 +84,14 @@ Subtask の done 条件は具体的に定義されています — そのスラ�
 
 ## 適用される場面
 
-- `/refine` は親 Issue を intent 本文の形で作成します
-- `/breakdown` は Subtask を作業本文の軽量な形で作成します
-- `/breakdown` を走らせる前に、`/validate` が既存 Issue が intent 本文の形になっているかを確認します
+- `/soloscrum:refine` は親 Issue を intent 本文の形で作成します
+- `/soloscrum:breakdown` は Subtask を作業本文の軽量な形で作成します
+- `/soloscrum:breakdown` を走らせる前に、`/soloscrum:validate` が既存 Issue が intent 本文の形になっているかを確認します
 - Issue や Subtask を triage、見積もり、ピックアップする際の読み手側の前提でもあります
 
 ## 付属テンプレート
 
-`templates/ISSUE_TEMPLATE.md` は 4 セクションの **intent 本文**を写したテンプレートです。Subtask はこのテンプレートを使いません — Subtask は `/breakdown` 経由で作られます。テンプレートの使い方は 2 通りあります。
+`templates/ISSUE_TEMPLATE.md` は 4 セクションの **intent 本文**を写したテンプレートです。Subtask はこのテンプレートを使いません — Subtask は `/soloscrum:breakdown` 経由で作られます。テンプレートの使い方は 2 通りあります。
 
 - `.github/ISSUE_TEMPLATE/` 配下にコピーすれば、GitHub の「New Issue」UI でテンプレートの選択肢として表示されます
 - GitHub web UI で新規 Issue を開き、本文に手動でペーストします

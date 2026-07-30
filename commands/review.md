@@ -14,15 +14,15 @@ allowed-tools:
   - Bash(gh label:*)
 ---
 
-# /review
+# /soloscrum:review
 
 Review implementation or design and close the Issue.
 
 ## Authorisation scope
 
-Invoking `/review` on a given PR constitutes **pre-authorisation for the entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`. The user is asking, for this invocation, for the verdict *and* the standard follow-through it implies — including `gh pr review --approve`, the tracker `→ done` transition, the **CI-green wait gate** via `soloscrum-tracker-github-wait-for-pr-checks` (which can retroactively downgrade Pass to Fail on red checks), and `gh pr ready`. **None** of those steps require an additional confirmation prompt; pausing on any reversible step is the failure mode the lifecycle skill exists to prevent. Issue close is not part of this sequence — it happens at merge time via the PR body's `Closes #` keyword.
+Invoking `/soloscrum:review` on a given PR constitutes **pre-authorisation for the entire post-verdict action sequence on that PR** as defined in `soloscrum-define-pr-lifecycle` and `soloscrum-define-code-review-process`. The user is asking, for this invocation, for the verdict *and* the standard follow-through it implies — including `gh pr review --approve`, the tracker `→ done` transition, the **CI-green wait gate** via `soloscrum-tracker-github-wait-for-pr-checks` (which can retroactively downgrade Pass to Fail on red checks), and `gh pr ready`. **None** of those steps require an additional confirmation prompt; pausing on any reversible step is the failure mode the lifecycle skill exists to prevent. Issue close is not part of this sequence — it happens at merge time via the PR body's `Closes #` keyword.
 
-The pre-authorisation applies to **this** invocation only and does not carry over to other PRs or to a re-run of `/review` on the same PR.
+The pre-authorisation applies to **this** invocation only and does not carry over to other PRs or to a re-run of `/soloscrum:review` on the same PR.
 
 The scope **stops** at `gh pr merge`. Merge is irreversible and is always the user's gate, regardless of verdict. The agent surfaces the exact merge command and does not execute it.
 
@@ -45,7 +45,7 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
      ```
      Then treat conclusions of `SUCCESS` / `SKIPPED` / `NEUTRAL` as acceptable. Anything else (`FAILURE` / `CANCELLED` / `TIMED_OUT` / `ERROR` / `ACTION_REQUIRED` / `STARTUP_FAILURE`) downgrades the verdict to **Fail**: post the failed conclusions on the PR, revert the Subtask to `in-progress`, and skip the remaining Pass actions. Inline `until ... gh pr view ... sleep ...` loops are an anti-pattern (per CLAUDE.md).
    - Promote the PR to ready (`gh pr ready`) — reversible; runs without pre-confirm
-   - **Hand the merge off to the user** — surface the exact `gh pr merge` command. Do not run `gh pr merge`; merge is the user's gate. Issue close is downstream of merge: GH auto-closes referenced Issues via the PR body's `Closes #` keyword. Parent Issues that GH does not auto-close are picked up by the next `/refine` janitor sweep.
+   - **Hand the merge off to the user** — surface the exact `gh pr merge` command. Do not run `gh pr merge`; merge is the user's gate. Issue close is downstream of merge: GH auto-closes referenced Issues via the PR body's `Closes #` keyword. Parent Issues that GH does not auto-close are picked up by the next `/soloscrum:refine` janitor sweep.
 6. On Fail:
    - Post specific feedback on PR
    - Invoke `soloscrum-tracker-{github|linear}-transition-state` to revert the Subtask to `in-progress`
@@ -62,7 +62,7 @@ The scope **stops** at `gh pr merge`. Merge is irreversible and is always the us
   - DoD checklist
   - Issues list (if any)
   - Pass / Pass with follow-ups / Fail verdict
-- On Pass / Pass with follow-ups: Subtask-done confirmation, PR promoted to ready, and the exact `gh pr merge` command for the user to run (Issue close is handled at merge time, not by `/review`)
+- On Pass / Pass with follow-ups: Subtask-done confirmation, PR promoted to ready, and the exact `gh pr merge` command for the user to run (Issue close is handled at merge time, not by `/soloscrum:review`)
 
 ## Resources
 

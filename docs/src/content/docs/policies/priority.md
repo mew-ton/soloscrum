@@ -36,7 +36,7 @@ Other (tech debt, future improvements)?
 
 ## When this applies
 
-`/refine` sets the label at Issue creation. After that the level is sticky — soloscrum does not re-decide priority automatically. Change it by editing the label on the Issue.
+`/soloscrum:refine` sets the label at Issue creation. After that the level is sticky — soloscrum does not re-decide priority automatically. Change it by editing the label on the Issue.
 
 ## Notes
 
@@ -45,5 +45,5 @@ Other (tech debt, future improvements)?
 
 ## See also
 
-- Where priority sits in the lifecycle (PO assigns it at `/refine`): [Agents and responsibilities](/concept/agent-responsibilities/).
+- Where priority sits in the lifecycle (PO assigns it at `/soloscrum:refine`): [Agents and responsibilities](/concept/agent-responsibilities/).
 - Canonical contract: [`skills/soloscrum-define-priority/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-priority/SKILL.md).

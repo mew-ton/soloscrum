@@ -36,7 +36,7 @@ Other (tech debt, future improvements)?
 
 ## 適用される場面
 
-`/refine` が Issue を作成するときにラベルを付けます。その後は基本的に変わりません — soloscrum が自動で優先度を再計算することはありません。変えたいときは Issue 上のラベルを直接編集します。
+`/soloscrum:refine` が Issue を作成するときにラベルを付けます。その後は基本的に変わりません — soloscrum が自動で優先度を再計算することはありません。変えたいときは Issue 上のラベルを直接編集します。
 
 ## メモ
 
@@ -45,5 +45,5 @@ Other (tech debt, future improvements)?
 
 ## 参考
 
-- ライフサイクル上の位置 (`/refine` で PO が付与する): [agent と責務](/ja/concept/agent-responsibilities/)
+- ライフサイクル上の位置 (`/soloscrum:refine` で PO が付与する): [agent と責務](/ja/concept/agent-responsibilities/)
 - canonical な契約: [`skills/soloscrum-define-priority/SKILL.md`](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-priority/SKILL.md)

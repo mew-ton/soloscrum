@@ -1,18 +1,18 @@
 ---
 title: はじめに
-description: 新しいリポジトリに soloscrum を導入する流れを 4 ステップで案内します。plugin インストール、tracker profile 選択、リポジトリルール設定、そして `/refine` で最初の Issue を起票するまでをカバーします。
+description: 新しいリポジトリに soloscrum を導入する流れを 4 ステップで案内します。plugin インストール、tracker profile 選択、リポジトリルール設定、そして `/soloscrum:refine` で最初の Issue を起票するまでをカバーします。
 sidebar:
   order: 1
 ---
 
-新しいリポジトリに soloscrum を導入する流れを 4 ステップで案内します。このページを読み終えるころには、plugin がインストールされ、tracker profile が選ばれ、必要なリポジトリルールが置かれ、`/refine` で最初の Issue が起票された状態になります。
+新しいリポジトリに soloscrum を導入する流れを 4 ステップで案内します。このページを読み終えるころには、plugin がインストールされ、tracker profile が選ばれ、必要なリポジトリルールが置かれ、`/soloscrum:refine` で最初の Issue が起票された状態になります。
 
 ## 前提条件
 
 - **Claude Code** をインストールし、認証を済ませてください
 - **GitHub CLI (`gh`)** をインストールし、対象リポジトリを所有する GitHub アカウントで認証し、Issue と PR の読み書きができる状態にしてください
 - **GitHub 上のリポジトリ** が必要です。soloscrum は tracker profile に関係なく、Issue の canonical なストアとして GitHub を使います
-- (任意) **CodeRabbit CLI** の認証。`/review` は multi-agent pipeline の一部として CodeRabbit を実行します。なくても local quality gate は動きますが、強度は下がります
+- (任意) **CodeRabbit CLI** の認証。`/soloscrum:review` は multi-agent pipeline の一部として CodeRabbit を実行します。なくても local quality gate は動きますが、強度は下がります
 - (任意) **Linear MCP** の接続と GitHub→Linear のネイティブ同期設定。`linear+github` profile を使う場合だけ必要です
 
 ## Step 1 — plugin をインストールする
@@ -26,7 +26,9 @@ soloscrum は marketplace 経由で配布される Claude Code plugin です。C
 
 別のリポジトリで以前インストール済みなら、`/plugin marketplace update soloscrum` で最新版を取り込んでください。
 
-インストール後、`/refine` / `/breakdown` / `/develop` / `/review` の各 command が、そのリポジトリ上の Claude Code セッションで使えるようになります。
+インストール後、`/soloscrum:refine` / `/soloscrum:breakdown` / `/soloscrum:develop` / `/soloscrum:review` の各 command が、そのリポジトリ上の Claude Code セッションで使えるようになります。
+
+`soloscrum:` の prefix は plugin の `name` フィールドに由来します。Claude Code は plugin が配布する command を `<plugin-name>:<command-name>` として登録するため、他の plugin が同名の command を持っていても衝突しません。`/refine` のような素の形も、その名前を要求する他の plugin が入っていなければ解決しますが、解決するかどうかはインストール済み plugin の構成次第です。そのためこのドキュメントでは常に名前空間付きの形を使います。
 
 ## Step 2 — tracker profile を選ぶ
 
@@ -56,7 +58,7 @@ soloscrum は `.claude/rules/` 配下から任意のリポジトリ固有ルー�
 | ファイル | 用途 |
 |---|---|
 | `.claude/rules/tracker.md` | tracker profile のオーバーライド (Step 2 参照) |
-| `.claude/rules/stack.md` | `/develop` 時に Dev が参照する技術スタック、ディレクトリ構成、命名規約 |
+| `.claude/rules/stack.md` | `/soloscrum:develop` 時に Dev が参照する技術スタック、ディレクトリ構成、命名規約 |
 | `.claude/rules/branch.md` | リポジトリ固有のブランチ戦略 (trunk-based / gitflow など、デフォルトの `<type>/<issue-id>-<slug>` から外れる場合) |
 | `.claude/rules/dod-extra.md` | [coreチェックリスト](/ja/policies/dod/) に追記する DoD 項目 (例: 「新規 component には Storybook story を用意」「i18n の文字列を両ロケールに登録」) |
 | `.claude/rules/pr.md` | always-draft PR のデフォルトを上書きする場合 (滅多に使いません。[PR ライフサイクル](/ja/concept/pr-lifecycle/) を参照) |
@@ -64,26 +66,26 @@ soloscrum は `.claude/rules/` 配下から任意のリポジトリ固有ルー�
 
 いずれもプレーンな Markdown です。必要なオーバーライドだけ書いてください。ファイルがなければ soloscrum のデフォルトが適用されます。
 
-## Step 4 — `/refine` で最初の Issue を起票する
+## Step 4 — `/soloscrum:refine` で最初の Issue を起票する
 
 リポジトリで Claude Code セッションを開き、次を実行してください。
 
 ```bash
-/refine "<your idea here>"
+/soloscrum:refine "<your idea here>"
 ```
 
 最初の行に janitor sweep の結果が表示されます。新規リポジトリでは `No stale Issues found` のはずです。続いて PO agent がアイデアを Background / Goal / AC / Out of Scope の 4 セクションに整形し、priority ラベルと size-check SP を提示します。確認して承認すると Issue が作成されます。
 
 その後のライフサイクルは次の流れになります。
 
-- `/refine` が Issue を「mis-scope の臭い」と判定した（SP > 5、または Subtask 数が 5 を超えそう、[issue size](/ja/policies/issue-size/) を参照）場合、その Issue は複数 intent を束ねている可能性が高いので、まず `/refine` で別々の Issue に分割してください
-- Issue の intent が一貫していて、作業が 1 つの reviewable PR に収まるなら、Issue に対してそのまま [`/develop`](/ja/commands/develop/) を実行してください
-- intent は一貫しているが 1 つの PR では unreviewable な配信になる場合、[`/breakdown`](/ja/commands/breakdown/) で配信を Subtask PR に切り、各 Subtask に `/develop` を実行してください（`/breakdown` は配信をスライスするのであって intent をスライスするのではありません）
-- `/develop` が draft PR を開いたら、[`/review`](/ja/commands/review/) を実行してください。Pass の verdict が出ると `/review` は PR を ready に昇格させ、`gh pr merge` のコマンドを提示します。merge を実行するのはユーザの仕事で、agent の仕事ではありません
+- `/soloscrum:refine` が Issue を「mis-scope の臭い」と判定した（SP > 5、または Subtask 数が 5 を超えそう、[issue size](/ja/policies/issue-size/) を参照）場合、その Issue は複数 intent を束ねている可能性が高いので、まず `/soloscrum:refine` で別々の Issue に分割してください
+- Issue の intent が一貫していて、作業が 1 つの reviewable PR に収まるなら、Issue に対してそのまま [`/soloscrum:develop`](/ja/commands/develop/) を実行してください
+- intent は一貫しているが 1 つの PR では unreviewable な配信になる場合、[`/soloscrum:breakdown`](/ja/commands/breakdown/) で配信を Subtask PR に切り、各 Subtask に `/soloscrum:develop` を実行してください（`/soloscrum:breakdown` は配信をスライスするのであって intent をスライスするのではありません）
+- `/soloscrum:develop` が draft PR を開いたら、[`/soloscrum:review`](/ja/commands/review/) を実行してください。Pass の verdict が出ると `/soloscrum:review` は PR を ready に昇格させ、`gh pr merge` のコマンドを提示します。merge を実行するのはユーザの仕事で、agent の仕事ではありません
 
 ## 次に読むもの
 
 - [Concept セクション](/ja/concept/tracker-profile/) — tracker profile、agent 責務、PR ライフサイクル、code review プロセス
-- [Policies セクション](/ja/policies/issue-format/) — `/refine` と `/review` が照らすルール (Issue フォーマット、優先度、story points、Issue サイズ、DoD)
-- [Commands セクション](/ja/commands/refine/) — `/refine` / `/breakdown` / `/develop` / `/review` の使い方
+- [Policies セクション](/ja/policies/issue-format/) — `/soloscrum:refine` と `/soloscrum:review` が照らすルール (Issue フォーマット、優先度、story points、Issue サイズ、DoD)
+- [Commands セクション](/ja/commands/refine/) — `/soloscrum:refine` / `/soloscrum:breakdown` / `/soloscrum:develop` / `/soloscrum:review` の使い方
 - canonical な spec: [`skills/`](https://github.com/mew-ton/soloscrum/tree/main/skills) / [`agents/`](https://github.com/mew-ton/soloscrum/tree/main/agents) / [`commands/`](https://github.com/mew-ton/soloscrum/tree/main/commands)

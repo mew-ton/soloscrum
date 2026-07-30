@@ -11,7 +11,7 @@ allowed-tools:
   - Bash(gh project:*)
 ---
 
-# /next
+# /soloscrum:next
 
 Recommend the next action.
 
@@ -25,13 +25,13 @@ Recommend the next action.
 
 ## Decision Logic
 
-`/develop` accepts either a Subtask or a no-Subtask Issue per `soloscrum-define-branch-commit`, so the rules below consider both classes when describing `/develop` targets:
+`/soloscrum:develop` accepts either a Subtask or a no-Subtask Issue per `soloscrum-define-branch-commit`, so the rules below consider both classes when describing `/soloscrum:develop` targets:
 
-1. In Progress Subtask **or no-Subtask Issue** exists → `Continue as-is`
-2. In Review Subtask **or no-Subtask Issue** exists → Suggest `/review`
-3. Untouched Subtask **or untouched no-Subtask Issue** in Backlog → Suggest `/develop` (Subtask / no-Subtask Issue) or `/design-ui` (Subtask) for the highest-priority candidate
-4. All Subtasks done, undecomposed Issue exists → Suggest `/breakdown` (only when the Issue's intent needs delivery slicing per `soloscrum-define-issue-size`; otherwise treat as a no-Subtask Issue and route to rule 3)
-5. Backlog empty → Suggest refining a new idea with `/refine`
+1. In Progress Subtask **or In Progress no-Subtask Issue** exists → `Continue as-is`
+2. In Review Subtask **or In Review no-Subtask Issue** exists → Suggest `/soloscrum:review`
+3. Untouched Subtask **or untouched no-Subtask Issue** in Backlog → Suggest `/soloscrum:develop` (Subtask / no-Subtask Issue) or `/soloscrum:design-ui` (Subtask) for the highest-priority candidate
+4. All Subtasks done, undecomposed Issue exists → Suggest `/soloscrum:breakdown` (only when the Issue's intent needs delivery slicing per `soloscrum-define-issue-size`; otherwise treat as a no-Subtask Issue and route to rule 3)
+5. Backlog empty → Suggest refining a new idea with `/soloscrum:refine`
 
 ## Input
 
@@ -42,12 +42,12 @@ None
 ```
 ## Next Action
 
-Recommended: /develop [subtask-id]
+Recommended: /soloscrum:develop [subtask-id]
 Reason: Priority High, SP: 2, no dependencies
 
 or
 
-Recommended: /review PR #N
+Recommended: /soloscrum:review PR #N
 Reason: There is a Subtask In Review
 ```
 

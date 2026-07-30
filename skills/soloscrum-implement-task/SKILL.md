@@ -59,7 +59,7 @@ Implements code for a develop work unit and generates a **draft** PR. The target
     - `github-only` → `soloscrum-tracker-github-transition-state`
     - `linear+github` → `soloscrum-tracker-linear-transition-state`
     Reversible per `soloscrum-define-pr-lifecycle`'s autonomy table; runs without pre-confirm. This is the creator-side `→ in-review` transition assigned to `dev` in `soloscrum-define-agent-responsibilities` (applies to both Subtask and no-Subtask Issue targets).
-11. Hand off to `/review` (which launches `soloscrum-review-implementation`). Do **not** promote the PR to ready from this skill — `gh pr ready` is owned by the review phase.
+11. Hand off to `/soloscrum:review` (which launches `soloscrum-review-implementation`). Do **not** promote the PR to ready from this skill — `gh pr ready` is owned by the review phase.
 
 ## Depends On
 

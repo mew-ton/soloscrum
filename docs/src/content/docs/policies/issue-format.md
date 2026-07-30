@@ -60,7 +60,7 @@ AC takes one of two shapes, picked per Issue:
 
 Both shapes describe a verifiable state, not a procedure. Mixing both within one Issue is allowed when the Issue legitimately spans both surfaces.
 
-A leading `<!-- soloscrum-issue-format -->` HTML comment plus a small italic footer mark the body as soloscrum-formatted, so the janitor and `/validate` can detect it cheaply.
+A leading `<!-- soloscrum-issue-format -->` HTML comment plus a small italic footer mark the body as soloscrum-formatted, so the janitor and `/soloscrum:validate` can detect it cheaply.
 
 ## Subtask body (work)
 
@@ -84,14 +84,14 @@ A Subtask's done condition is concrete: the slice lands an artefact the parent's
 
 ## When this applies
 
-- `/refine` writes parent Issues in the intent body shape.
-- `/breakdown` produces Subtasks in the lighter work body shape.
-- `/validate` checks an existing Issue against the intent body before `/breakdown` runs.
+- `/soloscrum:refine` writes parent Issues in the intent body shape.
+- `/soloscrum:breakdown` produces Subtasks in the lighter work body shape.
+- `/soloscrum:validate` checks an existing Issue against the intent body before `/soloscrum:breakdown` runs.
 - You read the body any time you triage, estimate, or pick up an Issue or Subtask.
 
 ## Companion template
 
-`templates/ISSUE_TEMPLATE.md` mirrors the four-section **intent body**. Subtasks do not use the template — they are created via `/breakdown`. Use the template in one of two ways:
+`templates/ISSUE_TEMPLATE.md` mirrors the four-section **intent body**. Subtasks do not use the template — they are created via `/soloscrum:breakdown`. Use the template in one of two ways:
 
 - Copy it into `.github/ISSUE_TEMPLATE/` so GitHub's "New Issue" UI offers it as a chooser entry.
 - Paste it manually into a fresh Issue body in the GitHub web UI.

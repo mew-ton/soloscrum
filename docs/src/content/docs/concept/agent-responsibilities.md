@@ -13,13 +13,13 @@ The authoritative ownership matrix lives in [`skills/soloscrum-define-agent-resp
 
 ### `soloscrum-po` — Product Owner
 
-PO is the entry point. It runs during `/refine` and converts a free-form idea into a structured GitHub Issue: verb-led title, Background, Goal, Acceptance Criteria, Out of Scope. PO also assigns Issue-level priority and the size-check SP — the rough estimate that decides whether the Issue enters the lifecycle or needs splitting first.
+PO is the entry point. It runs during `/soloscrum:refine` and converts a free-form idea into a structured GitHub Issue: verb-led title, Background, Goal, Acceptance Criteria, Out of Scope. PO also assigns Issue-level priority and the size-check SP — the rough estimate that decides whether the Issue enters the lifecycle or needs splitting first.
 
-PO is the only role that mutates the parent Issue's metadata after creation. PO also runs the `/refine` janitor sweep that closes parent Issues GitHub did not auto-close because the closing PR referenced sub-issues instead of the parent.
+PO is the only role that mutates the parent Issue's metadata after creation. PO also runs the `/soloscrum:refine` janitor sweep that closes parent Issues GitHub did not auto-close because the closing PR referenced sub-issues instead of the parent.
 
 ### `soloscrum-design` — Designer
 
-Design runs during `/validate` and the planning stage of `/breakdown`. It converts a validated Issue into an implementable plan: scope, dependencies, technical feasibility, and a list of subtasks with type and Checklist / slice scope ready for registration. (Subtasks do not carry their own AC — the parent Issue owns the AC and the Subtask slices its delivery; see [issue format](/policies/issue-format/).)
+Design runs during `/soloscrum:validate` and the planning stage of `/soloscrum:breakdown`. It converts a validated Issue into an implementable plan: scope, dependencies, technical feasibility, and a list of subtasks with type and Checklist / slice scope ready for registration. (Subtasks do not carry their own AC — the parent Issue owns the AC and the Subtask slices its delivery; see [issue format](/policies/issue-format/).)
 
 Design does **not** create subtask records on the tracker — that step belongs to Dev. This keeps the design pass as an idempotent thinking step, with tracker writes batched at the end.
 
@@ -27,36 +27,36 @@ Design does **not** create subtask records on the tracker — that step belongs 
 
 Dev owns implementation. It runs in two places:
 
-- **`/breakdown` registration stage** — writes the subtasks Design proposed to the tracker (SP, type label, parent link).
-- **`/develop`** — cuts a branch, writes code, commits with Conventional Commits, opens a draft PR.
+- **`/soloscrum:breakdown` registration stage** — writes the subtasks Design proposed to the tracker (SP, type label, parent link).
+- **`/soloscrum:develop`** — cuts a branch, writes code, commits with Conventional Commits, opens a draft PR.
 
 Dev also transitions a subtask from idle to `in-progress`, and from `in-progress` to `in-review` once the draft PR is open.
 
 ### `soloscrum-ui` — UI Designer
 
-UI is the design-ui counterpart of Dev. It runs during `/design-ui` and produces Figma artifacts — components, design tokens, state variants, accessibility checks — for subtasks tagged `type:design-ui`. Like Dev, UI transitions its own subtask to `in-review` when the Figma file is ready.
+UI is the design-ui counterpart of Dev. It runs during `/soloscrum:design-ui` and produces Figma artifacts — components, design tokens, state variants, accessibility checks — for subtasks tagged `type:design-ui`. Like Dev, UI transitions its own subtask to `in-review` when the Figma file is ready.
 
 UI features split into a `design-ui` subtask and a follow-up `develop` subtask. The `develop` work waits until the design subtask is reviewed.
 
 ### `soloscrum-review` — Reviewer
 
-Review is the only role allowed to mark something done. It runs during `/review`: verifies DoD and AC, runs the CodeRabbit + multi-agent review pipeline, decides each finding, and posts the verdict comment. On Pass, Review transitions the subtask to `done`, waits for CI green, and promotes the PR from draft to ready. `gh pr merge` is always the user's gate — the agent stops at "here is the merge command."
+Review is the only role allowed to mark something done. It runs during `/soloscrum:review`: verifies DoD and AC, runs the CodeRabbit + multi-agent review pipeline, decides each finding, and posts the verdict comment. On Pass, Review transitions the subtask to `done`, waits for CI green, and promotes the PR from draft to ready. `gh pr merge` is always the user's gate — the agent stops at "here is the merge command."
 
 Review is also the verifier for every other concept on the board. Any flip to a terminal status is Review's call.
 
 ## Lifecycle at a glance
 
 ```text
-/refine        po       → Issue (size-check SP, priority, AC, dependencies)
-/validate      design   → reads Issue, asks for refinement if invalid
-/breakdown     design   → proposes subtasks (type, Checklist / slice scope — Subtasks have no AC)
-               dev      → registers subtasks (SP, type label)
-/develop       dev      → branch + code + draft PR; subtask → in-review
-/design-ui     ui       → Figma + tokens + states; subtask → in-review
-/review        review   → DoD + AC + code; promote PR to ready;
+/soloscrum:refine        po       → Issue (size-check SP, priority, AC, dependencies)
+/soloscrum:validate      design   → reads Issue, asks for refinement if invalid
+/soloscrum:breakdown     design   → proposes subtasks (type, Checklist / slice scope — Subtasks have no AC)
+                         dev      → registers subtasks (SP, type label)
+/soloscrum:develop       dev      → branch + code + draft PR; subtask → in-review
+/soloscrum:design-ui     ui       → Figma + tokens + states; subtask → in-review
+/soloscrum:review        review   → DoD + AC + code; promote PR to ready;
                           subtask → done; surface merge command to user
-user           user     → runs `gh pr merge` (irreversible, user-gated)
-/refine        po       → janitor closes any parent Issues GH missed
+user                     user     → runs `gh pr merge` (irreversible, user-gated)
+/soloscrum:refine        po       → janitor closes any parent Issues GH missed
 ```
 
 ## Three rules tie this together

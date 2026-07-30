@@ -50,27 +50,27 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
 アイデア
   │
   ▼
-/refine             Issue構造化・粒度チェック・優先度・SP
+/soloscrum:refine             Issue構造化・粒度チェック・優先度・SP
   │
   ▼
-/validate           機能設計の妥当性・スコープ・依存関係の検証
+/soloscrum:validate           機能設計の妥当性・スコープ・依存関係の検証
   │
   ▼
-/breakdown          subtask分解・タイプ付与（develop / design-ui）
+/soloscrum:breakdown          subtask分解・タイプ付与（develop / design-ui）
   │
   ├─── type: develop ───────────────────────┐
   │                                         ▼
-  │                                      /develop
+  │                                      /soloscrum:develop
   │                                      コード実装・PR生成・State遷移
   │
   └─── type: design-ui ─────────────────────┐
                                             ▼
-                                         /design-ui
+                                         /soloscrum:design-ui
                                          Figma制作・トークン・パターン構築・State遷移
   │
   ▼
-/review             品質・DoD照合・SubtaskをDoneに遷移・PRをreadyに promote
-                     (Issueクローズはマージ時のGH `Closes #N` 自動クローズで発火)
+/soloscrum:review             品質・DoD照合・SubtaskをDoneに遷移・PRをreadyに promote
+                              (Issueクローズはマージ時のGH `Closes #N` 自動クローズで発火)
 ```
 
 ---
@@ -79,14 +79,22 @@ profile によって変わるのは「subtask / SP / state / dependencies の保
 
 | コマンド | 説明 |
 |---|---|
-| `/refine` | アイデアをIssueに構造化する |
-| `/validate` | 機能設計の妥当性を検証する |
-| `/breakdown` | IssueをSubtaskに分解しタイプを付与する |
-| `/develop` | develop Subtaskを実装する |
-| `/design-ui` | design-ui SubtaskをFigmaで制作する |
-| `/review` | 実装・デザインをレビューしSubtaskをDoneに遷移する（Issueクローズはマージ時に発火） |
-| `/status` | 現在の作業状況を確認する |
-| `/next` | 次にやるべきことを提示する |
+| `/soloscrum:refine` | アイデアをIssueに構造化する |
+| `/soloscrum:validate` | 機能設計の妥当性を検証する |
+| `/soloscrum:breakdown` | IssueをSubtaskに分解しタイプを付与する |
+| `/soloscrum:develop` | develop Subtaskを実装する |
+| `/soloscrum:design-ui` | design-ui SubtaskをFigmaで制作する |
+| `/soloscrum:review` | 実装・デザインをレビューしSubtaskをDoneに遷移する（Issueクローズはマージ時に発火） |
+| `/soloscrum:status` | 現在の作業状況を確認する |
+| `/soloscrum:next` | 次にやるべきことを提示する |
+
+### コマンド名前空間
+
+`soloscrum:` の部分は `.claude-plugin/plugin.json` の `name` フィールドに由来する。Claude Code はプラグインが配布するコマンドを `<plugin-name>:<command-name>` として登録するため、他のプラグインが同名のコマンドを持っていても衝突しない。
+
+`/refine` のような素の形も、そのコマンド名を要求する他のプラグインが入っていなければ解決する。ただし解決するかどうかはインストール済みプラグインの構成に依存するため、**ドキュメント・spec・ユーザーへの提示はすべて名前空間付きの `/soloscrum:<name>` を正規表記とする**。
+
+`.claude/commands/` に置かれたリポジトリローカルのコマンド（このリポジトリの `/audit` など）はプラグイン配布物ではないため名前空間が付かない。素の形が正しい表記になる。
 
 ---
 

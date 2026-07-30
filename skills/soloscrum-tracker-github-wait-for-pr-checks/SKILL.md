@@ -1,6 +1,6 @@
 ---
 name: soloscrum-tracker-github-wait-for-pr-checks
-description: "Operation: poll a GitHub PR's CI status checks until all of them complete (or until a timeout) and return their conclusions. Used by /develop and /review when the next step depends on green CI. Profile-agnostic — PRs live on GitHub regardless of tracker_profile, so both `github-only` and `linear+github` route here."
+description: "Operation: poll a GitHub PR's CI status checks until all of them complete (or until a timeout) and return their conclusions. Used by /soloscrum:develop and /soloscrum:review when the next step depends on green CI. Profile-agnostic — PRs live on GitHub regardless of tracker_profile, so both `github-only` and `linear+github` route here."
 user-invocable: false
 allowed-tools:
   - Bash(skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh:*)
@@ -76,8 +76,8 @@ The empty-rollup case (workflows have not yet registered, typical right after `g
 
 ## When to invoke
 
-- **`/develop`**: after `gh pr create --draft`, before handing off to `/review`. Lets `/develop` confirm CI started cleanly (typically only the first check or two are surfaced this early; setting a short `timeout_sec` like `300` is reasonable here).
-- **`/review`**: as part of step 6 (Pass post-verdict actions) before `gh pr ready`. The PR is about to be promoted to ready; waiting for green CI here means the user does not see a freshly-ready PR with red checks.
+- **`/soloscrum:develop`**: after `gh pr create --draft`, before handing off to `/soloscrum:review`. Lets `/soloscrum:develop` confirm CI started cleanly (typically only the first check or two are surfaced this early; setting a short `timeout_sec` like `300` is reasonable here).
+- **`/soloscrum:review`**: as part of step 6 (Pass post-verdict actions) before `gh pr ready`. The PR is about to be promoted to ready; waiting for green CI here means the user does not see a freshly-ready PR with red checks.
 - **Post-merge handoff**: not applicable — once `gh pr merge` runs, the user is in control.
 
 ## Notes
@@ -89,5 +89,5 @@ The empty-rollup case (workflows have not yet registered, typical right after `g
 
 ## Depends On
 
-- `soloscrum-define-pr-lifecycle` — the `/review` Pass-action sequence is the primary caller
+- `soloscrum-define-pr-lifecycle` — the `/soloscrum:review` Pass-action sequence is the primary caller
 - `soloscrum-define-tracker-profile` — both profiles route here, documented above

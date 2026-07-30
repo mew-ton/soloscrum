@@ -1,11 +1,11 @@
 ---
 title: code review プロセス
-description: "`/review` が CodeRabbit と multi-agent review pipeline をどう走らせるか、severity を情報扱いに留める理由、各 finding が verdict にどう収束するかを説明します。"
+description: "`/soloscrum:review` が CodeRabbit と multi-agent review pipeline をどう走らせるか、severity を情報扱いに留める理由、各 finding が verdict にどう収束するかを説明します。"
 sidebar:
   order: 4
 ---
 
-`/review` は 2 つの reviewer を並列に走らせ、その出力を 1 つの PR コメントにまとめます。どちらの reviewer から出てきた finding も、最終的に **修正する** か **理由を明記して skip する** のどちらかに収束します。「severity が低いから無視」という 3 つ目の選択肢はありません。
+`/soloscrum:review` は 2 つの reviewer を並列に走らせ、その出力を 1 つの PR コメントにまとめます。どちらの reviewer から出てきた finding も、最終的に **修正する** か **理由を明記して skip する** のどちらかに収束します。「severity が低いから無視」という 3 つ目の選択肢はありません。
 
 ## 2 つの review source
 
@@ -52,9 +52,9 @@ skip 理由として **無効** なもの:
 
 ## draft 窓のオーバーライド
 
-`code-review:code-review` command は eligibility check を持っており、draft 状態の PR を skip します。soloscrum はこの check を **意図的にバイパスします**。`/review` が走るとき PR は draft 状態にあり、それは [draft 窓](/ja/concept/pr-lifecycle/) がまさに local の quality gate を走らせるための時間枠だからです。上流の skip をそのまま尊重すると、review pipeline の半分が動かなくなります。
+`code-review:code-review` command は eligibility check を持っており、draft 状態の PR を skip します。soloscrum はこの check を **意図的にバイパスします**。`/soloscrum:review` が走るとき PR は draft 状態にあり、それは [draft 窓](/ja/concept/pr-lifecycle/) がまさに local の quality gate を走らせるための時間枠だからです。上流の skip をそのまま尊重すると、review pipeline の半分が動かなくなります。
 
-`code-review:code-review` が明示的な override 引数を提供しているなら、それを使います。それまでは、soloscrum の `/review` は draft PR を eligible として扱います。
+`code-review:code-review` が明示的な override 引数を提供しているなら、それを使います。それまでは、soloscrum の `/soloscrum:review` は draft PR を eligible として扱います。
 
 ## verdict
 

@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Story points (SP) は scope と uncertainty を表す指標で、時間ではありません。soloscrum は 1 / 2 / 3 / 5 の 4 段階スケールを使います。SP > 5 は **mis-scope の臭い**で、Issue が複数の intent を束ねている可能性が高いことを意味します — `/develop` に進む前に `/refine` で Issue を分割してください（[`issue-size`](/ja/policies/issue-size/) のとおり、大きいが一貫している単一 intent は分割せず、`/breakdown` で Subtask に切って配信します）。
+Story points (SP) は scope と uncertainty を表す指標で、時間ではありません。soloscrum は 1 / 2 / 3 / 5 の 4 段階スケールを使います。SP > 5 は **mis-scope の臭い**であって、自動的な分割条件ではありません。AC を読み直し、その Issue が複数の intent を束ねていないかを確認してください。束ねている場合は `/soloscrum:develop` に進む前に `/soloscrum:refine` で Issue を分割します。大きいが一貫している単一 intent なら Issue はそのままにし、`/soloscrum:breakdown` で Subtask に切って配信します（[`issue-size`](/ja/policies/issue-size/) のとおり）。
 
 ## スケール
 
@@ -15,15 +15,15 @@ Story points (SP) は scope と uncertainty を表す指標で、時間ではあ
 | 2  | 2-3 files / single skill area | 1 minor decision | ~100K-200K tokens, agent ~10-20 min |
 | 3  | Single subsystem cross-cut | 1-2 design decisions | ~200K-500K tokens, agent ~20-45 min |
 | 5  | Multi-subsystem cross-cut | Multiple design decisions | ~500K-1M tokens, agent ~45 min-2h |
-| >5 | (mis-scope signal) | (mis-scope signal) | 「複数 intent が束ねられている可能性が高い」サイン — `/refine` に戻して [`issue-size`](/ja/policies/issue-size/) に従い Issue 分割。分割後の各 Issue について見積もり直す |
+| >5 | (mis-scope signal) | (mis-scope signal) | 「複数 intent が束ねられている可能性が高い」サイン — `/soloscrum:refine` に戻して [`issue-size`](/ja/policies/issue-size/) に従い Issue 分割。分割後の各 Issue について見積もり直す |
 
 ## 2 段階の SP
 
 SP はライフサイクル上で 2 回登場します。
 
-**Issue SP** はサイズチェック用です。PO が `/refine` で使い、その Issue がライフサイクルに進めるサイズか、それとも [`issue-size`](/ja/policies/issue-size/) で `suggest_split` をかけるべきかを判断します。Issue SP は **どこにも保存しません** — 判断のための入力であり、レコードではありません。
+**Issue SP** はサイズチェック用です。PO が `/soloscrum:refine` で使い、その Issue がライフサイクルに進めるサイズか、それとも [`issue-size`](/ja/policies/issue-size/) で `suggest_split` をかけるべきかを判断します。Issue SP は **どこにも保存しません** — 判断のための入力であり、レコードではありません。
 
-**Subtask SP** が実際に保存される値です。Dev が `/breakdown` の中で Subtask の slice scope — [`issue-format`](/ja/policies/issue-format/) の Subtask 本文の "what" とチェックリスト項目（Subtask は AC を持ちません）— から算出し、`soloscrum-tracker-{github|linear}-set-sp` で tracker に書き込みます。バックログの計画や進捗管理にはこちらの値を使います。
+**Subtask SP** が実際に保存される値です。Dev が `/soloscrum:breakdown` の中で Subtask の slice scope — [`issue-format`](/ja/policies/issue-format/) の Subtask 本文の "what" とチェックリスト項目（Subtask は AC を持ちません）— から算出し、`soloscrum-tracker-{github|linear}-set-sp` で tracker に書き込みます。バックログの計画や進捗管理にはこちらの値を使います。
 
 ## なぜ時間ではなく scope × uncertainty なのか
 
@@ -42,7 +42,7 @@ Issue SP / Subtask SP のどちらでも同じ手順です。
 1. AC と Goal を読み、スコープを把握する — いくつのサブシステム / concern に触れるか
 2. uncertainty を測る — AC で確定していない設計判断はいくつ残っているか、新規性のある要素はあるか
 3. (scope, uncertainty) を SP テーブルにマッピングする。両軸とも満たす必要があり、迷ったら大きい方を選ぶ
-4. 5 を超えるなら mis-scope の臭い — 複数 intent を束ねている可能性が高いので、`/refine` に戻して [`issue-size`](/ja/policies/issue-size/) のとおり Issue 分割を行い、分割後の各 Issue で見積もり直す
+4. 5 を超えるなら mis-scope の臭い — 複数 intent を束ねている可能性が高いので、`/soloscrum:refine` に戻して [`issue-size`](/ja/policies/issue-size/) のとおり Issue 分割を行い、分割後の各 Issue で見積もり直す
 
 ## 参考
 

@@ -59,7 +59,7 @@ Not in scope (regardless of `--scope`):
   3. **Post-verdict actions sequence** — exact ordered step list (approve / tracker `→ done` / `gh pr ready` / merge surface)
   4. **Draft-window purpose** — auto-reviewer suppression vs self-quality-gate
   5. **Self-approve refusal handling** — verdict comment as Pass record + try-and-fall-through
-  6. **`/refine` janitor scope and trigger** — what it closes, when, with which `--reason`
+  6. **`/soloscrum:refine` janitor scope and trigger** — what it closes, when, with which `--reason`
   7. **Merge handoff** — who runs `gh pr merge` (always user)
 - For each concept, extract the prose snippet from each file that mentions it (concept index → file → snippet). If two snippets state different rules / classifications / sequences for the same concept, the pair is a finding.
 - Detection compares specific snippets against specific snippets — not free-form paraphrase. Worked example: if `soloscrum-define-pr-lifecycle` says *"`gh pr review --approve` is reversible"* and a hypothetical `agents/foo.md` says *"`gh pr review --approve` requires user confirmation,"* both snippets are extracted and the auditor flags the disagreement on the autonomy classification of that exact command.
@@ -142,13 +142,13 @@ Required substitutions per finding:
 
 Sections for rules with zero findings MUST still appear, with the finding list replaced by `(no findings)`. The Summary line totals MUST agree with the per-rule section counts.
 
-The auditor is read-only; **all fixes go through normal `/develop` cycles**. The report is the artifact, not file edits.
+The auditor is read-only; **all fixes go through the normal `/soloscrum:refine` → `/soloscrum:develop` cycle**. The report is the artifact, not file edits.
 
 ## Notes
 
 - This skill is profile-agnostic. The audit corpus is soloscrum's own docs, which are profile-independent.
 - This skill is `disable-model-invocation: true` and `user-invocable: false`. It is consumed by the `soloscrum-auditor` subagent; the user-facing entry point is the `/audit` command. (Both are tracked separately under #18's breakdown.)
-- The auditor MUST NOT edit any file. The report is the output; per-finding fixes go through `/refine` → `/develop`.
+- The auditor MUST NOT edit any file. The report is the output; per-finding fixes go through `/soloscrum:refine` → `/soloscrum:develop`.
 - When a finding repeats across multiple files (e.g. same workaround prose copied to three skills), report once with all locations listed; do not generate N separate findings.
 - **Self-applicability**: the audit corpus does not include `.claude/skills/`, `.claude/agents/`, or `.claude/commands/`, where this skill and its consumers live (see "File scope" above). The auditor never audits itself. Within the in-scope corpus, however, the same kind of false positive can arise from any spec body that legitimately quotes a heuristic phrase as an example: phrases that appear inside Markdown quotes (`*"..."*`) or fenced code blocks as illustrations of a heuristic are not findings, in any in-scope file.
 

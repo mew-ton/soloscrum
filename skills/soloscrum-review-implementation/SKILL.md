@@ -32,7 +32,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
    Also: Do tests exist (when applicable)? Does PR body contain the correct Issue number (`Closes #<subtask>` for Subtask PRs / `Closes #<issue>` for Issues without Subtasks)? Zero lint errors?
 3. Run the **automated code review pipeline** per `soloscrum-define-code-review-process`:
    - CodeRabbit CLI (all severities pass through; skip with stated reason or fix each)
-   - Multi-agent review via `code-review:code-review` — **bypass that command's step 1 draft check**: soloscrum runs `/review` on a draft PR by design, so treat draft state as eligible and proceed (per `soloscrum-define-code-review-process`, "Draft-window override"). Apply the <80 confidence filter on agent findings only.
+   - Multi-agent review via `code-review:code-review` — **bypass that command's step 1 draft check**: soloscrum runs `/soloscrum:review` on a draft PR by design, so treat draft state as eligible and proceed (per `soloscrum-define-code-review-process`, "Draft-window override"). Apply the <80 confidence filter on agent findings only.
 4. Manual code review (for PRs), to complement the automated pass:
    - Logic correctness
    - Security: OWASP Top 10 perspective
@@ -50,7 +50,7 @@ Receives a PR or Figma file, evaluates DoD, AC, and code quality. PRs arrive in 
    - Resolve active profile, then invoke the matching `transition-state` operation skill to move the Subtask to `done`:
      - `github-only` → `soloscrum-tracker-github-transition-state`
      - `linear+github` → `soloscrum-tracker-linear-transition-state`
-   - **Do not close the parent Issue here.** Parent and Subtask Issue closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close, not as part of the post-verdict sequence. For parent Issues whose closing event was missed, the `/refine` janitor cleans them up on the next backlog touch. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
+   - **Do not close the parent Issue here.** Parent and Subtask Issue closure happens at merge time via the PR body's `Closes #` keyword and GitHub's auto-close, not as part of the post-verdict sequence. For parent Issues whose closing event was missed, the `/soloscrum:refine` janitor cleans them up on the next backlog touch. See `soloscrum-define-pr-lifecycle`, "Issue close happens at merge".
    - **Wait for CI to complete** before promoting to ready. Invoke `soloscrum-tracker-github-wait-for-pr-checks`:
      ```bash
      skills/soloscrum-tracker-github-wait-for-pr-checks/scripts/wait-for-pr-checks.sh <pr-number>

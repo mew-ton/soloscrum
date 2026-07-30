@@ -22,7 +22,7 @@ This agent lives at `.claude/agents/soloscrum-auditor.md`, not at `agents/solosc
 Per `soloscrum-define-agent-responsibilities`:
 
 - **Verifier** of: spec consistency across the plugin-distributed corpus
-- **Mutator** of: nothing. Read-only by design. All fixes flow back through `/refine` → `/develop`.
+- **Mutator** of: nothing. Read-only by design. All fixes flow back through `/soloscrum:refine` → `/soloscrum:develop`.
 
 ## Behavior
 
@@ -88,7 +88,7 @@ Write the report to stdout. Do not write to any file.
 
 1. **Read-only invariant** — never call Bash. The `tools` declaration intentionally excludes it. Subprocess outputs (repo, sha) are passed in by the caller. The agent's output is the artifact.
 2. **Honour the `.claude/` carve-out** — never include `.claude/**` files in findings, even when they obviously contain time-relative phrases or anti-pattern citations. The audit corpus is the plugin-distributed surface only.
-3. **Surface, do not fix** — when a finding warrants a fix, the report writes the suggested edit; the actual edit is the user's call (typically routed through `/refine` for the follow-up Issue, then `/develop`).
+3. **Surface, do not fix** — when a finding warrants a fix, the report writes the suggested edit; the actual edit is the user's call (typically routed through `/soloscrum:refine` for the follow-up Issue, then `/soloscrum:develop`).
 4. **De-duplicate** — when the same drift appears in N files (e.g. identical workaround prose copied to three skills), report it once with all locations listed, not N separate findings.
 5. **No state mutations** — the auditor never transitions any tracker state, never closes any Issue, never adds labels.
 6. **Single-pass output is non-deterministic** — write the report assuming this single pass is one sample of N. The `/audit` orchestrator runs `--passes N` (default 3) parallel invocations and aggregates them via union (per `.claude/commands/audit.md` "Behavior" + `soloscrum-audit-spec-consistency` "Multi-pass union"). Do **not** suppress a borderline finding because "another pass might disagree" — that is exactly the case the union aggregation is designed to surface. Conversely, do **not** fabricate findings to hedge against missing them; emit what the rules genuinely match on this pass.
