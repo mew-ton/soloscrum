@@ -37,6 +37,19 @@ soloscrum の分割基準は **intent の coherence** で判断します。作�
 
 歴史的な **layer 軸**（backend / frontend）は Issue 分割の軸では**ありません**。1 機能の backend と frontend は同じ intent と同じ done を共有していて、layer で割ると断片の AC（*"user can reset password"*）が単独では成り立たなくなります。layer 軸の分割は Issue 分割ではなく `/soloscrum:breakdown` の Subtask スライスとして有効です。
 
+## 分割元 Issue はどうなるか
+
+分割は、新しい Issue が出来た時点では完了していません。**分割元**が終端状態に落ち着き、生まれた Issue すべてが分割元を指して初めて完了します。
+
+分割で生まれた各 Issue は、本文の先頭行に `Split from: #<source>` を持った状態で作成されます（[issue format](/ja/policies/issue-format/) 参照）。分割元には、先頭行が `Split into: #<a>, #<b>, ...` の告知コメントを 1 件付けます。後から分割を辿れるようにしているのはこの 2 つのマーカーです — `## Notes` の散文では辿れません。読み取れる形になっていないからです。
+
+分割元は、次の 2 つの状態のうち**ちょうど 1 つ**に落ち着きます。3 つ目の選択肢はありません。元の本文のまま open で放置すると **husk**（自分は何も持っていないのに、自分から生まれた Issue と並んで見える Issue）が出来上がります。
+
+- **close する。** AC がすべて移送済みで、分割元に他に残っているものもない場合。close は **user 判断**です — `/soloscrum:refine` は `gh issue close <source> --reason completed` を提示して止まります。分割手順も janitor も、代わりに実行することはありません。
+- **residual AC だけに絞って open のまま残す。** 一部の AC が移送されなかった場合、または分割元のコメントに、どの生成 Issue もカバーしていない指摘が残っている場合。本文を書き直して AC セクションに residue だけを残し、Background / Goal もそれに合わせて絞ります。分割元はそれ以降、residue そのものを intent とする live な Issue になります。
+
+`/soloscrum:refine` の janitor は、見つけた husk を報告します — [`/soloscrum:refine`](/ja/commands/refine/) を参照してください。
+
 ## days がキャリブレーションのみである理由
 
 `max_sp: 5` は [`story-points`](/ja/policies/story-points/) で定義される scope × uncertainty のスケールで動作します。しきい値の主要なドライバは uncertainty 軸（複数 subsystem にまたがる未解決判断の数）で、これは「実は複数 intent では？」と高い相関があります。作業量そのものは Issue 分割の駆動要因にはなりません。

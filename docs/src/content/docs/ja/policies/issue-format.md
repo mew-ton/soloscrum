@@ -62,6 +62,8 @@ AC は次の 2 つの shape のいずれかを使います（Issue ごとに選�
 
 本文の先頭には `<!-- soloscrum-issue-format -->` の HTML コメント、末尾には小さなイタリック体のフッタが付きます。これにより janitor や `/soloscrum:validate` は、その Issue が soloscrum フォーマットで書かれているかどうかを軽く判定できます。
 
+**Issue split** で生まれた Issue は、`## Background` の上に 1 行だけ `Split from: #N` を持ちます。下の「相互参照の body line」セクションを参照してください。
+
 ## Subtask 本文（作業）
 
 Subtask は親 Issue の intent を届ける作業スライスです。Background / Goal / Acceptance Criteria / Out of Scope を**持ちません** — それらは親に属します。Subtask の本文は意図的に軽くします。
@@ -81,6 +83,33 @@ Parent: #<parent-issue-number>
 ```
 
 Subtask の done 条件は具体的に定義されています — そのスライスが**親の AC が検証可能な形で依存する artefact を残す**か、あるいは**親の AC チェックリストの達成数を厳密に進める**こと（かつ退行がないこと）。親の AC に何もフィードバックしない純粋な spike / 調査 Subtask は、自身の PR が綺麗に着地しても親レベルでは done になりません。intent 単位の AC サインオフ自体は、**親 Issue の Subtask がすべて close した時点で**親 Issue 側で行います（時系列で最後にマージされた Subtask PR とは限りません — 依存順序で論理的に最後の作業がもっと早くマージされることがあります）。
+
+## 相互参照の body line
+
+他の Issue を指す body line は 3 種類あります。表す関係はそれぞれ別物で、置き換えは効きません。
+
+| Line | 意味 | 書かれる場所 |
+|---|---|---|
+| `Parent: #N` | この Subtask は Issue #N の**作業スライス**である | Subtask 本文の先頭行 |
+| `Depends on: #N` | この項目は #N が done になるまで**ブロックされている** | `## Dependencies` セクション配下 |
+| `Split from: #N` | この Issue の **intent は #N に由来する**（#N が分割され、この Issue と兄弟が生まれた） | 分割で生まれた Issue 本文の先頭行 |
+
+`Parent:` は階層、`Depends on:` は順序、`Split from:` は由来です。Issue split が生むのは子ではなく**兄弟**です — 分割で生まれた Issue は分割元の Sub-issue にはならず、分割元にブロックされることもありません。
+
+`Split from: #N` は、分割で生まれたすべての Issue に対して、作成時に `/soloscrum:refine` が本文の先頭行として書き込みます。
+
+```markdown
+<!-- soloscrum-issue-format -->
+
+Split from: #88
+
+## Background
+...
+```
+
+分割元はちょうど 1 つです。2 つの分割元が必要になる候補は、そもそも綺麗な分割の産物ではありません — それ自体を独立した intent として refine してください。GitHub は `#N` を相互リンクとしてレンダリングし、分割元側に back-reference を残します。`/soloscrum:refine` の janitor が「分割元から生まれた Issue はどれか」を辿れるのはこの back-reference があるからです。この行が記録するのは由来だけで、Sub-issue のリンクでもなければ、順序の制約を課すものでもありません。
+
+分割後に分割元 Issue がどうなるか（close するか、residual AC だけを持つ open Issue として残すか）は [issue size](/ja/policies/issue-size/) にあります。
 
 ## 適用される場面
 

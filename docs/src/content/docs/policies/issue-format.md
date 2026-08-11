@@ -62,6 +62,8 @@ Both shapes describe a verifiable state, not a procedure. Mixing both within one
 
 A leading `<!-- soloscrum-issue-format -->` HTML comment plus a small italic footer mark the body as soloscrum-formatted, so the janitor and `/soloscrum:validate` can detect it cheaply.
 
+An Issue produced by an **Issue split** carries one extra line above `## Background` — `Split from: #N`. See [Cross-reference body lines](#cross-reference-body-lines) below.
+
 ## Subtask body (work)
 
 Subtasks do not carry their own Background / Goal / Acceptance Criteria / Out of Scope — those belong to the parent. A Subtask body is intentionally light:
@@ -81,6 +83,33 @@ Parent: #<parent-issue-number>
 ```
 
 A Subtask's done condition is concrete: the slice lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions. A pure spike that does not feed back into the parent's AC is not done at the parent's level even when its own PR lands cleanly. The intent-level AC sign-off itself happens at the parent Issue when **all of its Subtasks are closed** — not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier.
+
+## Cross-reference body lines
+
+Three body lines point at another Issue. They record different relations and are not interchangeable:
+
+| Line | Meaning | Where it appears |
+|---|---|---|
+| `Parent: #N` | this Subtask is a **work slice of** Issue #N | first line of a Subtask body |
+| `Depends on: #N` | this item is **blocked by** #N until #N is done | under a `## Dependencies` section |
+| `Split from: #N` | this Issue's **intent originated in** #N, which was split into this and its siblings | first line of a split-product Issue body |
+
+`Parent:` is hierarchy, `Depends on:` is ordering, `Split from:` is origin. An Issue split produces siblings, not children — a split product is never a Sub-issue of its source, and is not blocked by it.
+
+`Split from: #N` is written on every split product at creation time by `/soloscrum:refine`, as the first line of the body:
+
+```markdown
+<!-- soloscrum-issue-format -->
+
+Split from: #88
+
+## Background
+...
+```
+
+Exactly one source Issue. A candidate that would need two sources is not a clean split product — refine it as its own intent instead. GitHub renders `#N` as a cross-link and records a back-reference on the source, which is what lets `/soloscrum:refine`'s janitor find a source's split products. The line records origin only: it is not a Sub-issue link, and it imposes no ordering.
+
+What happens to the source Issue after the split — closed, or open carrying only its residual AC — is covered in [issue size](/policies/issue-size/).
 
 ## When this applies
 

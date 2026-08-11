@@ -17,11 +17,12 @@ sidebar:
 
 ## 処理の流れ
 
-1. **バックログ janitor。** `/soloscrum:refine` は open Issue を 2 つの検出経路で走査します。**親 Issue（Sub-issue を持つもの）**については、すべての Sub-issue が close 済みなら親を close します。各 Subtask PR は `Closes #` で親を参照しない契約（[branch-commit](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md) の parent-close セクションを参照）なので、janitor が親の唯一の close 経路です。**スタンドアロン Issue（Sub-issue なし）**については、closing keyword (`Closes #N` / `Fixes #N` / `Resolves #N` など) を持つ PR が merge 済みなら close します — GH の auto-close が発火しなかった場合の safety net です。出力の 1 行目は `Closed N stale Issue(s): #X, #Y` か `No stale Issues found`、`--no-janitor` 指定時は `Janitor skipped` です。janitor は close するのみで、reopen することはありません。
-2. **アイデアの構造化。** PO agent がアイデアを読み、4 セクション構成の Issue 本文を組み立て、[priority](/ja/policies/priority/) ラベルを選び、size-check [SP](/ja/policies/story-points/) を算出します。
-3. **サイズゲート。** size-check SP が 5 を超える、または計画される `/soloscrum:breakdown` で Subtask が 5 個を超えそうな場合、`/soloscrum:refine` はこれを *mis-scope の臭い*（複数 intent を束ねている可能性が高い）と判定し、Issue を作成する前に「複数の Issue への分割」を提案します。これは `/soloscrum:breakdown` の配信スライス（1 つの一貫した intent の PR がレビュー不能になるときに発火）とは別物です。[issue size](/ja/policies/issue-size/) を参照してください。
-4. **承認。** 整形した Issue 本文をユーザに提示します。
-5. **Issue 作成。** 承認後、priority ラベルを付けた状態で GitHub Issue を作成します。
+1. **バックログ janitor。** `/soloscrum:refine` は open Issue を 3 つの検出経路で走査します。**親 Issue（Sub-issue を持つもの）**については、すべての Sub-issue が close 済みなら親を close します。各 Subtask PR は `Closes #` で親を参照しない契約（[branch-commit](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md) の parent-close セクションを参照）なので、janitor が親の唯一の close 経路です。**スタンドアロン Issue（Sub-issue なし）**については、closing keyword (`Closes #N` / `Fixes #N` / `Resolves #N` など) を持つ PR が merge 済みなら close します — GH の auto-close が発火しなかった場合の safety net です。**分割元 Issue** については、[Issue split](/ja/policies/issue-size/) で AC が他所に移された Issue には close してくれる PR が存在せず、この先も現れないため、janitor は *husk 候補* として報告します（下記）。出力の 1 行目は `Closed N stale Issue(s): #X, #Y` か `No stale Issues found`、`--no-janitor` 指定時は `Janitor skipped` です。janitor は close するのみで、reopen することはありません。
+2. **husk レポート。** husk とは、2 つの終端状態のどちらにも落ちていない分割元 Issue のことです（close もされておらず、residual AC だけに絞られてもいない）。janitor が husk として報告するのは、次がすべて成り立つときだけです — `Split from: #<this>` を宣言する Issue が 1 つ以上ある、本文に未チェックの AC が残っていない、`Split into: #…` の告知以外のコメントが残っていない。コメント側の residue は、分割告知より前に投稿されたものでも residue として数えます。したがって AC は移送済みでも未対応の指摘がコメントに残っている Issue は、close 候補ではなく `has residue — not a husk` として報告されます。**janitor が husk を close することはありません** — intent が完全に移りきったかどうかの判断は user のものなので、`gh issue close <n> --reason completed` を提示してそこで止まります。
+3. **アイデアの構造化。** PO agent がアイデアを読み、4 セクション構成の Issue 本文を組み立て、[priority](/ja/policies/priority/) ラベルを選び、size-check [SP](/ja/policies/story-points/) を算出します。
+4. **サイズゲート。** size-check SP が 5 を超える、または計画される `/soloscrum:breakdown` で Subtask が 5 個を超えそうな場合、`/soloscrum:refine` はこれを *mis-scope の臭い*（複数 intent を束ねている可能性が高い）と判定し、Issue を作成する前に「複数の Issue への分割」を提案します。これは `/soloscrum:breakdown` の配信スライス（1 つの一貫した intent の PR がレビュー不能になるときに発火）とは別物です。[issue size](/ja/policies/issue-size/) を参照してください。
+5. **承認。** 整形した Issue 本文をユーザに提示します。
+6. **Issue 作成。** 承認後、priority ラベルを付けた状態で GitHub Issue を作成します。
 
 ## 典型的な流れ
 
@@ -34,6 +35,7 @@ SP が 5 以下なら承認して Issue を作成します。authentication / em
 ## 出力
 
 - 1 行目: janitor の結果
+- 2 行目: husk レポート — `Husk candidates: #X (report-only)` か `No husk candidates`。候補ごとに、自分で実行するための `gh issue close` コマンドが続きます
 - 作成した GitHub Issue の URL
 - 適用された priority ラベル
 - size-check SP (情報用。tracker には保存されません — tracker に保存される SP は `/soloscrum:breakdown` が書き込む subtask 側の値です)
