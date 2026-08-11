@@ -37,6 +37,19 @@ When the diagnosis is *"multiple intents bundled"*, propose splitting along one 
 
 The historical **layer axis** (backend / frontend) is **not** an Issue split axis. Backend and frontend of one feature share one intent and one done; splitting along layer produces fragments whose AC (*"user can reset password"*) cannot be satisfied independently. Layer-axis splits are valid as `/soloscrum:breakdown` Subtask slices instead.
 
+## What happens to the source Issue
+
+A split is not complete when the new Issues exist. It is complete when the **source** Issue has a terminal state and every product points back at it.
+
+Each split product is created with `Split from: #<source>` as the first line of its body (see [issue format](/policies/issue-format/)), and the source gets one announcement comment whose first line is `Split into: #<a>, #<b>, ...`. Those two markers are what make a split traceable afterwards — prose in `## Notes` does not, because nothing can read it.
+
+The source then lands in exactly one of two states. There is no third outcome; leaving it open with its original body produces a **husk** — an Issue that presents as a peer of its own products while owning nothing.
+
+- **Closed.** Every AC migrated and nothing else survives on the source. Closing is **user-gated**: `/soloscrum:refine` surfaces `gh issue close <source> --reason completed` and stops. Neither the split procedure nor the janitor runs it for you.
+- **Open, reduced to its residual AC.** Some AC did not migrate, or the source's comments hold findings none of the products cover. The body is rewritten so the AC section holds only the residue, with Background and Goal narrowed to match. The source is then a live Issue whose intent *is* the residue.
+
+`/soloscrum:refine`'s janitor reports husks it finds — see [`/soloscrum:refine`](/commands/refine/).
+
 ## Why days is calibration-only
 
 `max_sp: 5` operates on the scope × uncertainty scale defined in [`story-points`](/policies/story-points/). The dominant driver of the threshold is the uncertainty axis (multiple unresolved decisions across multiple subsystems), which correlates strongly with *"are these actually multiple intents?"* Raw work volume on its own does not force an Issue split.

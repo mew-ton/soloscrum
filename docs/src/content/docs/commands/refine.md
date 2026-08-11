@@ -17,11 +17,12 @@ The argument is free text. Pass `--no-janitor` to skip the backlog sweep — use
 
 ## What happens
 
-1. **Backlog janitor.** `/soloscrum:refine` scans open Issues with two detection paths. **For parent Issues** (those with linked Sub-issues): if every Sub-issue is closed, the parent is closed. The per-Subtask PRs deliberately do not reference the parent via `Closes #` (see [branch-commit](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md)'s parent-close section), so the janitor is the only close path for parents. **For standalone Issues** (no Sub-issues): if a referencing PR with a closing keyword (`Closes #N`, `Fixes #N`, `Resolves #N`, etc.) has already merged, the Issue is closed — the safety-net case for when GH's auto-close didn't fire. The first line of output is `Closed N stale Issue(s): #X, #Y`, `No stale Issues found`, or `Janitor skipped` (with `--no-janitor`). The janitor only closes; it never reopens.
-2. **Idea structuring.** The PO agent reads your idea, extracts the four-section Issue body, picks a [priority](/policies/priority/) label, and computes a size-check [SP](/policies/story-points/).
-3. **Size gate.** If the size-check SP exceeds 5 (or a planned `/soloscrum:breakdown` would produce more than 5 Subtasks), `/soloscrum:refine` flags the Issue as a *mis-scope smell* — the Issue likely bundles multiple intents — and proposes splitting into separate Issues before creating it. This is distinct from `/soloscrum:breakdown`'s delivery slicing, which fires later when one coherent intent's PR would be unreviewable. See [issue size](/policies/issue-size/).
-4. **Confirmation.** The structured Issue body is shown to you for approval.
-5. **Issue creation.** On approval, the GitHub Issue is created with the priority label applied.
+1. **Backlog janitor.** `/soloscrum:refine` scans open Issues with three detection paths. **For parent Issues** (those with linked Sub-issues): if every Sub-issue is closed, the parent is closed. The per-Subtask PRs deliberately do not reference the parent via `Closes #` (see [branch-commit](https://github.com/mew-ton/soloscrum/blob/main/skills/soloscrum-define-branch-commit/SKILL.md)'s parent-close section), so the janitor is the only close path for parents. **For standalone Issues** (no Sub-issues): if a referencing PR with a closing keyword (`Closes #N`, `Fixes #N`, `Resolves #N`, etc.) has already merged, the Issue is closed — the safety-net case for when GH's auto-close didn't fire. **For split sources**: an Issue whose AC was migrated out by an [Issue split](/policies/issue-size/) has no closing PR and never will, so the janitor reports it as a *husk candidate* — see below. The first line of output is `Closed N stale Issue(s): #X, #Y`, `No stale Issues found`, or `Janitor skipped` (with `--no-janitor`). The janitor only closes; it never reopens.
+2. **Husk report.** A husk is a split source left in neither terminal state — not closed, and not reduced to its residual AC. The janitor reports one only when all of these hold: at least one Issue declares `Split from: #<this>`, the body has no unchecked AC left, and no comment other than the `Split into: #…` announcement survives on it. Comment-borne residue counts even when it predates the split, so an Issue whose AC migrated but whose comments still hold unaddressed findings is reported as `has residue — not a husk` rather than as a close candidate. **The janitor never closes a husk** — whether the intent fully migrated is your call, so it prints the `gh issue close <n> --reason completed` command and stops there.
+3. **Idea structuring.** The PO agent reads your idea, extracts the four-section Issue body, picks a [priority](/policies/priority/) label, and computes a size-check [SP](/policies/story-points/).
+4. **Size gate.** If the size-check SP exceeds 5 (or a planned `/soloscrum:breakdown` would produce more than 5 Subtasks), `/soloscrum:refine` flags the Issue as a *mis-scope smell* — the Issue likely bundles multiple intents — and proposes splitting into separate Issues before creating it. This is distinct from `/soloscrum:breakdown`'s delivery slicing, which fires later when one coherent intent's PR would be unreviewable. See [issue size](/policies/issue-size/).
+5. **Confirmation.** The structured Issue body is shown to you for approval.
+6. **Issue creation.** On approval, the GitHub Issue is created with the priority label applied.
 
 ## Typical flow
 
@@ -34,6 +35,7 @@ If the SP is 5 or below, you confirm and the Issue is created. If the SP comes b
 ## Output
 
 - Janitor summary on the first line.
+- Husk report on the second line — `Husk candidates: #X (report-only)` or `No husk candidates`, each candidate followed by the `gh issue close` command to run yourself.
 - Created GitHub Issue URL.
 - Priority label applied.
 - Size-check SP (informational, not registered to tracker storage — the registered SP belongs to the subtasks `/soloscrum:breakdown` writes).

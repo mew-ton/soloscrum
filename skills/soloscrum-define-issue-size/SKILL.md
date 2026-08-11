@@ -1,6 +1,6 @@
 ---
 name: soloscrum-define-issue-size
-description: "Reference: Issue and Subtask split criteria. Issues split when they bundle multiple independent intents (SP > 5 or subtask count > 5 are mis-scope smells, not hard work-volume limits). /soloscrum:breakdown fires when delivering one intent as a single PR would be unreviewable. Defines the suggest_split action."
+description: "Reference: Issue and Subtask split criteria. Issues split when they bundle multiple independent intents (SP > 5 or subtask count > 5 are mis-scope smells, not hard work-volume limits). /soloscrum:breakdown fires when delivering one intent as a single PR would be unreviewable. Defines the suggest_split action, including the source Issue's terminal disposition after a split."
 user-invocable: false
 ---
 
@@ -65,6 +65,31 @@ The historical **layer axis** (backend / frontend) is **not** an Issue split axi
 1. Present split proposals along the axes above. Each candidate split is itself a candidate Issue — confirm it can carry its own Background / Goal / AC / Out of Scope per `soloscrum-define-issue-format` (apply the Issue-vs-Subtask discriminator's two conditions: self-contained checkable outcome + not-merely-a-slice).
 2. Confirm each split Issue falls within thresholds.
 3. Obtain user approval before creating split Issues.
+4. Create each split product with **`Split from: #<source>` as the first line of its body**, per `soloscrum-define-issue-format`'s Cross-reference body lines. This is the only machine-readable record of where the intent came from — prose in `## Notes` does not satisfy it.
+5. Post one **split-announcement comment** on the source Issue. Its first line is exactly:
+
+   ```
+   Split into: #<a>, #<b>, ...
+   ```
+
+   followed by which AC each product took. That first line is what makes the announcement recognisable to `/soloscrum:refine`'s husk detection, which treats every *other* comment on the source as surviving residue.
+6. Settle the **source Issue's terminal disposition**. Exactly one of two branches applies — see below.
+
+### Terminal disposition of the source Issue
+
+A split is not complete until the source lands in one of these two states. There is **no third outcome**: leaving the source open with its original body is the husk defect this Procedure exists to prevent — an Issue that presents as a peer of its own products while owning nothing.
+
+- **Branch A — source closed.** Every AC migrated into split products, and nothing else survives on the source (no findings or follow-ups recorded in its comments). The source carries no remaining intent. **Closing is user-gated**: surface the exact command and stop.
+
+  ```bash
+  gh issue close <source> --reason completed
+  ```
+
+  Never run it autonomously — the judgment "the intent fully migrated" is the user's, and `/soloscrum:refine`'s janitor likewise only reports these (see `commands/refine.md`).
+
+- **Branch B — source stays open, reduced to its residual AC.** Some AC did not migrate, or the source's comments hold findings none of the products cover. Edit the source body so its `## Acceptance Criteria` holds only the residue, with Background / Goal narrowed to match, and fold the surviving comment-borne items into that AC. The source is then a live Issue whose intent *is* the residue — not a husk.
+
+Choosing Branch B for convenience while leaving the full original body in place is Branch-none, i.e. the defect.
 
 ## Notes
 

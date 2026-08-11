@@ -1,6 +1,6 @@
 ---
 name: refine
-description: Structures an idea into a GitHub Issue. Runs a backlog janitor first (closes stale Issues whose closing PR has merged), then checks size, suggests splitting when too large, determines priority and SP, and creates the Issue after confirmation.
+description: Structures an idea into a GitHub Issue. Runs a backlog janitor first (closes stale Issues whose closing PR has merged, and reports split-source husks without closing them), then checks size, suggests splitting when too large, determines priority and SP, and creates the Issue after confirmation.
 argument-hint: <idea or feature description> [--no-janitor]
 disable-model-invocation: true
 allowed-tools:
@@ -24,10 +24,10 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 
 ## Behavior
 
-1. **Backlog janitor** — close open Issues that should be closed but aren't. Two detection paths run together: (a) **parent Issues whose Sub-issue tree is fully closed** (per `soloscrum-define-branch-commit`'s parent-close contract, per-Subtask PRs do not reference the parent via `Closes #`, so the parent has no closing PR of its own — the janitor is the only close path for parents), and (b) **standalone Issues** (no Sub-issues) whose direct closing PR merged without GH's auto-close firing (the original safety-net case). Skipped when `--no-janitor` appears in `$ARGUMENTS`.
+1. **Backlog janitor** — close open Issues that should be closed but aren't, and report the ones only the user can decide about. Three detection paths run together: (a) **parent Issues whose Sub-issue tree is fully closed** (per `soloscrum-define-branch-commit`'s parent-close contract, per-Subtask PRs do not reference the parent via `Closes #`, so the parent has no closing PR of its own — the janitor is the only close path for parents), (b) **standalone Issues** (no Sub-issues) whose direct closing PR merged without GH's auto-close firing (the original safety-net case), and (c) **split-source husks** — sources of a completed Issue split that were never given a terminal disposition. Paths (a) and (b) close; path (c) **only reports**. Skipped when `--no-janitor` appears in `$ARGUMENTS`.
    - Resolve active tracker profile via `soloscrum-define-tracker-profile`.
    - **`github-only`**: scan open Issues; for each:
-     - **If the Issue has linked Sub-issues** (predicate: `subIssuesSummary.total > 0`), check whether **all** linked Sub-issues are closed. If so, close the parent with reason `completed`. Sub-issue data is only accessible via GraphQL — the `gh` CLI does not expose `subIssues` or `subIssuesSummary` through `gh issue view --json`. The GitHub sub-issues feature also requires the `GraphQL-Features: sub_issues` request header. Prefer the `subIssuesSummary` aggregate over paginating individual nodes:
+     - **Fetch the Issue's janitor data in one GraphQL call.** All three detection paths read from this single per-Issue query — path (c) adds fields to it and introduces **no additional per-Issue round trip**. Sub-issue data is only accessible via GraphQL (the `gh` CLI does not expose `subIssues` or `subIssuesSummary` through `gh issue view --json`) and requires the `GraphQL-Features: sub_issues` request header. Prefer the `subIssuesSummary` aggregate over paginating individual nodes:
 
        ```bash
        gh api graphql \
@@ -37,10 +37,23 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
              repository(owner: $owner, name: $repo) {
                issue(number: $number) {
                  subIssuesSummary { total completed percentCompleted }
+                 body
+                 comments(first: 100) { totalCount nodes { body } }
+                 timelineItems(first: 100, itemTypes: [CROSS_REFERENCED_EVENT]) {
+                   nodes {
+                     ... on CrossReferencedEvent {
+                       source { ... on Issue { number state body } }
+                     }
+                   }
+                 }
                }
              }
            }' -F owner=<owner> -F repo=<repo> -F number=<n>
        ```
+
+       Fields beyond `subIssuesSummary` exist for path (c): `body` supplies the AC-residue check, `comments` the comment-residue check, and `timelineItems` the split products — the nested `source { ... on Issue { body } }` is what makes "which Issues declare `Split from: #<this>`?" answerable without a second query per Issue.
+
+     - **If the Issue has linked Sub-issues** (predicate: `subIssuesSummary.total > 0`), check whether **all** linked Sub-issues are closed. If so, close the parent with reason `completed`.
 
        Close eligibility is `subIssuesSummary.total > 0 AND subIssuesSummary.total == subIssuesSummary.completed`. When per-Subtask detail is needed (e.g. surface which Subtasks are still open in the janitor's diagnostic output), fall back to `subIssues(first: 100) { nodes { number state } }` under the same header. The PR-keyword detection below does **not** apply to parent Issues — the contract guarantees their `closedByPullRequestsReferences` is empty.
 
@@ -48,9 +61,30 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 
        **Nested Sub-issue trees** (3+ levels): this check is one-level (only direct children of the scanned Issue). Deeper trees converge over successive `/soloscrum:refine` runs — each sweep closes one nesting level whose direct children are all closed, and the next sweep can then close its parent. Explicit recursion is unnecessary because the next `/soloscrum:refine` invocation re-scans.
      - **Otherwise** (standalone Issue, `subIssuesSummary.total == 0`), find PRs that reference it via any GitHub closing keyword (`close` / `closes` / `closed` / `fix` / `fixes` / `fixed` / `resolve` / `resolves` / `resolved`) in the PR body or merging commit; if any such PR is **MERGED**, close the Issue with reason `completed`. Use `gh issue view <n> --json closedByPullRequestsReferences` (or equivalent timeline query) for the linked-PR set — `closedByPullRequestsReferences` already encodes GitHub's server-side closing-keyword resolution, so the keyword list above is the contract GitHub honours, not a client-side regex the janitor needs to re-run; treat any merged PR present in that field as a positive match.
+     - **Husk detection (path (c), report-only)** — for standalone Issues that path (b) did **not** close. A completed Issue split leaves the source in one of two terminal states per `soloscrum-define-issue-size` (closed, or open carrying only its residual AC); a **husk** is a source stuck in neither. Report an Issue as a **husk candidate** only when **all five** hold, computed from the single query above:
+
+       1. `subIssuesSummary.total == 0` — path (a) owns Sub-issue trees.
+       2. Path (b) did not fire (no MERGED PR in its linked-PR set) — otherwise the Issue is already closed.
+       3. **Split products exist**: at least one `timelineItems` cross-reference whose `source` is an Issue whose `body` contains `Split from: #<this>`.
+       4. **No AC residue**: the Issue's own `body` has zero unchecked `- [ ]` items under `## Acceptance Criteria`.
+       5. **No comment residue**: every comment in `comments.nodes` is a split announcement — first line matching `Split into: #…`. Any other comment counts as surviving residue, regardless of when it was posted (residue routinely predates the split announcement).
+
+       When conditions 1-3 hold but 4 or 5 fails, the Issue is **not** a husk — report why rather than staying silent, since a source that still owns something is a live Issue, not a backlog problem:
+
+       ```text
+       Husk candidate: #88 — AC migrated to #105, #106, #107, #108; no residue.
+         Close with: gh issue close 88 --reason completed
+       #88 — has residue (2 comment(s) outside the split announcement); not a husk
+       #80 — 3 unchecked AC remain; live Issue with residual AC, not a husk
+       ```
+
+       **The janitor never closes a husk candidate.** Whether the intent fully migrated is a judgment the user makes; the janitor's job is to surface the candidate and the exact `gh issue close <n> --reason completed` command, then stop. This is the one janitor path that emits a command instead of running it.
+
+       **Truncation is conservative.** If `comments.totalCount > 100`, or the `timelineItems` page came back full (100 nodes), the janitor cannot see the whole picture — report the Issue as `has residue — not a husk` rather than as a candidate. Under-reporting a husk costs one stale Issue; over-reporting one invites a wrong close.
+
    - **`linear+github`**: skip — Linear's native sync auto-manages parent close (per `soloscrum-tracker-linear-transition-state`), so a janitor sweep on the GH side would dual-update.
-   - Surface the result at the start of `/soloscrum:refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`).
-   - **Always use `gh issue close --reason completed`.** Janitor never closes with `--reason not-planned` — that is a deliberate human decision. Janitor never reopens already-closed Issues.
+   - Surface the result at the start of `/soloscrum:refine` output: `Closed N stale Issue(s): #X, #Y` (or `No stale Issues found`), then the husk report — `Husk candidates: #X (report-only)` (or `No husk candidates`) followed by the per-Issue lines from path (c).
+   - **Always use `gh issue close --reason completed`.** Janitor never closes with `--reason not-planned` — that is a deliberate human decision. Janitor never reopens already-closed Issues, and never closes a path (c) husk candidate at all.
    - **Janitor failures MUST NOT block `/soloscrum:refine`**. If the scan errors (network, permission), log a one-line notice and proceed to the structuring step. The user can re-run with `--no-janitor` to bypass entirely on a flaky environment.
 2. Receive idea or request from user (`$ARGUMENTS`)
 3. Launch `soloscrum-po` to:
@@ -69,6 +103,8 @@ Structure an idea into a GitHub Issue, after sweeping stale-open Issues whose cl
 
 The janitor exists because Issue close happens at merge time (per `soloscrum-define-pr-lifecycle`, "Issue close happens at merge"), but GitHub's auto-close only fires on the directly-referenced Issue. Two cases need the janitor: (1) **parent Issues** in a sub-issue tree — `soloscrum-define-branch-commit`'s parent-close contract deliberately forbids per-Subtask PRs from including `Closes #<parent>` (to avoid premature close on the first Subtask merge), so the parent has no closing PR of its own; the janitor's parent-detection path catches parents whose Sub-issue tree is fully closed. (2) **standalone Issues** whose direct PR merged without GH's auto-close firing — the janitor's standalone-detection path is the safety net.
 
+The husk path exists for a third case with a different character: an Issue split moved the intent elsewhere, so no PR will ever close the source. It **reports** instead of closing because its evidence is weaker in kind. Paths (a) and (b) act on machine-checkable facts — a fully-closed Sub-issue tree, a merged closing PR. "Did the intent fully migrate out of this Issue?" is an inference from body and comment shape, and an inference does not get to close anything. The husk report is also why `soloscrum-define-issue-size` requires `Split from: #N` on every split product and a `Split into: #…` announcement on the source: without those two markers the janitor has nothing to read, and split sources go back to accumulating silently.
+
 ## Input
 
 - Idea or request text (free form)
@@ -77,6 +113,7 @@ The janitor exists because Issue close happens at merge time (per `soloscrum-def
 ## Output
 
 - Janitor summary (first line): `Closed N stale Issue(s): #X, #Y` or `No stale Issues found` (or `Janitor skipped` when `--no-janitor` was set)
+- Husk report (second line): `Husk candidates: #X (report-only)` or `No husk candidates`, each candidate followed by the `gh issue close <n> --reason completed` command for the user to run; non-husk split sources are listed with the reason they were not reported (`has residue` / `residual AC`)
 - Created GitHub Issue URL
 - Configured priority label
 - Issue-level SP (size-check value only; for routing decisions like splitting)

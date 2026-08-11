@@ -66,6 +66,8 @@ The four sections below are the **intent body** — the durable record described
 [Supplementary info, reference links, design mock links, etc. (optional)]
 ```
 
+An Issue produced by an **Issue split** carries one extra line above `## Background` — `Split from: #N`. See `## Cross-reference body lines` below for its placement and format.
+
 ## AC Writing Guide
 
 Acceptance Criteria describe the **outcome that holds when the Issue's intent is satisfied** — not the steps to make it true. Two shapes are allowed; pick whichever fits the Issue.
@@ -119,6 +121,39 @@ Parent: #<parent-issue-number>
 A Subtask's done condition is concrete: the slice **lands an artefact the parent's AC verifiably depends on, or strictly advances the parent's AC checklist count, without regressions**. A pure spike or research Subtask whose output does not feed back into the parent's AC is not done at the parent's level even if its own PR lands cleanly — promote such work into its own Issue, or restate its outcome as an artefact the parent AC depends on.
 
 The intent-level AC sign-off itself happens at the **parent Issue** when **all of its Subtasks are closed** — which is not necessarily the chronologically last Subtask PR, since dependency ordering can put logically-last work earlier. See `soloscrum-define-dod` (the "AC verification" section) and `commands/review.md` for how that split is enforced in review.
+
+## Cross-reference body lines
+
+Three body lines point at another Issue. They record **different relations** and are not interchangeable:
+
+| Line | Meaning | Where it appears |
+|---|---|---|
+| `Parent: #N` | this Subtask is a **work slice of** Issue #N | first line of a Subtask body (see `## Subtask Body (work)`) |
+| `Depends on: #N` | this item is **blocked by** #N until #N is done | under a `## Dependencies` section, written by `soloscrum-tracker-github-add-dependency` |
+| `Split from: #N` | this Issue's **intent originated in** #N, which was split into this and its siblings | first line of a split-product Issue body (below) |
+
+`Parent:` is hierarchy, `Depends on:` is ordering, `Split from:` is origin. An Issue split produces siblings, not children — a split product is never a Sub-issue of its source, and is not blocked by it.
+
+### `Split from: #N`
+
+Written on every Issue produced by an Issue split, at creation time, by `/soloscrum:refine`'s `suggest_split` procedure (see `soloscrum-define-issue-size`).
+
+- **Placement** — the first line of the body: after the `<!-- soloscrum-issue-format -->` marker, then a blank line, then `## Background`.
+
+  ```markdown
+  <!-- soloscrum-issue-format -->
+
+  Split from: #88
+
+  ## Background
+  ...
+  ```
+
+- **Format** — `Split from: #<n>`, exactly one source Issue. A candidate that would need two sources is not a clean split product; refine it as its own intent instead.
+- **Rendering** — GitHub renders `#N` as a cross-link and records a back-reference on the source Issue. That back-reference is what lets `/soloscrum:refine`'s janitor see a source's split products, so the line is the machine-readable half of the split contract, not decoration.
+- **Not** a Sub-issue link and **not** a dependency — it records origin only, and imposes no ordering.
+
+The source Issue's own end state after the split (closed, or open carrying only its residual AC) is specified in `soloscrum-define-issue-size`'s `suggest_split` Procedure.
 
 ## Companion files
 
